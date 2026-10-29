@@ -12,13 +12,11 @@
 const http = require('node:http');
 const fs = require('node:fs');
 const path = require('node:path');
-const { TMStore } = require('./tm-store.cjs');
 const { ImageCache } = require('./image-cache.cjs');
 const { NotebookLMClient, findMcpExecutable } = require('./notebooklm-client.cjs');
 const { buildReviewSummary, computeQueueCounts } = require('./review-summary.cjs');
 const { JobManager, JobConflictError, JobStoreUnhealthyError } = require('./jobs.cjs');
 const { describeModes, resolveModes } = require('./local-config.cjs');
-// tm-store.cjs가 같은 모듈을 먼저 불러오므로 여기서 따로 감싸 둘 이유가 없다.
 const { RepositoryImages } = require('./repository-images.cjs');
 
 const PREVIEW_ROOT = path.resolve(__dirname, '../preview');
@@ -370,7 +368,6 @@ function createServer(options = {}) {
   const jobsDir = options.jobsDir || (syntheticMode
     ? path.resolve(__dirname, '../preview/_synthetic_jobs')
     : path.resolve(__dirname, '../preview/_jobs'));
-  const tmStore = options.tmStore || new TMStore({ root: options.tmRoot || (syntheticMode ? path.join(jobsDir, 'teachable') : process.env.VISION_TM_ROOT), repositoryImagesRoot: repoImagesRoot, log: options.log, resolveRecord: id => imageCache.record(id, () => callGas('get_record', {record_id:id})) });
 
   const gasUrl = options.gasUrl || process.env.GAS_WEBAPP_URL || '';
   const imageCache = new ImageCache({root:options.imageCacheRoot || (syntheticMode ? path.join(jobsDir,'image-cache') : path.resolve(__dirname,'../scratch/image-cache')),validate:validateImageMagicBytes});
@@ -857,7 +854,6 @@ function createServer(options = {}) {
       };
 
       try {
-        if (await tmStore.handle(req, res, pathname, readBody)) return;
         // GET /api/health
         if (pathname === '/api/health' && req.method === 'GET') {
           // 꺼진 NotebookLM은 MCP 서버를 띄우지 않는다.
@@ -869,7 +865,7 @@ function createServer(options = {}) {
             synthetic_mode: syntheticMode,
             gas_configured: Boolean(gasUrl),
             mcp_status: mcpStatus,
-            modes: { storage: modes.storage, gemini: modes.gemini, notebooklm: modes.notebooklm, teachable_machine: 'browser' },
+            modes: { storage: modes.storage, gemini: modes.gemini, notebooklm: modes.notebooklm },
             integration_status: describeModes(modes, geminiModels)
           });
         }
@@ -1131,7 +1127,7 @@ function createServer(options = {}) {
           }
           imageCache.rememberRecord(recordId,recRes);
           const reviewSummary = recRes.review_summary || recRes.record.review_summary || buildReviewSummary(recRes.record, recRes.ai_draft ? [recRes.ai_draft] : [], recRes.evidence_check ? [recRes.evidence_check] : [], recRes.final_review ? [recRes.final_review] : [], recRes.actions || []);
-          return sendJson({ ...recRes, review_summary: reviewSummary, tm_predictions: tmStore.predictions(recordId), evidence_by_standard: evidenceByStandard(recordId, recRes.evidence_check) }, 200);
+          return sendJson({ ...recRes, review_summary: reviewSummary, evidence_by_standard: evidenceByStandard(recordId, recRes.evidence_check) }, 200);
         }
 
         // PATCH /api/records/:id - 사건 정보 수정 (화이트리스트, 멱등성, 버전 증가)
@@ -1307,21 +1303,19 @@ function createServer(options = {}) {
           const currentRecord = recRes.record;
           const aiDraft = recRes.ai_draft;
           const currentVersion = Number(currentRecord.version) || 1;
-          const appliedTM = tmStore.active()[currentRecord.category];
-          const tmPredictions = tmStore.predictions(recordId).filter(p => p.record_version === currentVersion && p.model_id === appliedTM?.id);
           const freshDraft = aiDraft && (Number(aiDraft.input_version) || 1) === currentVersion ? aiDraft : null;
 
           // AI 관찰 부재 및 stale 검증 정책
-          if (!aiDraft && !tmPredictions.length) {
+          if (!aiDraft) {
             return sendJson({
               success: false,
               error_code: 'AI_DRAFT_REQUIRED',
-              error: '현재 사건의 모델 분류 또는 Gemini 설명을 먼저 준비해 주세요.'
+              error: '현재 사건의 Gemini 설명을 먼저 준비해 주세요.'
             }, 400);
           }
 
           const draftVersion = Number(aiDraft?.input_version) || 1;
-          if (aiDraft && !freshDraft && !tmPredictions.length) {
+          if (!freshDraft) {
             return sendJson({
               success: false,
               error_code: 'AI_DRAFT_STALE',
@@ -1338,7 +1332,6 @@ function createServer(options = {}) {
           const observationParts = [
             `장소: ${currentRecord.location || '미지정'}`,
             currentRecord.memo ? `사용자 메모: ${currentRecord.memo}` : '',
-            ...tmPredictions.map(p => { const top = [...p.scores].sort((a,b)=>b.probability-a.probability)[0]; return `사진 ${p.image_index+1} TM 모델 v${p.model_number} 예측: ${top.className} (모델 점수 ${(top.probability*100).toFixed(1)}%, 관찰 사실·위험 확정이 아님)`; }),
             freshDraft?.suspected_risk ? `Gemini 의심 위험: ${freshDraft.suspected_risk}` : '',
             freshDraft?.facts ? `Gemini 관찰 초안: ${freshDraft.facts}` : '',
             freshDraft?.locations ? `위치: ${freshDraft.locations}` : '',
@@ -1353,8 +1346,6 @@ function createServer(options = {}) {
             version: currentVersion,
             updated_at: currentRecord.updated_at || currentRecord.created_at,
             standard_id: standardId,
-            tm_model_id: appliedTM?.id || null,
-            tm_prediction_ids: tmPredictions.map(p=>p.id),
             query: fullQuery
           };
 
@@ -1381,7 +1372,7 @@ function createServer(options = {}) {
                   query: fullQuery,
                   facts: freshDraft?.facts || observationParts,
                   locations: freshDraft?.locations || currentRecord.location || '',
-                  uncertainty: freshDraft?.uncertainty || '모델 예측은 현장 사실 확정이 아닙니다.',
+                  uncertainty: freshDraft.uncertainty || '',
                   synthetic: mockNotebook,
                   test_external_source: payload.test_external_source,
                   test_no_citation: payload.test_no_citation

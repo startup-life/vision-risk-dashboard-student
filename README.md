@@ -3,13 +3,12 @@
 가상 물류창고의 택배 발송·산업안전 상황을 사진으로 확인하고, 판단과 조치를 기록하는 현장 대시보드다.
 사진과 검사 기준을 살펴본 뒤 사람이 최종 판단을 남긴다.
 
-사건 상세는 다섯 단계로 진행한다.
+사건 상세는 네 단계로 진행한다.
 
 1. 사진
 2. AI 사진 설명 (Gemini)
-3. 모델 예측 (Teachable Machine)
-4. 관련 기준 확인 (NotebookLM)
-5. 내 판단 남기기
+3. 관련 기준 확인 (NotebookLM)
+4. 내 판단 남기기
 
 위험을 확인했다면 판단을 남긴 뒤 조치 기록으로 이어 간다.
 AI 결과는 참고 자료다. 발송 승인이나 안전 인증을 대신하지 않는다.
@@ -59,11 +58,9 @@ cd vision-risk-dashboard-student
 
 ```sh
 npm ci
-npm run setup:tm
 ```
 
-- `npm ci`는 `package-lock.json`에 적힌 버전 그대로 라이브러리를 설치한다.
-- `setup:tm`은 Teachable Machine 학습에 쓰는 공개 기초 모델(MobileNet v2)과 브라우저 라이브러리를 한 번 내려받는다. `courses/vision-96h-v2/preview/vendor/tm-v2/model.json`이 생기면 받은 것이다.
+`npm ci`는 `package-lock.json`에 적힌 버전 그대로 라이브러리를 설치한다.
 
 ## 3. 연결 설정 파일 만들기
 
@@ -103,7 +100,7 @@ npm start
 ```
 
 - 브라우저에서 `http://127.0.0.1:8765`를 연다.
-- 터미널에 `연동 상태: 저장소 로컬 저장 · Gemini mock · NotebookLM mock · Teachable Machine 브라우저`처럼 지금 쓰는 조합이 나온다.
+- 터미널에 `연동 상태: 저장소 로컬 저장 · Gemini mock · NotebookLM mock`처럼 지금 쓰는 조합이 나온다.
 - 이때 사건 기록은 이 PC의 로컬 파일에 저장되고, Gemini와 NotebookLM은 예시 결과(`mock`)를 돌려준다.
 - 끌 때는 서버를 띄운 터미널에서 `Ctrl+C`를 누른다.
 - 다른 프로그램이 이미 8765 포트를 쓰고 있으면 서버가 시작하지 않는다. 그 프로그램(다른 창에 띄운 대시보드 등)을 끈 뒤 다시 실행한다.
@@ -111,7 +108,6 @@ npm start
 ## 5. 외부 연결 켜기
 
 저장소·Gemini·NotebookLM은 설정 파일의 스위치로 하나씩 실제 연결(`live`), 모의 결과(`mock`), 끄기(`off`)로 정한다.
-Teachable Machine은 브라우저 안에서 돌아가므로 스위치가 없다.
 
 | 스위치 | 값 | 비워 두면 |
 | --- | --- | --- |
@@ -162,20 +158,6 @@ GAS 없이 NotebookLM만 실제로 써 보려면 `STORAGE_MODE=mock`, `GEMINI_MO
 웹앱 주소를 아는 사람은 누구나 이 시트의 기록을 읽고 쓸 수 있다. 화면을 공유하는 중에는 `gas:deploy`·`gas:redeploy`·`gas:open`을 실행하지 않는다.
 각 단계의 화면과 오류 안내는 [로컬 실행 준비 1~3절](docs/LOCAL-SETUP.md#1-gas-웹앱-배포)에 있다. `Code.gs`를 고친 뒤에는 `npm run gas:push`, `npm run gas:redeploy`, `npm run gas:init` 순서로 다시 배포한다(주소는 그대로다).
 
-### Teachable Machine (모델 예측)
-
-학습과 예측은 브라우저 안에서 돌아가고, 학습한 모델은 로컬 서버가 이 PC에 저장한다. 2절의 `npm run setup:tm`과 사진 저장소가 있으면 된다.
-
-1. 홈의 **모델 학습**에서 품질 또는 산업안전 프로젝트를 만든다.
-2. **제공 Train 사진 분류**와 **제공 Val 사진 분류**에서 제공 사진을 한 장씩 보고 확인 기준과 대조해 유형을 고른다. 제공 사진에는 유형이 정해져 있지 않다.
-3. 유형마다 Train 사진이 2장 이상, Val 사진이 1장 이상이면 학습할 수 있다. 학습한 버전을 저장하고 적용한다.
-4. 적용한 모델이 있으면 사건 상세를 열 때 사진별 모델 예측이 실행된다.
-
-- 학습하는 동안 대시보드 탭을 앞에 띄워 둔다. 다른 탭이나 창이 앞에 있으면 브라우저가 학습을 늦출 수 있다. 대시보드 안에서 다른 화면으로 옮겨도 학습은 이어지지만, 새로고침하거나 브라우저를 닫으면 중단된다.
-- 검증 정확도의 정답은 내가 고른 유형이다. 분류가 기준과 다르면 정확도도 그만큼 달라진다.
-- 예측은 사진 한 장의 대표 유형이다. 위치 탐지나 안전 인증이 아니므로 점수를 안전 판단 기준으로 쓰지 않는다.
-- 프로젝트는 **백업·가져오기**에서 JSON 파일로 백업하고 다른 PC에서 복원할 수 있다. 공식 Teachable Machine에서 내보낸 모델(`model.json`, `metadata.json`, `weights.bin`)도 가져올 수 있다.
-
 ## 이 PC에 생기는 파일
 
 아래 파일은 모두 Git이 추적하지 않는다. 지우면 그 기록이 없어진다.
@@ -185,15 +167,13 @@ GAS 없이 NotebookLM만 실제로 써 보려면 `STORAGE_MODE=mock`, `GEMINI_MO
 | `config/local-connection.json` | 연결 설정과 API 키 |
 | `courses/vision-96h-v2/preview/_synthetic_store.json`, `_synthetic_store_images/` | 로컬 저장(`STORAGE_MODE=mock`)의 사건 기록과 사진 |
 | `courses/vision-96h-v2/preview/_jobs/`, `_synthetic_jobs/` | AI 판독·기준 확인 작업 기록 |
-| `courses/vision-96h-v2/scratch/teachable/` | 학습 프로젝트와 모델 버전(설정의 `VISION_TM_ROOT`로 바꿀 수 있다) |
 | `courses/vision-96h-v2/scratch/image-cache/` | Google Drive에서 받은 사건 사진 캐시 |
-| `courses/vision-96h-v2/preview/vendor/` | `setup:tm`이 받은 기초 모델과 라이브러리 |
 | `.clasp.json` | 내 GAS 프로젝트 ID |
 
 ## 폴더 구조
 
 - `courses/vision-96h-v2/preview/`: 브라우저 화면, 검사 기준(`standards.json`, `factory-criteria-v1.txt`)
-- `courses/vision-96h-v2/tools/`: 로컬 Node 서버, Teachable Machine·NotebookLM 연결, GAS 배포 명령
+- `courses/vision-96h-v2/tools/`: 로컬 Node 서버, NotebookLM 연결, GAS 배포 명령
 - `courses/vision-96h-v2/gas/`: Google Sheets·Drive 저장과 Gemini 호출(Apps Script)
 - `config/`: 연결 설정 예시 파일
 - `docs/LOCAL-SETUP.md`: 외부 연결 준비의 자세한 안내

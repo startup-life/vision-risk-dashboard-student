@@ -977,7 +977,6 @@
     if (raw === 'records') {
       return { page: 'records', params };
     }
-    if (raw === 'training') return { page: 'training', params };
     if (raw === 'records/new') {
       return { page: 'records_new', params };
     }
@@ -1004,7 +1003,7 @@
 
   // API 호출 유틸리티
   let activeApiRequests = 0;
-  // fetch가 서버에 닿지 못하면(서버가 꺼졌을 때) 브라우저의 영어 원문(Failed to fetch) 대신 보여 줄 안내. tm-client.js에도 같은 문구가 있다.
+  // fetch가 서버에 닿지 못하면(서버가 꺼졌을 때) 브라우저의 영어 원문(Failed to fetch) 대신 보여 줄 안내.
   const SERVER_UNREACHABLE = '로컬 서버에 연결하지 못했습니다. 터미널에서 npm.cmd start(macOS: npm start)가 켜져 있는지 확인하세요.';
   async function api(path, options = {}) {
     activeApiRequests++;
@@ -1105,7 +1104,7 @@
     setTimeout(tickElapsed, 1000);
     const updateDataPage = () => {
       const page = parseRoute().page;
-      // 배경 조회 완료로 사용자가 작성 중인 폼이나 학습 화면을 교체하지 않는다. 그 화면은 머리말 연결 표시만 바꾼다.
+      // 배경 조회 완료로 사용자가 작성 중인 폼을 교체하지 않는다. 그 화면은 머리말 연결 표시만 바꾼다.
       if (['dashboard', 'records', 'record_detail', 'models'].includes(page)) render();
       else renderConnectionBadge();
     };
@@ -1180,13 +1179,11 @@
 
   // 화면 렌더러 정의
   const screens = {
-    training: () => '<div id="tm-training" class="tm-training"><h1>모델 학습</h1><p role="status">학습 프로젝트를 불러오고 있어요.</p><section><h2>1. 사진 준비</h2><p class="meta">학습·검증 사진</p></section><section><h2>2. 학습·검증</h2></section><section><h2>3. 모델 비교·적용</h2></section></div>',
     // 1. 홈 (현장 리스크 확인) - 큐 중심 사진 카드와 3개 필터 집계 버튼
     dashboard: () => {
       const topActions = `
         <a class="button primary" href="#records/new">사진 등록</a>
         <a class="button" href="#records">전체 사건</a>
-        <a class="button" href="#training">모델 학습</a><span id="tm-home-status" class="meta"></span>
       `;
 
       // 3개 큐 카운트 (미배포 GAS 등으로 불완전한 경우 '—' 표시)
@@ -1939,8 +1936,7 @@
     const items = [
       ['저장소 ' + (modes.storage === 'mock' ? '로컬 저장' : 'Google 시트'), modes.storage],
       ['Gemini ' + label(modes.gemini), modes.gemini],
-      ['NotebookLM ' + label(modes.notebooklm), modes.notebooklm],
-      ['Teachable Machine 브라우저', 'live']
+      ['NotebookLM ' + label(modes.notebooklm), modes.notebooklm]
     ];
     return `<p data-integration-status>연동 상태: ${items.map(([text, mode]) => `<span class="tag ${mode === 'off' ? 'warn' : 'gray'}">${escapeHtml(text)}</span>`).join(' ')}</p>`;
   }
@@ -2034,7 +2030,7 @@
       const titles = {record_detail:'사건 상세',record_edit:'사건 정보 수정',record_review:'내 판단 남기기',record_action:'대응 조치'};
       const notice = state.detailError ? `<p role="alert">사건을 불러오지 못했습니다. ${escapeHtml(state.detailError)}</p><button class="button" data-action="retry-detail">다시 조회</button>` : '<p role="status">사건 정보를 불러오고 있어요.</p>';
       return heading(titles[route.page] || '사건 확인', '', `<a class="button" href="#records">사건 목록</a>`) +
-        (route.page === 'record_detail' ? `<div class="workbench-split" aria-busy="${!state.detailError}">${card('현장 사진',notice)}${card('사진 검토', '<p class="meta">모델 예측 · 기준 근거 · 사람 판단</p>')}</div>` : card('사건 정보',notice));
+        (route.page === 'record_detail' ? `<div class="workbench-split" aria-busy="${!state.detailError}">${card('현장 사진',notice)}${card('사진 검토', '<p class="meta">사진 설명 · 기준 근거 · 사람 판단</p>')}</div>` : card('사건 정보',notice));
     } : screens[route.page] || screens.dashboard;
     const isDash = route.page === 'dashboard';
 
@@ -2042,9 +2038,7 @@
 
     // 브레드크럼 헤더
     let breadcrumb = '<b>현장 리스크 확인</b>';
-    if (route.page === 'training') {
-      breadcrumb = '<a class="back-link" href="#dashboard">← 홈으로</a><span class="header-sep">/</span><b>모델 학습</b>';
-    } else if (route.page === 'records') {
+    if (route.page === 'records') {
       breadcrumb = `<a class="back-link" href="#dashboard">← 홈으로</a><span class="header-sep">/</span><b>사건 목록</b>`;
     } else if (route.page === 'records_new') {
       breadcrumb = `<a class="back-link" href="#records">← 사건 목록</a><span class="header-sep">/</span><b>현장 사건 등록</b>`;
@@ -2102,40 +2096,9 @@
     renderStatus();
     updateSiteAlertDom();
     if (routeChanged) window.scrollTo(0, 0);
-    if (['training', 'dashboard', 'record_detail'].includes(route.page)) {
-      try {
-        if (!window.VisionTM) {
-          if (!window._visionTMLoader) window._visionTMLoader = new Promise((resolve, reject) => {
-            const script = document.createElement('script'); script.src = 'tm-client.js';
-            script.onload = resolve; script.onerror = () => { window._visionTMLoader = null; reject(new Error('모델 학습 화면을 불러오지 못했습니다.')); };
-            document.head.append(script);
-          });
-          await window._visionTMLoader;
-        }
-        if (currentRenderToken === latestRenderToken) {
-          if (route.page === 'training') window.VisionTM.mountTraining();
-          else if (route.page === 'dashboard') window.VisionTM.home();
-          else if (!needsDetail && state.currentDetail?.record) {
-            const rec = state.currentDetail.record;
-            // 예측이 끝나면 markReady가 "관련 기준 찾기"를 켜므로, 기다리는 요청이 있으면 다시 끈다.
-            window.VisionTM.detail(rec, rows => { applyTmPredictions(rec.record_id, rows); syncDetailJobButtons(rec.record_id); });
-          }
-        }
-      } catch (e) { const el = document.getElementById('tm-training') || document.getElementById('tm-record-predictions'); if (el) el.textContent = e.message; }
-    }
   }
 
-  // 상세에서 Teachable Machine이 예측해 저장한 결과를 상세 정보(tm_predictions)에 넣는다. rows는 서버 목록에 새 예측을 더한 것이다.
-  // 판단 화면은 상세를 다시 받지 않고 이 값을 쓴다. 판단 화면을 이미 열었으면 참고 칸만 다시 그린다(작성 중인 입력은 그대로 둔다).
-  function applyTmPredictions(recordId, rows) {
-    const detail = state.currentDetail;
-    if (!Array.isArray(rows) || detail?.record?.record_id !== recordId) return;
-    detail.tm_predictions = rows;
-    const route = parseRoute(), box = document.getElementById('review-sources');
-    if (route.page === 'record_review' && route.recordId === recordId && box) box.innerHTML = reviewSources(detail.record);
-  }
-  // 판단 기록 화면에 Gemini 초안, Teachable Machine 예측, NotebookLM 대조 결과를 함께 보여 준다.
-  // 상세 조회가 이미 받은 값만 쓴다. 예측은 현재 정보 버전에서 가장 최근에 예측한 모델의 결과를 사진별로 보여 준다.
+  // 판단 기록 화면에 Gemini 초안과 NotebookLM 대조 결과를 함께 보여 준다. 상세 조회가 이미 받은 값만 쓴다.
   function reviewSources(rec){
     const detail=state.currentDetail||{},draft=detail.ai_draft,version=Number(rec.version||1);
     // 상세에서 고른 기준의 근거만 보여 준다. 고른 기준이 없으면(판단 화면으로 바로 들어온 경우) 최신 근거를 보여 준다.
@@ -2144,19 +2107,9 @@
     const context=(rec.review_summary||detail.review_summary)?.context_changed||{},old=' <span class="meta">(수정 전 결과)</span>';
     const freshDraft=draft&&Number(draft.input_version||1)===version&&!context.after_ai;
     const freshEvidence=evid&&Number(evid.input_version||1)===version&&!context.after_evidence;
-    const rows=(detail.tm_predictions||[]).filter(p=>Number(p.record_version)===version);
-    const newest=(a,b)=>String(b.created_at||'')>=String(a.created_at||'')?b:a;
-    const latest=rows.length?rows.reduce(newest):null,byImage=new Map();
-    for(const p of rows.filter(p=>p.model_id===latest.model_id))byImage.set(p.image_index,byImage.has(p.image_index)?newest(byImage.get(p.image_index),p):p);
-    const tm=[...byImage.values()].sort((a,b)=>a.image_index-b.image_index).map(p=>{
-      const top=[...(p.scores||[])].sort((a,b)=>b.probability-a.probability)[0];
-      return `사진 ${p.image_index+1} · ${escapeHtml(top?.className||'결과 없음')}${top?' '+(top.probability*100).toFixed(1)+'%':''}`;
-    });
     const view=RiskWorkflow.evidenceView(evid,{standards:state.standards||[],standardId:evid?.standard_id||state.selectedStandardId,normalizeBool});
     const cited=evid?RiskWorkflow.citedLabel(evid.quote,state.standards||[]):'';
     return `<p style="margin:2px 0;"><b>Gemini 관찰 사실:</b> ${escapeHtml(draft?.facts || 'AI 초안 미등록')}${draft&&!freshDraft?old:''}</p>`+
-      `<p style="margin:2px 0;"><b>Teachable Machine 모델 예측${latest?' (모델 v'+escapeHtml(latest.model_number)+')':''}:</b> ${tm.length?tm.join(' / '):'현재 사진의 모델 예측이 없습니다.'}</p>`+
-      (tm.length?'<p class="meta" style="margin:2px 0;">모델 점수는 위험 확정·안전 인증이 아닙니다.</p>':'')+
       `<p style="margin:2px 0;"><b>NotebookLM 기준 확인:</b> ${evid?escapeHtml(view.title)+(freshEvidence?'':old):chosen?escapeHtml(chosen.id+' '+chosen.name)+' 기준으로는 아직 확인하지 않았습니다.':'아직 관련 기준을 확인하지 않았습니다.'}</p>`+
       (view?.reason?`<p style="margin:2px 0;"><b>확인 필요:</b> ${escapeHtml(view.reason)}</p>`:'')+
       (evid?`<div style="margin:2px 0;">${evid.answer?RiskWorkflow.answerPreview(evid.answer,escapeHtml):escapeHtml((evid.notes||'').slice(0,240))}</div><p style="margin:2px 0;"><b>인용:</b> ${escapeHtml(evid.quote||'인용 없음')}</p><p class="meta" style="margin:2px 0;">${cited?'인용한 기준: '+escapeHtml(cited)+' · ':''}소스 ID: ${escapeHtml(evid.source_id||'없음')}</p>`:'');
@@ -2166,7 +2119,7 @@
     const detail=state.currentDetail,rec=detail.record,summary=rec.review_summary||detail.review_summary;
     // 확인하지 않은 Gemini 요청 상태(진행 중·중단·실패·전송 확인 필요)가 있으면 2단계 영역을 펼친다. 완료는 펼치지 않는다.
     const aiJob=shownJob(rec.record_id,'analyze',{version:rec.version??null});
-    const live=RiskLiveDetail({rec,aiAlert:Boolean(aiJob)&&aiJob.status!=='succeeded',draft:detail.ai_draft,evid:detail.evidence_check,evidenceByStandard:detail.evidence_by_standard,rev:detail.final_review,actions:detail.actions||[],summary,context:summary?.context_changed||{},standards:state.standards,selectedStandardId:state.selectedStandardId,inlineStatus:renderInlineJobStatus,normalizeBool,integrations:state.integrations?.modes,tmPredictions:detail.tm_predictions||[],step:state.workflowStep?.recordId===rec.record_id?state.workflowStep.n:undefined});
+    const live=RiskLiveDetail({rec,aiAlert:Boolean(aiJob)&&aiJob.status!=='succeeded',draft:detail.ai_draft,evid:detail.evidence_check,evidenceByStandard:detail.evidence_by_standard,rev:detail.final_review,actions:detail.actions||[],summary,context:summary?.context_changed||{},standards:state.standards,selectedStandardId:state.selectedStandardId,inlineStatus:renderInlineJobStatus,normalizeBool,integrations:state.integrations?.modes,step:state.workflowStep?.recordId===rec.record_id?state.workflowStep.n:undefined});
     // 기준 목록(GET /api/standards)이 아직 도착하지 않았으면(불러오는 중이거나 불러오지 못했으면) 기억한 기준 ID를 바꾸지 않는다.
     // 기준 목록을 받은 뒤에는 지금 규칙(기억한 기준 ID가 선택지에 있으면 그것, 없으면 첫 선택지, 고를 기준이 없으면 빈 값)을 그대로 쓴다.
     if(!state.standardsLoading&&!state.standardsError)state.selectedStandardId=live.standardId;
@@ -2186,22 +2139,16 @@
     const pane=document.querySelector('.review-pane');
     state.currentDetail=res;
     if(!pane)return false;
-    const path=document.querySelector('.workflow-path');
-    let hadTm=false;try{hadTm=JSON.parse(path?.dataset.state||'{}').tm===true;}catch(e){hadTm=false;}
     const openIds=[...pane.querySelectorAll('details[id]')].map(el=>[el.id,el.open]);
     const focusId=document.activeElement?.id;
     const live=buildLiveDetail(),paneTpl=document.createElement('template'),introTpl=document.createElement('template');
     paneTpl.innerHTML=live.pane;introTpl.innerHTML=live.intro;
     const fresh=paneTpl.content.firstElementChild;
-    // 이미 그린 Teachable Machine 예측은 그대로 옮겨 다시 계산하지 않는다.
-    const oldTm=document.getElementById('tm-record-predictions'),freshTm=fresh.querySelector('#tm-record-predictions');
-    if(oldTm&&freshTm)freshTm.replaceWith(oldTm);
     pane.replaceWith(fresh);
     for(const sel of ['.workflow-path','#workflow-guidance']){const oldEl=document.querySelector(sel),newEl=introTpl.content.querySelector(sel);if(oldEl&&newEl)oldEl.replaceWith(newEl);}
     for(const [id,open] of openIds){const el=document.getElementById(id);if(el)el.open=open;}
     // 새로 도착한 Gemini 설명은 접힌 채로 두지 않는다.
     if(jobType==='analyze'){const ai=document.getElementById('details-ai');if(ai)ai.open=true;}
-    if(hadTm)window.VisionTM?.markReady?.();
     bindEvents(parseRoute());
     syncDetailJobButtons(recordId);
     if(focusId)document.getElementById(focusId)?.focus({preventScroll:true});

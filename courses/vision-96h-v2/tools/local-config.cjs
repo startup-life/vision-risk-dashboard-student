@@ -3,7 +3,7 @@
 // Messages name keys and file paths only; setting values are never printed because they hold secrets.
 const fs = require('node:fs');
 const path = require('node:path');
-const CONFIG_KEYS = ['GAS_WEBAPP_URL', 'GEMINI_API_KEY', 'NOTEBOOKLM_NOTEBOOK_ID', 'NOTEBOOKLM_SOURCE_IDS', 'NOTEBOOKLM_MCP_COMMAND', 'VISION_TM_ROOT', 'REPOSITORY_IMAGES_ROOT', 'STORAGE_MODE', 'GEMINI_MODE', 'NOTEBOOKLM_MODE'];
+const CONFIG_KEYS = ['GAS_WEBAPP_URL', 'GEMINI_API_KEY', 'NOTEBOOKLM_NOTEBOOK_ID', 'NOTEBOOKLM_SOURCE_IDS', 'NOTEBOOKLM_MCP_COMMAND', 'REPOSITORY_IMAGES_ROOT', 'STORAGE_MODE', 'GEMINI_MODE', 'NOTEBOOKLM_MODE'];
 // Keys only `npm run gas:init` reads. The Gemini key goes to the GAS script property; the local server never needs it,
 // so it is not copied into the server's environment (and from there into child processes).
 const GAS_INIT_ONLY_KEYS = ['GEMINI_API_KEY'];
@@ -107,7 +107,7 @@ function applyLocalConfig(values, env = process.env) {
 }
 
 // Connection switches. STORAGE_MODE picks Google Sheets through GAS (live) or the local mock store (mock).
-// GEMINI_MODE and NOTEBOOKLM_MODE default to the storage mode. Teachable Machine runs in the browser and has no switch.
+// GEMINI_MODE and NOTEBOOKLM_MODE default to the storage mode.
 const MODE_VALUES = { STORAGE_MODE: ['live', 'mock'], GEMINI_MODE: ['off', 'mock', 'live'], NOTEBOOKLM_MODE: ['off', 'mock', 'live'] };
 
 function modeValue(env, key) {
@@ -139,7 +139,7 @@ function resolveModes(env = process.env) {
 function describeModes(modes, geminiModels) {
   const label = mode => mode === 'off' ? '꺼짐' : mode;
   const models = modes.gemini === 'live' && geminiModels?.model ? `(${geminiModels.model}${geminiModels.fallback_model ? `, 대체 ${geminiModels.fallback_model}` : ''})` : '';
-  return `연동 상태: 저장소 ${modes.storage === 'mock' ? '로컬 저장' : 'Google 시트'} · Gemini ${label(modes.gemini)}${models} · NotebookLM ${label(modes.notebooklm)} · Teachable Machine 브라우저`;
+  return `연동 상태: 저장소 ${modes.storage === 'mock' ? '로컬 저장' : 'Google 시트'} · Gemini ${label(modes.gemini)}${models} · NotebookLM ${label(modes.notebooklm)}`;
 }
 
 module.exports = { applyLocalConfig, checkModes, CONFIG_KEYS, describeModes, GAS_INIT_ONLY_KEYS, MODE_VALUES, resolveModes, DEFAULT_CONFIG_PATH, EXAMPLE_CONFIG_PATH, LEGACY_CONFIG_PATH, LocalConfigError, loadLocalConfig, readConfigFile, validateConfig };

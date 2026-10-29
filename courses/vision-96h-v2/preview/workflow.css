@@ -14,7 +14,6 @@ body{background:#f6f7f9!important;color:#243044}
 .workflow-step p{font-size:16px;line-height:1.65;overflow-wrap:anywhere}
 .workflow-step .hint,.workflow-step .meta{font-size:14px!important;color:#526071}
 .workflow-step .hint{background:none;border:0;padding:0}
-.workflow-step .tm-prediction{margin:12px 0;padding-top:12px;border-top:1px solid #edf0f4}
 .workflow-step .actions{margin-top:16px}
 .workflow-step details{margin-top:16px}
 .workflow-step summary{min-height:44px;padding:8px 0;cursor:pointer;font-size:14px}
@@ -32,7 +31,6 @@ body{background:#f6f7f9!important;color:#243044}
 .form-context p{margin:4px 0;overflow-wrap:anywhere}
 .workflow-step .review-details{border:0;box-shadow:none;margin:16px 0 0;padding:0}
 .workflow-step .review-details-body{padding:0}
-.workflow-step .tm-prediction{padding:0;border:0;margin:16px 0;background:none}
 .workflow-step .quote{font-size:14px}
 .photo-panel,.photo-pane{min-width:0}
 .photo-panel img,.photo-pane img{object-fit:contain}

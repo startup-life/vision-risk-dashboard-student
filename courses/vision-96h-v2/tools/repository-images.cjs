@@ -129,4 +129,4 @@ class RepositoryImages {
     } catch (_) { return null; }
   }
 }
-module.exports = { RepositoryImages, parseCsv, LOAD_FAILURE_REASONS };
+module.exports = { RepositoryImages, LOAD_FAILURE_REASONS };

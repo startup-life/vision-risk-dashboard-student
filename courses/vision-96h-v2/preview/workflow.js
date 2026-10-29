@@ -1,33 +1,26 @@
 (function(root){
-  const steps=['사진','AI 사진 설명 (Gemini)','모델 예측 (Teachable Machine)','관련 기준 확인 (NotebookLM)','내 판단 남기기'];
-  // 진행 중인 단계는 1~5 번호로, 끝난 상태는 단계 번호와 겹치지 않는 이름으로 돌려준다.
+  const steps=['사진','AI 사진 설명 (Gemini)','관련 기준 확인 (NotebookLM)','내 판단 남기기'];
+  // 진행 중인 단계는 1~4 번호로, 끝난 상태는 단계 번호와 겹치지 않는 이름으로 돌려준다.
   const DONE='done',ACTION='action';
-  // 진행 단계는 2, 3, 4, 5 순서다. 사진이 없으면 1, Gemini 설명이 없으면 2, 모델 예측이 없으면 3, 기준 확인이 없으면 4, 아니면 5다.
+  // 진행 단계는 2, 3, 4 순서다. 사진이 없으면 1, Gemini 설명이 없으면 2, 기준 확인이 없으면 3, 아니면 4다.
   // 꺼진 연동(geminiOff, notebookOff)의 단계는 건너뛴다. 상세 화면은 처음 그릴 때만 이 값을 쓰고, 그 뒤에는 "다음" 버튼(go)으로만 옮긴다.
-  function current({photo=true,ai=false,tm=false,evidence=false,review=false,queue=null,geminiOff=false,notebookOff=false}={}) {
+  function current({photo=true,ai=false,evidence=false,review=false,queue=null,geminiOff=false,notebookOff=false}={}) {
     if(queue==='confirmed_risk')return ACTION;
     if(review&&queue!=='additional_check')return DONE;
-    return !photo?1:!ai&&!geminiOff?2:!tm?3:!evidence&&!notebookOff?4:5;
+    return !photo?1:!ai&&!geminiOff?2:!evidence&&!notebookOff?3:4;
   }
   function action(state={}) {
     const n=current(state);
-    return n===ACTION?'조치 기록':n===DONE?'기록 보기':state.ai||state.tm||state.evidence||state.review?'이어서 확인':'확인 시작';
+    return n===ACTION?'조치 기록':n===DONE?'기록 보기':state.ai||state.evidence||state.review?'이어서 확인':'확인 시작';
   }
   // 단계(current의 값)마다 보여 줄 안내 문구.
   function guide(n) {
-    return ({[DONE]:'판단이 저장됐습니다. 기록을 다시 확인할 수 있습니다.',1:'먼저 확인할 사진을 등록해 주세요.',2:'Gemini 사진 설명을 확인해 주세요.',3:'Teachable Machine 모델 예측을 확인해 주세요.',4:'AI 결과를 확인했다면, NotebookLM으로 관련 기준을 찾아 사진과 비교해 주세요.',5:'사진과 기준을 비교하고, 직접 확인한 판단을 남겨주세요.',[ACTION]:'어떤 조치를 했는지 기록해 주세요.'})[n];
+    return ({[DONE]:'판단이 저장됐습니다. 기록을 다시 확인할 수 있습니다.',1:'먼저 확인할 사진을 등록해 주세요.',2:'Gemini 사진 설명을 확인해 주세요.',3:'AI 결과를 확인했다면, NotebookLM으로 관련 기준을 찾아 사진과 비교해 주세요.',4:'사진과 기준을 비교하고, 직접 확인한 판단을 남겨주세요.',[ACTION]:'어떤 조치를 했는지 기록해 주세요.'})[n];
   }
   // "다음" 버튼을 누르면 진행 표시와 안내 문구를 n단계로 옮긴다.
   function go(doc,n) {
     doc.querySelectorAll('.workflow-path li').forEach((li,i)=>{if(i+1===n)li.setAttribute('aria-current','step');else li.removeAttribute('aria-current');});
     const g=doc.getElementById('workflow-guidance');if(g)g.textContent=guide(n);
-  }
-  // 도착한 결과를 진행 표시의 data-state에 적는다. 진행 단계는 옮기지 않는다.
-  function sync(doc,patch={}) {
-    const path=doc.querySelector('.workflow-path');if(!path)return;
-    // 읽을 수 없는 값이면 의도적으로 빈 상태에서 다시 적는다.
-    let saved={};try{saved=JSON.parse(path.dataset.state||'{}');}catch{}
-    path.dataset.state=JSON.stringify({...saved,...patch});
   }
   // NotebookLM 인용문이 어느 기준의 문장인지 standards.json의 기준 원문(이름, canonical_quote, notes)으로 찾는다.
   // 응답에는 기준 ID가 없어서 이 대조로 구한다. 기준 원문 하나를 통째로 담은 인용이면 그 기준을(whole),
@@ -89,6 +82,6 @@
     const by=byStandard||(latest?{[latest.standard_id]:latest}:{});
     return by[standardId]||null;
   }
-  const api={steps,DONE,ACTION,current,action,guide,go,sync,quoteStandards,citedLabel,answerHtml,answerPreview,evidenceView,evidenceFor};root.RiskWorkflow=api;
+  const api={steps,DONE,ACTION,current,action,guide,go,quoteStandards,citedLabel,answerHtml,answerPreview,evidenceView,evidenceFor};root.RiskWorkflow=api;
   if(typeof module!=='undefined')module.exports=api;
 })(globalThis);

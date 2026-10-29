@@ -14,7 +14,6 @@ courses/vision-96h-v2/preview/_jobs/
 courses/vision-96h-v2/preview/_synthetic_jobs/
 courses/vision-96h-v2/preview/*store*.json
 courses/vision-96h-v2/preview/*store*_images/
-courses/vision-96h-v2/preview/vendor/
 courses/vision-96h-v2/preview/assets/*
 !courses/vision-96h-v2/preview/assets/factory-logo.png
 *.tmp

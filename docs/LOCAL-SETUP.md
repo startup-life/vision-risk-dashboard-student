@@ -403,7 +403,6 @@ clasp 경로에서는 `npm.cmd run gas:deploy`가 이 파일이 없으면 만들
 | `NOTEBOOKLM_NOTEBOOK_ID` | 노트북 ID | 4절 |
 | `NOTEBOOKLM_SOURCE_IDS` | 소스 ID. 여러 개면 쉼표로 구분한 문자열 하나(`"ID1,ID2"`) | 4절 |
 | `NOTEBOOKLM_MCP_COMMAND` | MCP 실행 파일 경로나 명령 이름. Antigravity 설정을 쓰면 비워 둔다 | 5절 |
-| `VISION_TM_ROOT` | 학습한 TM 모델을 저장할 폴더. 비워 두면 기본 위치를 쓴다 | 직접 정한다 |
 | `REPOSITORY_IMAGES_ROOT` | 이미지 레포 폴더. 기본 위치에 두었으면 비워 둔다 | 12절 |
 | `STORAGE_MODE`, `GEMINI_MODE`, `NOTEBOOKLM_MODE` | 연동 스위치. 비워 두면 기본값을 쓴다 | 7절 |
 
@@ -454,7 +453,6 @@ clasp 경로에서는 `npm.cmd run gas:deploy`가 이 파일이 없으면 만들
 ## 7. 연동 스위치
 
 저장소·Gemini·NotebookLM을 하나씩 실제 연결(`live`), 모의 결과(`mock`), 끄기(`off`)로 정한다.
-Teachable Machine은 브라우저 안에서 돌아가므로 스위치가 없다.
 
 | 이름 | 값 | 기본값 | 막는 조합 | 수업에서 쓰는 조합 |
 | --- | --- | --- | --- | --- |
@@ -482,14 +480,13 @@ Teachable Machine은 브라우저 안에서 돌아가므로 스위치가 없다.
 
 연동을 `off`로 두면 그 단계의 버튼이 꺼지고 화면에 이유가 보인다.
 API로 요청하면 HTTP 409와 `error_code` `INTEGRATION_OFF`를 돌려준다.
-Gemini가 꺼져 있어도 Teachable Machine 예측이 있으면 NotebookLM 기준 확인은 할 수 있다.
 
 지금 쓰는 조합은 상태 줄로 확인한다.
 상태 줄은 서버를 시작할 때 터미널과 `/api/health`의 `integration_status`에 늘 나온다.
 화면 상단에는 `live`가 아닌 연동(`mock`·`off`)이 하나라도 있을 때만 보인다.
 
 ```text
-연동 상태: 저장소 로컬 저장 · Gemini mock · NotebookLM live · Teachable Machine 브라우저
+연동 상태: 저장소 로컬 저장 · Gemini mock · NotebookLM live
 ```
 
 `off`인 연동은 상태 줄에 `꺼짐`으로 나온다.
@@ -557,15 +554,15 @@ Gemini가 꺼져 있어도 Teachable Machine 예측이 있으면 NotebookLM 기�
 - NotebookLM 로그인 상태는 서버가 MCP에 연결한 뒤 첫 기준 확인 때 한 번만 본다. 쓰는 도중 로그인이 만료되면 `nlm login` 안내 대신 "NotebookLM 질의가 실패했습니다" 문구가 나올 수 있다. 그때는 `nlm login --storage protected` 뒤 로컬 서버를 다시 시작한다.
 - 없는 사건에 판단·조치를 저장하면 GAS의 문구("기록을 찾지 못했습니다(사건 번호). …")가 나온다. 상세 조회의 404 문구와 사건 번호 표시가 다르다.
 - 시트가 날짜·숫자로 바꾸지 않게 `'`를 붙이는 글자는 `=`·`+`·`-`·`@`·탭·줄바꿈 문자(CR)·숫자로 시작하는 것뿐이다. `Jan 5`처럼 다른 글자로 시작해도 시트가 날짜로 읽는 값은 바뀔 수 있다.
-- 로컬 서버는 사건 정보(사진 파일 ID 목록·버전)를 60초 동안 기억해 사진과 모델 예측 저장에 쓴다. 이 PC 밖(다른 PC·시트 편집)에서 사건을 고치면 최대 60초 동안 이전 정보로 확인한다.
+- 로컬 서버는 사건 정보(사진 파일 ID 목록·버전)를 60초 동안 기억해 사진을 보여 줄 때 쓴다. 이 PC 밖(다른 PC·시트 편집)에서 사건을 고치면 최대 60초 동안 이전 정보로 확인한다.
 
 ## 12. 사진 저장소 받기
 
-홈의 저장소 사진과 모델 학습 사진은 별도 공개 저장소 `startup-life/vision-risk-student-images`에서 읽는다. 사진은 일반 파일이라 `git clone`만으로 받는다. Git LFS는 필요 없다.
+홈과 사건 등록 화면의 저장소 사진은 별도 공개 저장소 `startup-life/vision-risk-student-images`에서 읽는다. 사진은 일반 파일이라 `git clone`만으로 받는다. Git LFS는 필요 없다.
 
 - **ZIP으로 받지 않는다.** GitHub의 **Code**, **Download ZIP**으로 받으면 `.git` 폴더가 없다. 대시보드는 git으로 원격 주소(origin)와 커밋을 확인하고 그 커밋의 매니페스트를 읽으므로 ZIP 폴더는 쓰지 못한다.
 - 공개 저장소라 GitHub 계정 없이 받는다.
-- 받는 양은 약 170MB다. 사진은 Train 180장(품질 90, 산업안전 90)과 Val 30장(트랙별 15)이다. Test 사진과 시퀀스 사진은 들어 있지 않다.
+- 받는 양은 약 170MB다. 사진은 210장이고, 대시보드는 그중 Train 사진 180장(품질 90, 산업안전 90)을 쓴다.
 
 ### 단계 1. Git for Windows 설치 — 웹(클릭)
 
@@ -617,7 +614,7 @@ cd ../vision-risk-dashboard-student
 
 ### 단계 4. 대시보드에서 확인 — Antigravity(터미널)
 
-`npm.cmd start`로 서버를 띄운다. 서버 콘솔에 `[RepositoryImages`로 시작하는 경고가 없고, 홈의 저장소 사진이 보이고, 모델 학습 화면에서 프로젝트를 만든 뒤 **제공 Train 사진 분류**를 눌렀을 때 제공 사진 목록이 보이면 된다.
+`npm.cmd start`로 서버를 띄운다. 서버 콘솔에 `[RepositoryImages`로 시작하는 경고가 없고, 홈과 사건 등록 화면에 저장소 사진이 보이면 된다.
 경고가 있으면 `불러오지 못했습니다:` 뒤의 원인을 본다.
 
 | 원인 | 할 일 |
