@@ -198,7 +198,7 @@ GAS 없이 NotebookLM만 실제로 써 보려면 `STORAGE_MODE=mock`, `GEMINI_MO
 - `courses/vision-96h-v2/gas/`: Google Sheets·Drive 저장과 Gemini 호출(Apps Script)
 - `config/`: 연결 설정 예시 파일
 - `docs/LOCAL-SETUP.md`: 외부 연결 준비의 자세한 안내
-- `.agent/rules/class-rules.md`·`materials/`: 수업 공통 규칙과 지급 원문 자료. 따라하기 프롬프트는 `main` 브랜치의 `prompts/` 폴더에 있다.
+- `.agent/rules/class-rules.md`·`materials/`: 수업 공통 규칙과 지급 원문 자료. 따라하기 프롬프트는 `main` 브랜치의 `follow-along/` 폴더에 있다.
 
 ## 라이선스
 
