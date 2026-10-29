@@ -1,12 +1,9 @@
 'use strict';
-// Single list of local connection settings; run-local, tests and the example file follow it.
-// Messages name keys and file paths only; setting values are never printed because they hold secrets.
+// Single list of local settings; run-local and the example file follow it.
+// Messages name keys and file paths only; setting values are never printed.
 const fs = require('node:fs');
 const path = require('node:path');
-const CONFIG_KEYS = ['GAS_WEBAPP_URL', 'GEMINI_API_KEY', 'NOTEBOOKLM_NOTEBOOK_ID', 'NOTEBOOKLM_SOURCE_IDS', 'NOTEBOOKLM_MCP_COMMAND', 'REPOSITORY_IMAGES_ROOT', 'STORAGE_MODE', 'GEMINI_MODE', 'NOTEBOOKLM_MODE'];
-// Keys only `npm run gas:init` reads. The Gemini key goes to the GAS script property; the local server never needs it,
-// so it is not copied into the server's environment (and from there into child processes).
-const GAS_INIT_ONLY_KEYS = ['GEMINI_API_KEY'];
+const CONFIG_KEYS = ['REPOSITORY_IMAGES_ROOT'];
 const DEFAULT_CONFIG_PATH = path.resolve(__dirname, '../../../config/local-connection.json');
 const LEGACY_CONFIG_PATH = path.resolve(__dirname, '../scratch/local-connection.json');
 const EXAMPLE_CONFIG_PATH = path.resolve(__dirname, '../../../config/local-connection.example.json');
@@ -93,7 +90,7 @@ function loadLocalConfig(options = {}) {
     file = legacyPath;
     notices.push(`예전 위치의 설정 파일을 읽었다: ${legacyPath}\n이 파일을 ${defaultPath}로 옮긴다.`);
   } else {
-    notices.push(`설정 파일 없이 시작한다. 연결 설정이 필요하면 config/local-connection.example.json을 복사해 ${defaultPath}를 만든다.`);
+    notices.push(`설정 파일 없이 시작한다. 설정이 필요하면 config/local-connection.example.json을 복사해 ${defaultPath}를 만든다.`);
     return { file, values: {}, notices, warnings: exampleWarnings };
   }
   const { values, warnings } = validateConfig(readConfigFile(file));
@@ -102,44 +99,8 @@ function loadLocalConfig(options = {}) {
 
 // Empty values mean "not set here", so an environment variable of the same name stays in effect.
 function applyLocalConfig(values, env = process.env) {
-  for (const [key, value] of Object.entries(values)) if (value !== '' && !GAS_INIT_ONLY_KEYS.includes(key)) env[key] = value;
+  for (const [key, value] of Object.entries(values)) if (value !== '') env[key] = value;
   return env;
 }
 
-// Connection switches. STORAGE_MODE picks Google Sheets through GAS (live) or the local mock store (mock).
-// GEMINI_MODE and NOTEBOOKLM_MODE default to the storage mode.
-const MODE_VALUES = { STORAGE_MODE: ['live', 'mock'], GEMINI_MODE: ['off', 'mock', 'live'], NOTEBOOKLM_MODE: ['off', 'mock', 'live'] };
-
-function modeValue(env, key) {
-  const raw = env[key] === undefined || env[key] === null ? '' : String(env[key]).trim().toLowerCase();
-  if (raw === '') return '';
-  // The value is not echoed: the loader never prints setting values.
-  if (!MODE_VALUES[key].includes(raw)) throw new LocalConfigError(`${key} 값을 알아볼 수 없다. 허용 값은 ${MODE_VALUES[key].join(', ')}이다. 설정 파일이나 환경 변수의 ${key}를 고친다.`);
-  return raw;
-}
-
-// Mock results must not mix into the real Google Sheets records, and Gemini is called inside GAS.
-function checkModes(modes) {
-  if (modes.storage === 'live' && modes.gemini === 'mock') throw new LocalConfigError('STORAGE_MODE=live에서는 GEMINI_MODE=mock을 쓸 수 없다. 모의 사진 설명이 실제 Google 시트 기록에 저장되기 때문이다. GEMINI_MODE를 live나 off로 바꾸거나 STORAGE_MODE=mock으로 시작한다.');
-  if (modes.storage === 'live' && modes.notebooklm === 'mock') throw new LocalConfigError('STORAGE_MODE=live에서는 NOTEBOOKLM_MODE=mock을 쓸 수 없다. 모의 근거가 실제 Google 시트 기록에 저장되기 때문이다. NOTEBOOKLM_MODE를 live나 off로 바꾸거나 STORAGE_MODE=mock으로 시작한다.');
-  if (modes.storage === 'mock' && modes.gemini === 'live') throw new LocalConfigError('STORAGE_MODE=mock에서는 GEMINI_MODE=live를 쓸 수 없다. Gemini는 GAS 안에서 호출하므로 Google 시트 저장소 없이는 실제로 부를 수 없다. GEMINI_MODE를 mock이나 off로 바꾸거나 STORAGE_MODE=live로 시작한다.');
-  return modes;
-}
-
-// SYNTHETIC_MODE=true is kept as an alias for STORAGE_MODE=mock (both switches then default to mock).
-function resolveModes(env = process.env) {
-  const synthetic = String(env.SYNTHETIC_MODE || '').trim().toLowerCase() === 'true';
-  let storage = modeValue(env, 'STORAGE_MODE');
-  if (synthetic && storage === 'live') throw new LocalConfigError('SYNTHETIC_MODE=true는 STORAGE_MODE=mock과 같은 뜻이라 STORAGE_MODE=live와 함께 쓸 수 없다. SYNTHETIC_MODE를 지우거나 STORAGE_MODE=mock으로 맞춘다.');
-  storage = storage || (synthetic ? 'mock' : 'live');
-  return checkModes({ storage, gemini: modeValue(env, 'GEMINI_MODE') || storage, notebooklm: modeValue(env, 'NOTEBOOKLM_MODE') || storage });
-}
-
-// geminiModels: GAS가 알려 준 판독 모델({ model, fallback_model }). 받기 전이거나 live가 아니면 모델을 적지 않는다.
-function describeModes(modes, geminiModels) {
-  const label = mode => mode === 'off' ? '꺼짐' : mode;
-  const models = modes.gemini === 'live' && geminiModels?.model ? `(${geminiModels.model}${geminiModels.fallback_model ? `, 대체 ${geminiModels.fallback_model}` : ''})` : '';
-  return `연동 상태: 저장소 ${modes.storage === 'mock' ? '로컬 저장' : 'Google 시트'} · Gemini ${label(modes.gemini)}${models} · NotebookLM ${label(modes.notebooklm)}`;
-}
-
-module.exports = { applyLocalConfig, checkModes, CONFIG_KEYS, describeModes, GAS_INIT_ONLY_KEYS, MODE_VALUES, resolveModes, DEFAULT_CONFIG_PATH, EXAMPLE_CONFIG_PATH, LEGACY_CONFIG_PATH, LocalConfigError, loadLocalConfig, readConfigFile, validateConfig };
+module.exports = { applyLocalConfig, CONFIG_KEYS, DEFAULT_CONFIG_PATH, EXAMPLE_CONFIG_PATH, LEGACY_CONFIG_PATH, LocalConfigError, loadLocalConfig, readConfigFile, validateConfig };
