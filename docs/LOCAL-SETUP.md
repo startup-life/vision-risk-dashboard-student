@@ -22,13 +22,13 @@
 | 로컬 설정 파일 | 위 두 곳의 주소·ID를 서버에 알려 주고, Gemini API 키를 GAS로 보낼 때 읽는다 | `config/local-connection.json` |
 
 1절부터 6절까지가 연결 준비다. 7절은 연동을 하나씩 켜고 끄는 스위치, 8절은 연결 확인, 9절은 NotebookLM 결과를 읽는 법, 10절은 서버를 끄는 법, 11절은 알려진 제한, 12절은 사진 저장소(이미지 레포)를 받는 법이다.
-API 키와 웹 앱 주소는 GAS 스크립트 속성과 6절의 설정 파일에만 둔다. 문서·메신저·커밋·에이전트 대화창에 붙여 넣지 않는다.
+API 키와 웹 앱 주소는 GAS 스크립트 속성과 6절의 설정 파일에만 둔다. 문서·메신저·커밋에는 붙여 넣지 않는다. 설정 파일에 넣을 때는 Antigravity 채팅에 붙여 넣어 맡겨도 된다(1절 단계 8).
 
 단계마다 **할 곳**을 적었다.
 
 - **Antigravity(터미널)**: 저장소 폴더의 터미널에서 명령으로 끝난다. Antigravity 에이전트가 명령을 대신 실행해도 된다.
 - **웹(클릭)**: 브라우저의 Google 화면에서 본인이 직접 로그인하고 누른다. 에이전트가 대신하지 않는다.
-- **설정 파일(본인 편집)**: `config/local-connection.json`을 본인이 열어 고친다. API 키를 붙여 넣는 단계라 에이전트에게 맡기지 않는다.
+- **설정 파일**: `config/local-connection.json`의 값을 바꾼다. 값을 Antigravity 채팅에 붙여 넣으면 Antigravity가 그 파일의 해당 한 줄만 바꾸고, 값을 화면이나 대화에 다시 출력하지 않는다. 본인이 파일을 열어 고쳐도 된다.
 
 단계 끝의 「확인:」 줄은 그 단계가 끝났을 때 보이는 것이다.
 
@@ -55,7 +55,7 @@ API 키와 웹 앱 주소는 GAS 스크립트 속성과 6절의 설정 파일에
 | 5 | 코드 올리기 | Antigravity(터미널) | `npm.cmd run gas:push` |
 | 6 | 웹앱 배포와 주소 기록 | Antigravity(터미널) | `npm.cmd run gas:deploy` |
 | 7 | 배포 접근 설정 확인 | Antigravity(터미널), 이어서 웹(클릭) | `npm.cmd run gas:editor`, 편집기의 배포 관리 |
-| 8 | Gemini API 키 넣기 | 설정 파일(본인 편집) | `config/local-connection.json`의 `GEMINI_API_KEY` |
+| 8 | Gemini API 키 넣기 | 설정 파일 | `config/local-connection.json`의 `GEMINI_API_KEY` |
 | 9 | 첫 권한 승인 | Antigravity(터미널), 이어서 웹(클릭) | `npm.cmd run gas:open` |
 | 10 | 초기화(시트·폴더 만들기, 키 저장) | Antigravity(터미널) | `npm.cmd run gas:init` |
 
@@ -132,9 +132,11 @@ npm.cmd run gas:deploy
 
 확인: 배포 관리에 보이는 설정이 웹 앱, 나, 모든 사용자다.
 
-### 단계 8. Gemini API 키 넣기 — 설정 파일(본인 편집)
+### 단계 8. Gemini API 키 넣기 — 설정 파일
 
-`config/local-connection.json`을 메모장(macOS: 텍스트 편집기)이나 Antigravity 편집기로 열고, 3절에서 만든 키를 `GEMINI_API_KEY`의 따옴표 안에 붙여 넣고 저장한다.
+3절에서 만든 키를 Antigravity 채팅에 붙여 넣고 `config/local-connection.json`의 `GEMINI_API_KEY`에 넣어 달라고 한다. Antigravity는 그 파일의 `GEMINI_API_KEY` 한 줄만 바꾸고, 키 값을 화면이나 대화에 다시 출력하지 않는다(수업 규칙 `.agent/rules/class-rules.md` 7번).
+
+직접 고쳐도 된다. 파일을 메모장(macOS: 텍스트 편집기)이나 Antigravity 편집기로 열고 키를 `GEMINI_API_KEY`의 따옴표 안에 붙여 넣고 저장한다.
 
 ```json
 "GEMINI_API_KEY": "여기에 키를 붙여 넣는다",
@@ -142,7 +144,7 @@ npm.cmd run gas:deploy
 
 - 키는 10단계 `npm.cmd run gas:init`만 읽어 GAS 스크립트 속성 `GEMINI_API_KEY`로 보낸다. `npm start`로 띄운 로컬 서버는 이 값을 환경 변수로 옮기지 않는다.
 - 같은 이름의 환경 변수는 읽지 않는다. 다른 도구용으로 넣어 둔 키가 GAS로 가지 않게 하려는 것이다.
-- 키를 Antigravity 대화창에 붙여 넣거나 에이전트에게 이 파일을 읽게 하지 않는다.
+- 화면을 공유하는 중에는 키를 채팅이나 파일에 붙여 넣지 않는다.
 - 편집기의 **프로젝트 설정**, **스크립트 속성**에 직접 넣어도 된다(2절). 그때는 이 칸을 비워 둔다.
 
 확인: 파일을 저장한 뒤 `npm start`를 실행했을 때 `설정 경고:`로 시작하는 줄이 없다.
@@ -200,7 +202,7 @@ clasp를 쓸 수 없을 때(Apps Script API를 켤 수 없는 계정 등) 편집
 | 1 | 새 프로젝트를 만들고 코드 붙여 넣기 | 웹(클릭) |
 | 2 | `initialSetup` 실행과 권한 승인 | 웹(클릭) |
 | 3 | 웹 앱 배포 | 웹(클릭) |
-| 4 | 웹 앱 URL을 설정 파일에 넣기 | 설정 파일(본인 편집) |
+| 4 | 웹 앱 URL을 설정 파일에 넣기 | 설정 파일 |
 | 5 | 키 저장 | Antigravity(터미널) 또는 웹(클릭) |
 
 1. [Apps Script](https://script.google.com)에서 **새 프로젝트**를 만든다. 편집기의 `Code.gs` 내용을 모두 지우고 이 저장소의 `courses/vision-96h-v2/gas/Code.gs` 내용을 그대로 붙여 넣은 뒤 저장한다.
