@@ -24,7 +24,7 @@ cd vision-risk-dashboard-student
 
 ## 따라하기 자료
 
-- 따라하기 프롬프트는 `main` 브랜치의 `prompts/` 폴더에 있습니다.
+- 따라하기 프롬프트는 `main` 브랜치의 `follow-along/` 폴더에 있습니다.
 - 공통 규칙은 `.agent/rules/class-rules.md`, 원문 자료는 `materials/`에 있습니다.
 
 ## 회차를 놓쳤을 때
