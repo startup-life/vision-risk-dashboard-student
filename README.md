@@ -87,7 +87,8 @@ cp -n config/local-connection.example.json config/local-connection.json
 
 - 값은 복사한 `config/local-connection.json`에만 넣는다. 예시 파일은 고치지 않는다.
 - 쓰지 않는 항목은 빈 문자열(`""`)로 둔다.
-- API 키와 웹앱 주소는 이 파일에만 둔다. 이 파일을 커밋하거나 메신저·에이전트 대화창에 붙여 넣지 않는다.
+- API 키와 웹앱 주소는 이 파일에만 둔다. 이 파일을 커밋하거나 메신저에 붙여 넣지 않는다.
+- API 키는 Antigravity 채팅에 붙여 넣어 이 파일에 넣게 해도 된다. Antigravity는 이 파일의 해당 한 줄만 바꾸고 값을 화면이나 대화에 다시 출력하지 않는다. 직접 파일을 열어 고쳐도 된다.
 - 각 키의 뜻과 터미널에 나오는 설정 메시지는 [로컬 실행 준비 6절](docs/LOCAL-SETUP.md#6-로컬-설정-파일)에 있다.
 
 ## 4. 실행
@@ -197,6 +198,7 @@ GAS 없이 NotebookLM만 실제로 써 보려면 `STORAGE_MODE=mock`, `GEMINI_MO
 - `courses/vision-96h-v2/gas/`: Google Sheets·Drive 저장과 Gemini 호출(Apps Script)
 - `config/`: 연결 설정 예시 파일
 - `docs/LOCAL-SETUP.md`: 외부 연결 준비의 자세한 안내
+- `.agent/rules/class-rules.md`·`materials/`: 수업 공통 규칙과 지급 원문 자료. 따라하기 프롬프트는 `main` 브랜치의 `prompts/` 폴더에 있다.
 
 ## 라이선스
 
