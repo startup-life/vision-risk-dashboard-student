@@ -22,15 +22,12 @@ body{background:#f6f7f9!important;color:#243044}
 .workflow-step label,.workflow-step select,.workflow-step textarea{font-size:16px!important}
 .workflow-result{border-left:3px solid #768eaf;padding:0 0 0 16px;margin:16px 0}
 .workflow-result p{margin-bottom:8px}
-.workflow-next{display:inline-flex;align-items:center;min-height:44px;margin-top:16px}
 .example-reference{display:flex;gap:12px;align-items:center;background:#f6f7f9;padding:12px;margin:16px 0;border-radius:6px}
 .example-reference img{width:88px;height:88px;object-fit:contain;flex-shrink:0}
 .example-reference p{font-size:14px;margin:0}
 .form-context{display:flex;gap:16px;padding:16px;background:white;border:1px solid #dce1e8;border-radius:8px;margin-bottom:24px;align-items:center}
 .form-context img{width:120px;height:120px;object-fit:contain;flex-shrink:0}
 .form-context p{margin:4px 0;overflow-wrap:anywhere}
-.workflow-step .review-details{border:0;box-shadow:none;margin:16px 0 0;padding:0}
-.workflow-step .review-details-body{padding:0}
 .workflow-step .quote{font-size:14px}
 .photo-panel,.photo-pane{min-width:0}
 .photo-panel img,.photo-pane img{object-fit:contain}

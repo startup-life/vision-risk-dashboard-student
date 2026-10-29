@@ -5,18 +5,7 @@
   "private": true,
   "type": "commonjs",
   "scripts": {
-    "start": "node courses/vision-96h-v2/tools/run-local.cjs",
-    "gas:login": "npx --yes @google/clasp@3.4.1 login",
-    "gas:create": "node courses/vision-96h-v2/tools/gas-clasp.cjs create",
-    "gas:push": "npx --yes @google/clasp@3.4.1 push --force",
-    "gas:deploy": "node courses/vision-96h-v2/tools/gas-clasp.cjs deploy",
-    "gas:redeploy": "node courses/vision-96h-v2/tools/gas-clasp.cjs redeploy",
-    "gas:open": "node courses/vision-96h-v2/tools/gas-clasp.cjs open",
-    "gas:editor": "npx --yes @google/clasp@3.4.1 open-script",
-    "gas:init": "node courses/vision-96h-v2/tools/gas-init.cjs"
+    "start": "node courses/vision-96h-v2/tools/run-local.cjs"
   },
-  "engines": { "node": ">=22.9.0" },
-  "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.31.0"
-  }
+  "engines": { "node": ">=22.9.0" }
 }

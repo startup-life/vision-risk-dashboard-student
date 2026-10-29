@@ -59,25 +59,12 @@ function parseKstOrIso(ts) {
 }
 
 /**
- * 불리언 정규화: true/false, 'true'/'false', 'TRUE'/'FALSE'만 boolean으로 인정, 나머지는 null
- */
-function normalizeBool(val) {
-  if (typeof val === 'boolean') return val;
-  if (typeof val === 'string') {
-    const s = val.trim().toLowerCase();
-    if (s === 'true') return true;
-    if (s === 'false') return false;
-  }
-  return null;
-}
-
-/**
- * Google Sheets 셀 날짜 정규화:
+ * 기록 날짜 정규화:
  * - Date 객체: isNaN이면 null (Invalid Date는 불명 처리), 정상이면 ISO 8601 문자열(val.toISOString())로 정규화
  * - 문자열: 엄격 ISO/KST 형식만 허용 (parseKstOrIso 검증 통과한 경우에만 문자열 인정, 임의 자연어는 null 불명 처리)
  * - 기타/빈값: null
  */
-function normalizeSheetDate(val) {
+function normalizeDate(val) {
   if (val === undefined || val === null || val === '') return null;
   if (val instanceof Date) {
     if (isNaN(val.getTime())) return null;
@@ -96,46 +83,23 @@ function normalizeSheetDate(val) {
 /**
  * 단일 사건의 review_summary 및 queue 산출
  */
-function buildReviewSummary(record, aiList = [], evidenceList = [], reviewList = [], actionList = []) {
-  const latestAi = aiList.length > 0 ? aiList[aiList.length - 1] : null;
-  const latestEvidence = evidenceList.length > 0 ? evidenceList[evidenceList.length - 1] : null;
+function buildReviewSummary(record, reviewList = [], actionList = []) {
   const latestReview = reviewList.length > 0 ? reviewList[reviewList.length - 1] : null;
   const latestAction = actionList.length > 0 ? actionList[actionList.length - 1] : null;
-
-  const ai = latestAi ? {
-    facts: latestAi.facts || '',
-    suspected_risk: latestAi.suspected_risk || '',
-    locations: latestAi.locations || '',
-    uncertainty: latestAi.uncertainty || '',
-    additional_checks: latestAi.additional_checks || '',
-    input_version: latestAi.input_version !== undefined && latestAi.input_version !== '' && latestAi.input_version !== null ? Number(latestAi.input_version) : null,
-    created_at: normalizeSheetDate(latestAi.created_at)
-  } : null;
-
-  const evidence = latestEvidence ? {
-    standard_id: latestEvidence.standard_id || '',
-    source_id: latestEvidence.source_id || '',
-    quote: latestEvidence.quote || '',
-    match: normalizeBool(latestEvidence.match),
-    sufficient: normalizeBool(latestEvidence.sufficient),
-    notes: latestEvidence.notes || '',
-    input_version: latestEvidence.input_version !== undefined && latestEvidence.input_version !== '' && latestEvidence.input_version !== null ? Number(latestEvidence.input_version) : null,
-    created_at: normalizeSheetDate(latestEvidence.created_at)
-  } : null;
 
   const review = latestReview ? {
     decision: latestReview.decision || '',
     basis: latestReview.basis || '',
     followup_note: latestReview.followup_note || '',
     reviewer: latestReview.reviewer || '',
-    created_at: normalizeSheetDate(latestReview.created_at)
+    created_at: normalizeDate(latestReview.created_at)
   } : null;
 
   const action = latestAction ? {
     action_type: latestAction.action_type || '',
     description: latestAction.description || '',
     evidence_note: latestAction.evidence_note || '',
-    created_at: normalizeSheetDate(latestAction.created_at)
+    created_at: normalizeDate(latestAction.created_at)
   } : null;
 
   // 버전 및 수정 시점 판별
@@ -161,8 +125,6 @@ function buildReviewSummary(record, aiList = [], evidenceList = [], reviewList =
   }
 
   const contextChanged = {
-    after_ai: checkContextChanged(ai),
-    after_evidence: checkContextChanged(evidence),
     after_review: checkContextChanged(review),
     after_action: checkContextChanged(action),
     version_time_unknown: versionTimeUnknown
@@ -244,8 +206,6 @@ function buildReviewSummary(record, aiList = [], evidenceList = [], reviewList =
   }
 
   return {
-    ai,
-    evidence,
     review,
     latest_action: action,
     context_changed: contextChanged,
@@ -279,8 +239,7 @@ function computeQueueCounts(records) {
 
 module.exports = {
   parseKstOrIso,
-  normalizeBool,
-  normalizeSheetDate,
+  normalizeDate,
   buildReviewSummary,
   computeQueueCounts
 };
