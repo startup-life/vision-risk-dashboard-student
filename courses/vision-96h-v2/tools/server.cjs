@@ -65,6 +65,7 @@ class SyntheticStore {
   }
 
   load() {
+    const lists = Object.keys(this.data); // 생성자가 정한 이 회차의 목록 칸
     if (this.filepath && fs.existsSync(this.filepath)) {
       try {
         const raw = fs.readFileSync(this.filepath, 'utf8');
@@ -73,7 +74,22 @@ class SyntheticStore {
         // fallback to empty
       }
     }
+    this.fillMissing(lists);
     this.loadImages();
+  }
+
+  // 지난 회차 서버가 만든 기록 파일에는 이 회차에서 새로 쓰는 목록 칸이 없다. 없는 칸은 빈 목록으로 채운다.
+  // 버전·마지막 수정 시각이 없는 사건(사건 정보 수정이 없던 회차에 등록한 사건)은 버전 1·등록 시각으로 본다.
+  fillMissing(lists) {
+    if (!this.data || typeof this.data !== 'object' || Array.isArray(this.data)) this.data = {};
+    for (const key of lists) {
+      if (!Array.isArray(this.data[key])) this.data[key] = [];
+    }
+    for (const rec of this.data.records) {
+      if (!rec || typeof rec !== 'object') continue;
+      if (!rec.version) rec.version = 1;
+      if (!rec.updated_at) rec.updated_at = rec.created_at;
+    }
   }
 
   // 기록에 있는 사건의 사진 장수 안쪽만 읽는다. 기록 파일을 지우고 다시 쓰면 같은 사건 번호가 다시 나오므로 남은 옛 사진은 쓰지 않는다.
@@ -371,7 +387,8 @@ function createServer(options = {}) {
         phase: 'EVIDENCE_CHECK',
         action_name: '기준 근거 대조',
         summary: `기준 ${payload.standard_id} 대조 (충족여부: ${payload.sufficient})`,
-        operator: 'NotebookLM MCP (Synthetic)'
+        // 로컬 저장소에도 실제 NotebookLM 결과가 저장된다(NOTEBOOKLM_MODE=live). "(Synthetic)"은 모의 결과에만 붙인다.
+        operator: modes.notebooklm === 'mock' ? 'NotebookLM MCP (Synthetic)' : 'NotebookLM MCP'
       });
       syntheticStore.save();
       return { success: true, check_id: checkId, record_id: payload.record_id, input_version: inputVersion };
