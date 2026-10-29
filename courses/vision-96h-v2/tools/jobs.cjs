@@ -552,7 +552,7 @@ class JobManager {
         ...input_snapshot,
         input_version: Number(input_version) || 1
       }) || {},
-      provider_result: null, // MCP/Gemini raw provider response (no secrets)
+      provider_result: null, // MCP raw provider response (no secrets)
       result: null,
       error: null
     };
@@ -692,7 +692,7 @@ class JobManager {
   }
 
   /**
-   * MCP/외부 provider 결과 즉시 원자적 디스크 저장 (Sheets 저장 실패 시에도 로컬 보존)
+   * MCP/외부 provider 결과 즉시 원자적 디스크 저장 (저장소 저장 실패 시에도 로컬 보존)
    */
   persistProviderResult(jobId, providerResult) {
     this.checkHealthy();

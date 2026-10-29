@@ -1,5 +1,5 @@
 // Vision Risk Management Dashboard - Live Application
-// Integrates with local same-origin REST API (/api/*), GAS backend, and NotebookLM MCP.
+// Integrates with local same-origin REST API (/api/*), the local store, and NotebookLM MCP.
 
 (function () {
   // 라이브 대시보드 개편 스타일 동적 주입
@@ -355,7 +355,7 @@
     return tag('확인 완료', 'green');
   }
 
-  // 사건 상태 배지. rec.status(등록·초안 같은 처리 단계)가 아니라 review_summary의 큐와 최신 판단·완료 기록으로 정한다.
+  // 사건 상태 배지. rec.status(등록·판단 같은 처리 단계)가 아니라 review_summary의 큐와 최신 판단·완료 기록으로 정한다.
   // 상세, 사건 목록, 홈의 최근 확인 표가 같은 규칙을 쓴다.
   function reviewStatusTag(summary, rev) {
     if (summary?.queue) return getQueueTag(summary.queue);
@@ -365,7 +365,7 @@
   }
 
   // 큐 및 사건 확인 이유 도출 공통 헬퍼 (홈/상세 완벽 동기화)
-  function getCheckReason(summary, rec, ai, evidence, review) {
+  function getCheckReason(summary, rec, evidence, review) {
     if (!summary) return '';
     const q = summary.queue;
     const context = summary.context_changed || {};
@@ -378,11 +378,9 @@
       } else if (context.after_action) {
         return '조치 후 정보가 바뀌어 다시 확인해야 합니다';
       } else if (review && review.decision === '판단 보류') {
-        return review.basis || review.followup_note || (ai && ai.additional_checks) || '판단 보류된 사건으로 추가 확인이 필요합니다';
+        return review.basis || review.followup_note || '판단 보류된 사건으로 추가 확인이 필요합니다';
       } else if (review && review.followup_note) {
         return review.followup_note;
-      } else if (ai && ai.additional_checks) {
-        return ai.additional_checks;
       } else {
         return '추가 확인이 필요한 사건입니다';
       }
@@ -484,9 +482,6 @@
     return rawMsg || '요청 처리 중 오류가 발생했습니다. 다시 시도할 수 있습니다.';
   }
 
-  // Gemini 요청이 로컬 대기 시간(300초)을 넘기거나 연결이 끊겨 중단된 경우의 안내. 서버 오류 원문(영어)은 보이지 않는다.
-  const AI_TIMEOUT_RETRY = 'Gemini 응답이 늦거나 연결이 끊겨 AI 초안을 받지 못했습니다. Gemini가 붐빌 때 생길 수 있습니다. 3분쯤 뒤 이 사건을 다시 열어 AI 초안이 없으면 다시 요청해 주세요.';
-  const isAiTimeout = job => job.job_type === 'analyze' && job.error?.code === 'NETWORK_TIMEOUT';
   // 보내는 중에 새로 고치거나 연결이 끊겨 서버 작업 목록에 없는 요청(not_received)의 안내. 요청 단추는 다시 켜진다.
   const NOT_RECEIVED = '요청이 서버에 닿지 않았습니다. 다시 요청해 주세요.';
   // 근거 대조 작업의 기준. 서버 작업은 input_snapshot에, 브라우저가 만든 항목은 standard_id에 있다.
@@ -514,7 +509,7 @@
     return [...jobs].sort((a, b) => startMs(a) - startMs(b)).at(-1) || null;
   }
 
-  // AI 및 근거 영역 인라인 요청 상태에 보일 작업
+  // 근거 영역 인라인 요청 상태에 보일 작업
   // scope: 지금 보는 정보 버전(version)과 기준(standardId). 끝난 작업(완료·실패·중단)이 다른 버전이나
   // 다른 기준의 것이면 표시하지 않는다. 진행 중인 작업과 값을 모르는 작업은 그대로 보여 준다.
   // 전송 상태를 모르는 작업(unknown_dispatch)은 어느 기준에서든 단추를 막으므로(inFlightJob) 진행 중처럼 늘 보여 준다.
@@ -529,7 +524,7 @@
     return latestJob(jobs);
   }
 
-  // AI 및 근거 영역 인라인 요청 상태 렌더러
+  // 근거 영역 인라인 요청 상태 렌더러
   function renderInlineJobStatus(recordId, jobType, scope = {}) {
     const job = shownJob(recordId, jobType, scope);
     if (!job) return '';
@@ -553,7 +548,7 @@
       text = NOT_RECEIVED;
     } else if (job.status === 'interrupted') {
       bg = '#fffbeb'; border = '#fde68a'; color = '#92400e'; icon = '⚠️';
-      text = isAiTimeout(job) ? AI_TIMEOUT_RETRY : '처리가 중단됐습니다. 저장된 결과를 확인해 주세요.';
+      text = '처리가 중단됐습니다. 저장된 결과를 확인해 주세요.';
     } else if (job.status === 'failed') {
       bg = '#fef2f2'; border = '#fca5a5'; color = '#991b1b'; icon = '❌';
       text = formatJobErrorMessage(job.error);
@@ -580,17 +575,16 @@
     if (!blocks.length) return escapeHtml(text);
     return `${escapeHtml(text.replace(PROVENANCE_BLOCK, '').trim())}<details><summary>사진 출처</summary><p class="meta">${escapeHtml(blocks.join('\n\n'))}</p></details>`;
   };
-  // 감사 이력의 단계 코드(GAS와 로컬 저장소가 같은 코드를 쓴다)를 화면 이름으로 바꾼다. 모르는 코드는 그대로 보여 준다.
+  // 감사 이력의 단계 코드(저장소가 남긴 코드)를 화면 이름으로 바꾼다. 모르는 코드는 그대로 보여 준다.
   const HISTORY_PHASE_LABELS = {
     REGISTER: '사진 등록',
     RECORD_UPDATE: '정보 수정',
-    AI_ANALYSIS: 'Gemini 판독',
     EVIDENCE_CHECK: 'NotebookLM 대조',
     HUMAN_REVIEW: '내 판단',
     ACTION_TAKEN: '조치 기록'
   };
   const historyPhaseLabel = phase => Object.hasOwn(HISTORY_PHASE_LABELS, phase) ? HISTORY_PHASE_LABELS[phase] : String(phase || '');
-  // 로컬 저장소가 모의 Gemini·NotebookLM 작업자 이름 끝에 붙이는 "(Synthetic)"을 상태 줄의 mock 표기와 같은 말로 바꾼다.
+  // 로컬 저장소가 모의 NotebookLM 작업자 이름 끝에 붙이는 "(Synthetic)"을 상태 줄의 mock 표기와 같은 말로 바꾼다.
   const historyOperator = operator => String(operator || '').replace(/\s*\(Synthetic\)$/, ' (mock)');
 
   // HTML escape 헬퍼 (XSS 및 템플릿 인젝션 방지)
@@ -615,7 +609,6 @@
     standardsLoading: true,
     standardsError: null,
     error: null,
-    setupRequired: false,
     connected: false,
     integrations: null, // /api/health의 연동 모드와 상태 한 줄
     queue_counts: null,
@@ -669,26 +662,25 @@
       let icon = '⏳';
       let title = '';
       let msg = '';
-      const isAi = job.job_type === 'analyze';
 
       if (job.status === 'sending') {
         icon = '📡';
-        title = isAi ? 'AI 초안 요청 전송 중...' : '기준 근거 대조 요청 전송 중...';
+        title = '기준 근거 대조 요청 전송 중...';
         msg = '요청을 보내고 있어요.';
       } else if (job.status === 'queued') {
         icon = '📥';
-        title = isAi ? 'AI 초안 요청 접수' : '기준 근거 대조 접수';
+        title = '기준 근거 대조 접수';
         msg = '요청을 접수했습니다. 순서가 되면 분석을 시작합니다.';
       } else if (job.status === 'running') {
         icon = '⚙️';
-        title = isAi ? 'AI 초안 분석 중' : '기준 근거 대조 중';
+        title = '기준 근거 대조 중';
         msg = '분석 결과를 기다리고 있어요. 다른 사건을 확인해도 됩니다. 준비되면 사이트에서 알려드릴게요.';
       } else if (job.status === 'succeeded') {
         bg = '#ecfdf5';
         border = '#a7f3d0';
         color = '#065f46';
         icon = '✅';
-        title = isAi ? 'AI 초안이 준비됐습니다.' : '기준 근거 대조가 완료됐습니다.';
+        title = '기준 근거 대조가 완료됐습니다.';
         msg = '분석이 완료되어 결과를 확인할 수 있습니다.';
       } else if (job.error_kind === 'unknown_dispatch') {
         bg = '#fffbeb';
@@ -702,21 +694,21 @@
         border = '#fde68a';
         color = '#92400e';
         icon = '⚠️';
-        title = isAi ? 'AI 초안 요청을 다시 보내 주세요' : '기준 근거 대조 요청을 다시 보내 주세요';
+        title = '기준 근거 대조 요청을 다시 보내 주세요';
         msg = NOT_RECEIVED;
       } else if (job.status === 'interrupted') {
         bg = '#fffbeb';
         border = '#fde68a';
         color = '#92400e';
         icon = '⚠️';
-        title = isAiTimeout(job) ? 'AI 초안 요청이 중단됐습니다' : '처리가 중단됐습니다';
-        msg = isAiTimeout(job) ? AI_TIMEOUT_RETRY : '처리가 중단됐습니다. 저장된 결과를 확인해 주세요.';
+        title = '처리가 중단됐습니다';
+        msg = '처리가 중단됐습니다. 저장된 결과를 확인해 주세요.';
       } else if (job.status === 'failed') {
         bg = '#fef2f2';
         border = '#fca5a5';
         color = '#991b1b';
         icon = '❌';
-        title = isAi ? 'AI 초안 생성 실패' : '기준 근거 대조 실패';
+        title = '기준 근거 대조 실패';
         msg = formatJobErrorMessage(job.error);
       }
 
@@ -761,23 +753,7 @@
     const curRoute = parseRoute();
     if (curRoute.page !== 'record_detail' || curRoute.recordId !== job.record_id) return;
 
-    if (job.job_type === 'analyze') {
-      const inlineStatus = document.getElementById('ai-inline-job-status');
-      if (inlineStatus) inlineStatus.innerHTML = renderInlineJobStatus(job.record_id, 'analyze', currentJobScope());
-
-      const btn = document.querySelector(`[data-action="request-ai"][data-record-id="${job.record_id}"]`);
-      if (btn) {
-        if (job.status === 'queued' || job.status === 'running' || job.status === 'sending' || job.error_kind === 'unknown_dispatch') {
-          btn.disabled = true;
-          if (job.status === 'sending') btn.textContent = '초안 요청 보내는 중...';
-          else if (job.error_kind === 'unknown_dispatch') btn.textContent = '전송 상태 확인 필요';
-          else btn.textContent = 'AI 초안 분석 중...';
-        } else {
-          btn.disabled = false;
-          btn.textContent = state.currentDetail?.ai_draft ? '사진 설명 다시 보기' : '사진 설명 더 보기'; // 상세 화면의 단추 이름과 같다.
-        }
-      }
-    } else if (job.job_type === 'evidence_check') {
+    if (job.job_type === 'evidence_check') {
       const inlineStatus = document.getElementById('evidence-inline-job-status');
       if (inlineStatus) inlineStatus.innerHTML = renderInlineJobStatus(job.record_id, 'evidence_check', currentJobScope());
 
@@ -798,10 +774,8 @@
 
   // 새로 그린 상세에 진행 중인 요청을 반영한다. 상세 HTML은 요청 단추를 켜 둔 채로 그리므로, 그대로 두면 기다리는 동안 다시 누를 수 있다.
   function syncDetailJobButtons(recordId) {
-    for (const type of ['analyze', 'evidence_check']) {
-      const job = inFlightJob(recordId, type);
-      if (job) updateDetailJobPaneDom(job);
-    }
+    const job = inFlightJob(recordId, 'evidence_check');
+    if (job) updateDetailJobPaneDom(job);
   }
 
   // 작업 ACK 헬퍼 (독립 fetch, 전체 render() 호출 금지)
@@ -889,7 +863,7 @@
             updateSiteAlertDom();
             // 결과가 오면 보고 있는 상세의 검토 영역만 다시 그린다. 완료 표시는 다시 그린 영역과 함께 보인다.
             // 완료 표시부터 바꾸면 결과를 받는 몇 초 동안 결과 칸이 이전 상태로 남는다. 다시 받지 못하면 완료 표시만 바꾼다.
-            if (finishedNow) refreshDetailReviewPane(job.record_id, job.job_type).then(done => { if (!done) updateDetailJobPaneDom(job); });
+            if (finishedNow) refreshDetailReviewPane(job.record_id).then(done => { if (!done) updateDetailJobPaneDom(job); });
             else updateDetailJobPaneDom(job);
 
             if (job.status === 'succeeded' || job.status === 'failed' || job.status === 'interrupted') {
@@ -1016,9 +990,6 @@
       }).catch(() => { throw new Error(SERVER_UNREACHABLE); });
       const data = await resp.json();
       if (!resp.ok) {
-        if (data.status === 'setup_required' || resp.status === 503) {
-          state.setupRequired = true;
-        }
         // 요청 오류(4xx: 입력 검사 실패, 없는 사건)는 서버가 정상으로 답한 것이다. 연결 표시는 그대로 두고 그 화면의 알림으로만 보인다.
         if (resp.status >= 500) state.connected = false;
         const err = new Error(data.error || `HTTP ${resp.status}`);
@@ -1027,7 +998,6 @@
         throw err;
       }
       state.error = null;
-      state.setupRequired = false;
       return data;
     } catch (err) {
       if (!(err.status >= 400 && err.status < 500)) state.error = err.message;
@@ -1056,7 +1026,6 @@
     state.records = recRes.records || [];
     state.queue_counts = recRes.queue_counts || null;
     state.connected = true;
-    state.setupRequired = false;
     state.error = null;
   }
 
@@ -1073,7 +1042,7 @@
     }
   }
 
-  // 저장소 사진 카탈로그 로드 함수 (독립 fetch 호출로 Sheets 상태와 완전 격리)
+  // 저장소 사진 카탈로그 로드 함수 (독립 fetch 호출로 사건 목록 상태와 완전 격리)
   async function loadRepositoryImages() {
     if (state.repoImagesLoading || state.repoImagesLoaded) return;
     state.repoImagesLoading = true;
@@ -1186,7 +1155,7 @@
         <a class="button" href="#records">전체 사건</a>
       `;
 
-      // 3개 큐 카운트 (미배포 GAS 등으로 불완전한 경우 '—' 표시)
+      // 3개 큐 카운트 (목록을 받지 못해 불완전한 경우 '—' 표시)
       const counts = state.queue_counts;
       const addCountText = counts && counts.additional_check !== null && counts.additional_check !== undefined ? String(counts.additional_check) : '—';
       const awaitCountText = counts && counts.awaiting_review !== null && counts.awaiting_review !== undefined ? String(counts.awaiting_review) : '—';
@@ -1269,28 +1238,18 @@
             ${displayCards.map(r => {
               const summary = r.review_summary || {};
               const q = summary.queue;
-              const ai = summary.ai;
               const review = summary.review;
               const context = summary.context_changed || {};
               const evidence = summary.evidence;
 
-              // AI 관찰 (최대 2줄, 시점 불명/수정 전 자료 표시: version_time_unknown 우선 검사)
+              // 현장 메모 (최대 2줄)
               let obsText = '관찰 내용 없음';
-              if (ai && (ai.facts || ai.suspected_risk)) {
-                const factContent = ai.facts || ai.suspected_risk;
-                if (context.version_time_unknown) {
-                  obsText = 'AI 관찰(시점 불명): ' + factContent;
-                } else if (context.after_ai) {
-                  obsText = 'AI 관찰(수정 전 자료): ' + factContent;
-                } else {
-                  obsText = 'AI 관찰: ' + factContent;
-                }
-              } else if (memoNote(r.memo)) {
+              if (memoNote(r.memo)) {
                 obsText = '현장 메모: ' + memoNote(r.memo);
               }
 
               // 확인 이유 (공통 헬퍼 재사용)
-              const reasonText = getCheckReason(summary, r, ai, evidence, review);
+              const reasonText = getCheckReason(summary, r, evidence, review);
 
               // 출처 대조 상태 (시점 불명/수정 전 대조 명시: version_time_unknown 우선 검사)
               let evStatus = '';
@@ -1334,7 +1293,7 @@
                     </div>
                   </div>
                   <div style="margin-top:12px;">
-                    <a href="#records/${recIdEnc}" class="button small primary" style="display:block; text-align:center; width:100%; box-sizing:border-box;">${RiskWorkflow.action({ai:!!ai,evidence:!!evidence,review:!!review,queue:q})}</a>
+                    <a href="#records/${recIdEnc}" class="button small primary" style="display:block; text-align:center; width:100%; box-sizing:border-box;">${RiskWorkflow.action({evidence:!!evidence,review:!!review,queue:q})}</a>
                   </div>
                 </div>
               `;
@@ -1582,13 +1541,13 @@
             <label class="field">
               <span><b>현장 사진 첨부 (1~5장, JPG/PNG 2MB 이하) *</b></span>
               <input type="file" id="new-files" multiple accept="image/png,image/jpeg">
-              <small class="meta">현장 사진은 Google Drive 비공개 폴더에 즉시 격리 보존됩니다.</small>
+              <small class="meta">현장 사진은 이 컴퓨터의 로컬 저장소에 보존됩니다.</small>
             </label>
           </div>
         `;
       }
 
-      return heading('현장 사건 등록', '현장 사진(1~5장)과 초기 관찰 메모를 등록하여 Google Drive와 Sheets에 안전하게 보존합니다.', actionButtons) +
+      return heading('현장 사건 등록', '현장 사진(1~5장)과 초기 관찰 메모를 등록하여 로컬 저장소에 보존합니다.', actionButtons) +
         card('사건 등록 양식', `
           <form id="new-record-form" class="upload-form">
             ${modeTabs}
@@ -1626,7 +1585,6 @@
           `<p><a class="button" href="#records">← 사건 목록으로 돌아가기</a></p>`;
       }
 
-      const draft = state.currentDetail?.ai_draft;
       const evid = state.currentDetail?.evidence_check;
       const rev = state.currentDetail?.final_review;
       const actions = state.currentDetail?.actions || [];
@@ -1644,14 +1602,13 @@
       const currentStatusBadge = reviewStatusTag(summary, rev);
 
       // 사유 텍스트 (홈과 100% 동일한 getCheckReason 공유)
-      const checkReason = getCheckReason(summary, rec, draft, evid, rev);
+      const checkReason = getCheckReason(summary, rec, evid, rev);
       const queueReasonText = checkReason ? `<span class="meta" style="margin-left:8px; font-size:13px; color:#475569;">(${escapeHtml(checkReason)})</span>` : '';
 
       // 맥락 변경 경고 배너 (쉬운 문구로 통일)
       const context = summary?.context_changed || {};
       const hasContextChanged = Boolean(
         context.version_time_unknown ||
-        context.after_ai ||
         context.after_evidence ||
         context.after_review ||
         context.after_action
@@ -1749,8 +1706,7 @@
           <div style="margin-top:12px; border-top:1px solid #e2e8f0; padding-top:12px;">
             <div style="background:#f8fafc; padding:8px 10px; border-radius:6px; font-size:12px; margin-bottom:12px;">
               <p style="margin:2px 0;"><b>사건 ID:</b> <code>${escapeHtml(rec.record_id)}</code> · <b>버전:</b> v${escapeHtml(String(rec.version || 1))} · <b>최종 수정:</b> ${escapeHtml((rec.updated_at || rec.created_at) ? formatDateSimple(rec.updated_at || rec.created_at) : '수정 이력 없음')}</p>
-              <p style="margin:2px 0;"><b>Drive 폴더 ID:</b> <code>${escapeHtml(rec.drive_folder_id || '없음')}</code></p>
-              <p style="margin:2px 0;"><b>Drive 파일 목록:</b> <code>${escapeHtml(JSON.stringify(rec.drive_file_ids || []))}</code></p>
+              <p style="margin:2px 0;"><b>사진 파일 목록:</b> <code>${escapeHtml(JSON.stringify(rec.drive_file_ids || []))}</code></p>
             </div>
             ${actions.length > 1 ? `
               <h4 style="margin:10px 0 6px; font-size:12px; color:#475569;">전체 대응 조치 이력 (${actions.length}건)</h4>
@@ -1788,7 +1744,7 @@
       return heading(`사건 정보 수정 · ${rec.record_id}`, `현재 버전: v${rec.version || 1} → 저장 시 v${(rec.version || 1) + 1}로 갱신됩니다.`) +
         `<div style="background:#eff6ff; border:1px solid #bfdbfe; padding:12px; border-radius:6px; margin-bottom:16px;">
           <p style="margin:0; color:#1e40af; font-size:13px;">
-            <b>🛡️ 데이터 보존 및 무결성 원칙:</b> 원본 사진(Drive 영구 보존), 기존 AI 관찰 초안, 사람 판단 이력, 기준 근거는 절대 덮어쓰지 않고 안전하게 보존됩니다.
+            <b>🛡️ 데이터 보존 및 무결성 원칙:</b> 원본 사진, 사람 판단 이력, 기준 근거는 절대 덮어쓰지 않고 안전하게 보존됩니다.
             장소·분류·메모 수정 시 버전이 증가하며 감사 이력(RECORD_UPDATE)에 변경 전후 내역이 영구 기록됩니다.
           </p>
         </div>` +
@@ -1928,14 +1884,13 @@
   };
 
   // 연동 상태 줄. 항목마다 .tag(줄바꿈 없음)로 감싸 좁은 화면에서도 항목 단위로만 줄이 바뀌고,
-  // <p>의 아래 여백으로 제목과 떨어진다. 모두 live이면 그리지 않는다.
+  // <p>의 아래 여백으로 제목과 떨어진다. 저장소는 늘 로컬 저장소라 연동 모드를 받으면 늘 그린다.
   function integrationStatusHtml() {
     const modes = state.integrations?.modes;
-    if (!modes || !['storage', 'gemini', 'notebooklm'].some(k => modes[k] !== 'live')) return '';
+    if (!modes) return '';
     const label = mode => mode === 'off' ? '꺼짐' : mode;
     const items = [
-      ['저장소 ' + (modes.storage === 'mock' ? '로컬 저장' : 'Google 시트'), modes.storage],
-      ['Gemini ' + label(modes.gemini), modes.gemini],
+      ['저장소 로컬 저장', 'mock'],
       ['NotebookLM ' + label(modes.notebooklm), modes.notebooklm]
     ];
     return `<p data-integration-status>연동 상태: ${items.map(([text, mode]) => `<span class="tag ${mode === 'off' ? 'warn' : 'gray'}">${escapeHtml(text)}</span>`).join(' ')}</p>`;
@@ -1945,8 +1900,6 @@
   function connectionBadgeHtml() {
     if (state.loading && !state.connected) {
       return `<span class="preview-status" style="border-color:#3b82f6; color:#1e40af; background:#eff6ff;"><i class="dot" style="background:#3b82f6;"></i>연결 확인 중...</span>`;
-    } else if (state.setupRequired) {
-      return `<span class="preview-status" style="border-color:#f59e0b; color:#92400e; background:#fffbeb;"><i class="dot" style="background:#f59e0b;"></i>설정 필요 (GAS Web App 배포 대기)</span>`;
     } else if (state.error) {
       return `<span class="preview-status" style="border-color:#ef4444; color:#991b1b; background:#fef2f2;"><i class="dot" style="background:#ef4444;"></i>조회 실패 (${escapeHtml(state.error)})</span>`;
     } else if (state.connected) {
@@ -1967,9 +1920,6 @@
     if (!el) return;
     if (state.loading) {
       el.innerHTML = '<span class="status-badge loading">처리 중...</span>';
-    } else if (state.setupRequired) {
-      // 설정 필요 안내는 머리말 연결 배지가 이미 보여 주므로 여기서 되풀이하지 않는다.
-      el.innerHTML = integrationStatusHtml();
     } else if (state.error) {
       el.innerHTML = `<span class="status-badge error">오류: ${escapeHtml(state.error)}</span>`;
     } else {
@@ -2098,28 +2048,24 @@
     if (routeChanged) window.scrollTo(0, 0);
   }
 
-  // 판단 기록 화면에 Gemini 초안과 NotebookLM 대조 결과를 함께 보여 준다. 상세 조회가 이미 받은 값만 쓴다.
+  // 판단 기록 화면에 NotebookLM 대조 결과를 함께 보여 준다. 상세 조회가 이미 받은 값만 쓴다.
   function reviewSources(rec){
-    const detail=state.currentDetail||{},draft=detail.ai_draft,version=Number(rec.version||1);
+    const detail=state.currentDetail||{},version=Number(rec.version||1);
     // 상세에서 고른 기준의 근거만 보여 준다. 고른 기준이 없으면(판단 화면으로 바로 들어온 경우) 최신 근거를 보여 준다.
     const chosen=(state.standards||[]).find(s=>s.id===state.selectedStandardId&&s.category===rec.category);
     const evid=RiskWorkflow.evidenceFor(detail,chosen?.id);
     const context=(rec.review_summary||detail.review_summary)?.context_changed||{},old=' <span class="meta">(수정 전 결과)</span>';
-    const freshDraft=draft&&Number(draft.input_version||1)===version&&!context.after_ai;
     const freshEvidence=evid&&Number(evid.input_version||1)===version&&!context.after_evidence;
     const view=RiskWorkflow.evidenceView(evid,{standards:state.standards||[],standardId:evid?.standard_id||state.selectedStandardId,normalizeBool});
     const cited=evid?RiskWorkflow.citedLabel(evid.quote,state.standards||[]):'';
-    return `<p style="margin:2px 0;"><b>Gemini 관찰 사실:</b> ${escapeHtml(draft?.facts || 'AI 초안 미등록')}${draft&&!freshDraft?old:''}</p>`+
-      `<p style="margin:2px 0;"><b>NotebookLM 기준 확인:</b> ${evid?escapeHtml(view.title)+(freshEvidence?'':old):chosen?escapeHtml(chosen.id+' '+chosen.name)+' 기준으로는 아직 확인하지 않았습니다.':'아직 관련 기준을 확인하지 않았습니다.'}</p>`+
+    return `<p style="margin:2px 0;"><b>NotebookLM 기준 확인:</b> ${evid?escapeHtml(view.title)+(freshEvidence?'':old):chosen?escapeHtml(chosen.id+' '+chosen.name)+' 기준으로는 아직 확인하지 않았습니다.':'아직 관련 기준을 확인하지 않았습니다.'}</p>`+
       (view?.reason?`<p style="margin:2px 0;"><b>확인 필요:</b> ${escapeHtml(view.reason)}</p>`:'')+
       (evid?`<div style="margin:2px 0;">${evid.answer?RiskWorkflow.answerPreview(evid.answer,escapeHtml):escapeHtml((evid.notes||'').slice(0,240))}</div><p style="margin:2px 0;"><b>인용:</b> ${escapeHtml(evid.quote||'인용 없음')}</p><p class="meta" style="margin:2px 0;">${cited?'인용한 기준: '+escapeHtml(cited)+' · ':''}소스 ID: ${escapeHtml(evid.source_id||'없음')}</p>`:'');
   }
   // 상세 오른쪽 검토 영역과 진행 표시. record_detail과 작업 완료 뒤 국소 갱신이 같은 값으로 그린다.
   function buildLiveDetail(){
     const detail=state.currentDetail,rec=detail.record,summary=rec.review_summary||detail.review_summary;
-    // 확인하지 않은 Gemini 요청 상태(진행 중·중단·실패·전송 확인 필요)가 있으면 2단계 영역을 펼친다. 완료는 펼치지 않는다.
-    const aiJob=shownJob(rec.record_id,'analyze',{version:rec.version??null});
-    const live=RiskLiveDetail({rec,aiAlert:Boolean(aiJob)&&aiJob.status!=='succeeded',draft:detail.ai_draft,evid:detail.evidence_check,evidenceByStandard:detail.evidence_by_standard,rev:detail.final_review,actions:detail.actions||[],summary,context:summary?.context_changed||{},standards:state.standards,selectedStandardId:state.selectedStandardId,inlineStatus:renderInlineJobStatus,normalizeBool,integrations:state.integrations?.modes,step:state.workflowStep?.recordId===rec.record_id?state.workflowStep.n:undefined});
+    const live=RiskLiveDetail({rec,evid:detail.evidence_check,evidenceByStandard:detail.evidence_by_standard,rev:detail.final_review,actions:detail.actions||[],summary,context:summary?.context_changed||{},standards:state.standards,selectedStandardId:state.selectedStandardId,inlineStatus:renderInlineJobStatus,normalizeBool,integrations:state.integrations?.modes,step:state.workflowStep?.recordId===rec.record_id?state.workflowStep.n:undefined});
     // 기준 목록(GET /api/standards)이 아직 도착하지 않았으면(불러오는 중이거나 불러오지 못했으면) 기억한 기준 ID를 바꾸지 않는다.
     // 기준 목록을 받은 뒤에는 지금 규칙(기억한 기준 ID가 선택지에 있으면 그것, 없으면 첫 선택지, 고를 기준이 없으면 빈 값)을 그대로 쓴다.
     if(!state.standardsLoading&&!state.standardsError)state.selectedStandardId=live.standardId;
@@ -2129,7 +2075,7 @@
   }
   // 작업이 끝나면 그 사건 상세를 다시 받아 오른쪽 검토 영역과 진행 표시만 바꿔 끼운다.
   // 폴링은 어느 화면에서나 돌기 때문에 전체 render()를 부르면 다른 화면의 입력과 포커스가 지워진다. 그래서 상세 화면의 이 영역만 고친다.
-  async function refreshDetailReviewPane(recordId, jobType){
+  async function refreshDetailReviewPane(recordId){
     const onDetail=()=>{const r=parseRoute();return r.page==='record_detail'&&r.recordId===recordId;};
     if(!onDetail())return false;
     let res;
@@ -2147,16 +2093,14 @@
     pane.replaceWith(fresh);
     for(const sel of ['.workflow-path','#workflow-guidance']){const oldEl=document.querySelector(sel),newEl=introTpl.content.querySelector(sel);if(oldEl&&newEl)oldEl.replaceWith(newEl);}
     for(const [id,open] of openIds){const el=document.getElementById(id);if(el)el.open=open;}
-    // 새로 도착한 Gemini 설명은 접힌 채로 두지 않는다.
-    if(jobType==='analyze'){const ai=document.getElementById('details-ai');if(ai)ai.open=true;}
     bindEvents(parseRoute());
     syncDetailJobButtons(recordId);
     if(focusId)document.getElementById(focusId)?.focus({preventScroll:true});
     return true;
   }
   function formContext(rec){
-    const detail=state.currentDetail,review=detail?.final_review,draft=detail?.ai_draft;
-    return '<aside class="form-context"><img src="/api/records/'+encodeURIComponent(rec.record_id)+'/images/0" alt="확인할 현장 사진"><div><strong>'+escapeHtml(rec.location||'현장 사진')+'</strong><p>'+escapeHtml(review?.decision||'아직 판단을 남기지 않았습니다.')+'</p><p>'+escapeHtml(review?.basis||draft?.facts||'사진에서 직접 확인한 내용을 기록해 주세요.')+'</p></div></aside>';
+    const detail=state.currentDetail,review=detail?.final_review;
+    return '<aside class="form-context"><img src="/api/records/'+encodeURIComponent(rec.record_id)+'/images/0" alt="확인할 현장 사진"><div><strong>'+escapeHtml(rec.location||'현장 사진')+'</strong><p>'+escapeHtml(review?.decision||'아직 판단을 남기지 않았습니다.')+'</p><p>'+escapeHtml(review?.basis||'사진에서 직접 확인한 내용을 기록해 주세요.')+'</p></div></aside>';
   }
   function bindEvents(route) {
     const appEl = document.getElementById('app');
@@ -2260,8 +2204,6 @@
             });
           }
           return;
-        } else if (action === 'request-ai') {
-          await window.requestAiAnalysis(recId);
         } else if (action === 'check-evidence') {
           await window.checkEvidence(recId);
         }
@@ -2668,193 +2610,6 @@
   }
 
   // 전역 액션 헬퍼 (202 비동기 기반, 독립 fetch로 글로벌 상태 오염 방지)
-  window.requestAiAnalysis = async (recordId) => {
-    // 상세 화면 unreadable 1x1 사진 감지 시 분석 차단 및 승인 안내 유지
-    const unreadableBox = document.getElementById('detail-photo-unreadable');
-    if ((unreadableBox && unreadableBox.style.display !== 'none') || window._isCurrentPhotoUnreadable) {
-      notify('사진 내용을 확인할 수 없어 AI 분석을 요청할 수 없습니다. 다른 사진으로 새 사건을 등록해 주세요.', 'warn');
-      return;
-    }
-
-    // 최초 전송부터 중복 방지
-    if (isJobInFlight(recordId, 'analyze')) {
-      console.warn('AI analysis job already in flight for record:', recordId);
-      return;
-    }
-
-    const btn = document.querySelector(`[data-action="request-ai"][data-record-id="${recordId}"]`);
-    if (btn) {
-      btn.disabled = true;
-      btn.textContent = '요청을 보내고 있어요...';
-    }
-
-    // 클라이언트 UUID를 제출 전 생성 및 저장. 서버에 닿지 않은 요청을 다시 보내면 그 번호를 다시 쓴다.
-    const missed = notReceivedJob(recordId, 'analyze');
-    if (missed) delete state.activeJobs[missed.job_id];
-    const clientRequestId = missed?.request_id || generateClientRequestId('req_ai_' + recordId);
-    const tempJobId = `temp-ai-${clientRequestId}`;
-    // 단추를 누른 시각. 기다리는 동안 경과 시간을 이 시각부터 센다.
-    const requestedAt = new Date().toISOString();
-
-    state.activeJobs[tempJobId] = {
-      job_id: tempJobId,
-      request_id: clientRequestId,
-      record_id: recordId,
-      job_type: 'analyze',
-      status: 'sending',
-      created_at: requestedAt,
-      acknowledged: false
-    };
-    saveActiveJobsToStorage();
-    updateSiteAlertDom();
-    // 이전 작업의 완료 표시가 남지 않도록 이 단계의 요청 상태도 바로 "요청을 보내고 있어요"로 바꾼다.
-    const inlineStatus = document.getElementById('ai-inline-job-status');
-    if (inlineStatus) inlineStatus.innerHTML = renderInlineJobStatus(recordId, 'analyze', currentJobScope());
-
-    let res;
-    try {
-      res = await fetch(`/api/records/${encodeURIComponent(recordId)}/analyze`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ request_id: clientRequestId })
-      });
-    } catch (err) {
-      delete state.activeJobs[tempJobId];
-
-      // 네트워크 전송불명 (Network Error / TypeError): 자동 재POST 금지!
-      // 같은 clientRequestId로 GET /api/jobs 조회하여 서버 도달 여부 대조
-      let matchedJob = null;
-      // 작업 목록을 받았는지. 받았는데 이 요청 번호가 없으면 서버에 닿지 않은 요청이다(새로 고친 뒤 loadPendingJobs와 같은 판단).
-      let listed = false;
-      try {
-        const checkRes = await fetch(`/api/jobs?record_id=${encodeURIComponent(recordId)}`);
-        if (checkRes.ok) {
-          const jobsData = await checkRes.json();
-          listed = Array.isArray(jobsData?.jobs);
-          matchedJob = (jobsData.jobs || []).find(j => j.request_id === clientRequestId);
-        }
-      } catch (checkErr) {
-        console.warn('Jobs lookup failed after network error:', checkErr);
-      }
-
-      if (matchedJob) {
-        // 이미 서버에 접수되어 실행 중인 경우 동기화
-        matchedJob = withEarlierStart(matchedJob, { created_at: requestedAt });
-        state.activeJobs[matchedJob.job_id] = matchedJob;
-        saveActiveJobsToStorage();
-        updateSiteAlertDom();
-        updateDetailJobPaneDom(matchedJob);
-        startJobPolling(matchedJob.job_id);
-      } else {
-        // 목록에 없으면 서버에 닿지 않은 요청(not_received)으로 두어 다시 누를 수 있게 한다. 다시 누르면 이 요청 번호를 다시 쓴다.
-        // 목록을 받지 못했으면 도달 여부를 모르므로 interrupted/unknown_dispatch로 새 요청을 막는다.
-        const unknownJobId = `unknown-${clientRequestId}`;
-        state.activeJobs[unknownJobId] = {
-          job_id: unknownJobId,
-          request_id: clientRequestId,
-          record_id: recordId,
-          job_type: 'analyze',
-          status: 'interrupted',
-          created_at: requestedAt,
-          error_kind: listed ? 'not_received' : 'unknown_dispatch',
-          error: {
-            message: listed ? NOT_RECEIVED : '네트워크 연결 불안정으로 요청 도달 여부가 확인되지 않았습니다. 작업 상태를 먼저 확인해 주세요.'
-          },
-          acknowledged: false
-        };
-        saveActiveJobsToStorage();
-        updateSiteAlertDom();
-        updateDetailJobPaneDom(state.activeJobs[unknownJobId]);
-      }
-      return;
-    }
-
-    // 서버 응답이 온 경우
-    delete state.activeJobs[tempJobId];
-    let data = {};
-    try {
-      data = await res.json();
-    } catch (e) {
-      data = {};
-    }
-
-    if (res.ok && data && data.job_id) {
-      state.activeJobs[data.job_id] = {
-        job_id: data.job_id,
-        request_id: clientRequestId,
-        record_id: recordId,
-        job_type: 'analyze',
-        // 다시 보낸 요청 번호로 이미 끝난 작업을 돌려받아도 대기로 넣어, 폴링이 끝남을 알아채고 결과를 다시 그리게 한다.
-        status: ['queued', 'running'].includes(data.status) ? data.status : 'queued',
-        created_at: requestedAt,
-        acknowledged: false
-      };
-      saveActiveJobsToStorage();
-      updateSiteAlertDom();
-      updateDetailJobPaneDom(state.activeJobs[data.job_id]);
-      startJobPolling(data.job_id);
-    } else if (res.ok) {
-      // 2xx 헤더를 수신했으나 본문 유실 또는 job_id 파싱 불가 -> 명백한 서버 거절 아님!
-      // 동일 request_id로 GET /api/jobs 대조
-      let matchedJob = null;
-      try {
-        const checkRes = await fetch(`/api/jobs?record_id=${encodeURIComponent(recordId)}`);
-        if (checkRes.ok) {
-          const jobsData = await checkRes.json();
-          matchedJob = (jobsData.jobs || []).find(j => j.request_id === clientRequestId);
-        }
-      } catch (checkErr) {
-        console.warn('Jobs lookup failed after unreadable 2xx body:', checkErr);
-      }
-
-      if (matchedJob) {
-        matchedJob = withEarlierStart(matchedJob, { created_at: requestedAt });
-        state.activeJobs[matchedJob.job_id] = matchedJob;
-        saveActiveJobsToStorage();
-        updateSiteAlertDom();
-        updateDetailJobPaneDom(matchedJob);
-        startJobPolling(matchedJob.job_id);
-      } else {
-        const unknownJobId = `unknown-${clientRequestId}`;
-        state.activeJobs[unknownJobId] = {
-          job_id: unknownJobId,
-          request_id: clientRequestId,
-          record_id: recordId,
-          job_type: 'analyze',
-          status: 'interrupted',
-          created_at: requestedAt,
-          error_kind: 'unknown_dispatch',
-          error: {
-            message: '서버 접수는 되었으나 작업 정보를 수신하지 못했습니다. 작업 대기열 상태 확인이 필요합니다.'
-          },
-          acknowledged: false
-        };
-        saveActiveJobsToStorage();
-        updateSiteAlertDom();
-        updateDetailJobPaneDom(state.activeJobs[unknownJobId]);
-      }
-    } else {
-      // 명백한 HTTP 서버 거절 (4xx, 5xx)
-      const failId = `err-ai-${Date.now()}`;
-      state.activeJobs[failId] = {
-        job_id: failId,
-        request_id: clientRequestId,
-        record_id: recordId,
-        job_type: 'analyze',
-        status: 'failed',
-        created_at: requestedAt,
-        error_kind: 'http_rejection',
-        error: {
-          message: data.error || `서버 거절 (HTTP ${res.status})`
-        },
-        acknowledged: false
-      };
-      saveActiveJobsToStorage();
-      updateSiteAlertDom();
-      updateDetailJobPaneDom(state.activeJobs[failId]);
-    }
-  };
-
   window.checkEvidence = async (recordId) => {
     // 최초 전송부터 중복 방지
     if (isJobInFlight(recordId, 'evidence_check')) {

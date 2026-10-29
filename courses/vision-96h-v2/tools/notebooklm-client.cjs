@@ -118,7 +118,7 @@ const FIXED_MCP_ENV = {
   NOTEBOOKLM_DISABLE_HEADLESS_REFRESH: '1'
 };
 // SDK 기본 목록(PATH·HOME, Windows의 APPDATA·SYSTEMROOT 등)에 더해 넘기는 변수: 임시 폴더·로캘, 그리고 표준 프록시 설정.
-// 프록시를 쓰는 네트워크에서는 이 값이 없으면 MCP가 Google에 접속하지 못한다. 앱 설정값(GAS_WEBAPP_URL 등)과는 무관하다.
+// 프록시를 쓰는 네트워크에서는 이 값이 없으면 MCP가 Google에 접속하지 못한다. 앱 설정값(REPOSITORY_IMAGES_ROOT 등)과는 무관하다.
 // TLS 검사 장비가 있는 네트워크를 위해 인증서 묶음 위치(SSL_CERT_FILE 등)도 넘긴다.
 const EXTRA_INHERITED_ENV_VARS = [
   'TMPDIR', 'TMP', 'LANG', 'LC_ALL', 'LC_CTYPE',
@@ -137,7 +137,7 @@ function isInheritedEnvName(key, platform) {
 }
 
 /**
- * 비공식 MCP 서버에는 필요한 변수만 넘긴다. GAS_WEBAPP_URL·GEMINI_API_KEY 같은 서버 설정값은 넘기지 않는다.
+ * 비공식 MCP 서버에는 필요한 변수만 넘긴다. REPOSITORY_IMAGES_ROOT 같은 서버 설정값은 넘기지 않는다.
  * 넘기는 것: SDK getDefaultEnvironment(), NOTEBOOKLM_로 시작하는 변수, Antigravity 설정 항목의 env, 고정값, 생성자 옵션 env.
  */
 function buildMcpEnv(launchEnv = {}, overrides = {}, env = process.env, platform = process.platform) {

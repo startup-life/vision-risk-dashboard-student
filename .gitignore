@@ -2,7 +2,6 @@ node_modules/
 .DS_Store
 *.log
 .env
-.clasp.json
 .env.*
 *.env
 !*.example
@@ -10,7 +9,6 @@ runtime/
 config/*
 !config/*.example.json
 courses/vision-96h-v2/scratch/
-courses/vision-96h-v2/preview/_jobs/
 courses/vision-96h-v2/preview/_synthetic_jobs/
 courses/vision-96h-v2/preview/*store*.json
 courses/vision-96h-v2/preview/*store*_images/

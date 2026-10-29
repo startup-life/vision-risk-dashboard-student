@@ -72,7 +72,7 @@ function normalizeBool(val) {
 }
 
 /**
- * Google Sheets 셀 날짜 정규화:
+ * 저장된 날짜 값 정규화:
  * - Date 객체: isNaN이면 null (Invalid Date는 불명 처리), 정상이면 ISO 8601 문자열(val.toISOString())로 정규화
  * - 문자열: 엄격 ISO/KST 형식만 허용 (parseKstOrIso 검증 통과한 경우에만 문자열 인정, 임의 자연어는 null 불명 처리)
  * - 기타/빈값: null
@@ -96,21 +96,10 @@ function normalizeSheetDate(val) {
 /**
  * 단일 사건의 review_summary 및 queue 산출
  */
-function buildReviewSummary(record, aiList = [], evidenceList = [], reviewList = [], actionList = []) {
-  const latestAi = aiList.length > 0 ? aiList[aiList.length - 1] : null;
+function buildReviewSummary(record, evidenceList = [], reviewList = [], actionList = []) {
   const latestEvidence = evidenceList.length > 0 ? evidenceList[evidenceList.length - 1] : null;
   const latestReview = reviewList.length > 0 ? reviewList[reviewList.length - 1] : null;
   const latestAction = actionList.length > 0 ? actionList[actionList.length - 1] : null;
-
-  const ai = latestAi ? {
-    facts: latestAi.facts || '',
-    suspected_risk: latestAi.suspected_risk || '',
-    locations: latestAi.locations || '',
-    uncertainty: latestAi.uncertainty || '',
-    additional_checks: latestAi.additional_checks || '',
-    input_version: latestAi.input_version !== undefined && latestAi.input_version !== '' && latestAi.input_version !== null ? Number(latestAi.input_version) : null,
-    created_at: normalizeSheetDate(latestAi.created_at)
-  } : null;
 
   const evidence = latestEvidence ? {
     standard_id: latestEvidence.standard_id || '',
@@ -161,7 +150,6 @@ function buildReviewSummary(record, aiList = [], evidenceList = [], reviewList =
   }
 
   const contextChanged = {
-    after_ai: checkContextChanged(ai),
     after_evidence: checkContextChanged(evidence),
     after_review: checkContextChanged(review),
     after_action: checkContextChanged(action),
@@ -244,7 +232,6 @@ function buildReviewSummary(record, aiList = [], evidenceList = [], reviewList =
   }
 
   return {
-    ai,
     evidence,
     review,
     latest_action: action,
