@@ -107,7 +107,7 @@ npm start
 - `courses/vision-96h-v2/tools/`: 로컬 Node 서버, 사진 저장소 읽기
 - `config/`: 설정 예시 파일
 - `docs/LOCAL-SETUP.md`: 로컬 실행 준비의 자세한 안내
-- `.agent/rules/class-rules.md`·`materials/`: 수업 공통 규칙과 지급 원문 자료. 따라하기 프롬프트는 `main` 브랜치의 `follow-along/` 폴더에 있다.
+- `AGENTS.md`·`materials/`: 수업 공통 규칙·기술 약속과 지급 원문 자료. 따라하기 프롬프트는 `main` 브랜치의 `follow-along/` 폴더에 있다.
 
 ## 라이선스
 
