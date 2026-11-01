@@ -1,7 +1,7 @@
 # 비전 리스크 대시보드 — 수강생 저장소
 
 현장 사진으로 위험을 확인하고 판단·조치를 기록하는 대시보드를 6회차 수업에서 함께 만듭니다.
-이 브랜치(`milestone-0`)는 출발점이라 이 안내 파일만 있습니다.
+이 브랜치(`milestone-0`)는 출발점이라 이 안내 파일과 강사가 준 자료(`materials`)만 있습니다.
 
 ## 브랜치
 
@@ -25,7 +25,7 @@ cd vision-risk-dashboard-student
 ## 따라하기 자료
 
 - 따라하기 프롬프트는 `main` 브랜치의 `follow-along/` 폴더에 있습니다.
-- 공통 규칙은 `.agent/rules/class-rules.md`, 원문 자료는 `materials/`에 있습니다.
+- 공통 규칙은 1회차 1-1에서 만드는 `AGENTS.md`에, 원문 자료는 `materials/`에 있습니다.
 
 ## 회차를 놓쳤을 때
 
