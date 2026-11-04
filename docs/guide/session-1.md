@@ -24,7 +24,7 @@
 - 서버는 public 폴더의 파일만 브라우저에 보냅니다. 주소 /는 public/index.html입니다.
 - 주소는 퍼센트 인코딩을 푼 뒤에 판단합니다. /%2e%2e%2fpackage.json 같은 주소도 public 폴더 밖 파일로 보고 거절합니다. 풀 수 없는 주소와 널 문자(%00)가 든 주소는 400과 `{"error": "Malformed URI encoding"}`로 답하고 서버는 꺼지지 않습니다.
 - 파일을 보낼 때 종류를 알려 줍니다. html은 text/html, css는 text/css, js는 text/javascript, png는 image/png, jpg와 jpeg는 image/jpeg, json은 application/json이고 글자 파일에는 charset=utf-8을 붙입니다. 그 밖은 application/octet-stream입니다.
-- 파일을 보내는 주소는 GET과 HEAD만 받고 다른 방식의 요청은 405로 답합니다.
+- 파일을 보내는 주소(/api/ 로 시작하지 않는 주소)는 GET과 HEAD만 받고 다른 방식의 요청은 405로 답합니다. /api/ 주소는 이 검사를 받지 않습니다.
 - public 폴더에 없는 파일은 404와 "Not found" 글로 답합니다.
 - public 폴더 밖의 파일, 이름이 점(.)으로 시작하는 파일, 이름에 .env가 들어간 파일은 보내지 않고 403과 "Forbidden" 글로 거절합니다.
 - 다른 사이트 주소에서 온 요청은 403으로 거절합니다. 요청에 Origin 헤더가 있는데 127.0.0.1이나 localhost가 아니면 다른 사이트로 봅니다. Origin 헤더가 없는 요청은 받습니다. 이 검사는 파일과 데이터 주소를 처리하기 전에 먼저 하고 거절 답은 `{"error": "Forbidden: invalid origin"}`입니다.
