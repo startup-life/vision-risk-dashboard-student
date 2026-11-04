@@ -5,12 +5,12 @@
 
 | 회차 | 파일 | 단계 | 끝나면 되는 것 | 완료 브랜치 |
 |---|---|---|---|---|
-| 1 | [session-1.md](session-1.md) | 24 | 서버를 켜면 화면 틀이 뜨고 확인 기준 목록이 보인다 | `milestone-1` |
-| 2 | [session-2.md](session-2.md) | 36 | 파일이나 저장소 사진으로 사건을 등록하면 목록과 홈에 나온다 (내 컴퓨터 저장) | `milestone-2` |
+| 1 | [session-1.md](session-1.md) | 25 | 서버를 켜면 화면 틀이 뜨고 확인 기준 목록이 보인다 | `milestone-1` |
+| 2 | [session-2.md](session-2.md) | 38 | 파일이나 저장소 사진으로 사건을 등록하면 목록과 홈에 나온다 (내 컴퓨터 저장) | `milestone-2` |
 | 3 | [session-3.md](session-3.md) | 42 | 사건 상세에서 정보 수정·판단·조치를 기록하면 상태에 반영된다 | `milestone-3` |
-| 4 | [session-4.md](session-4.md) | 47 | 관련 기준 확인을 요청하면 NotebookLM 인용이 나온다 | `milestone-4` |
-| 5 | [session-5.md](session-5.md) | 46 | 사건이 Google 시트에 저장되고 Gemini 사진 판독 초안이 나온다 | `milestone-5` |
-| 6 | [session-6.md](session-6.md) | 47 | 직접 학습한 Teachable Machine 모델의 예측이 상세와 홈에 나온다 | `main` |
+| 4 | [session-4.md](session-4.md) | 49 | 관련 기준 확인을 요청하면 NotebookLM 인용이 나온다 | `milestone-4` |
+| 5 | [session-5.md](session-5.md) | 49 | 사건이 Google 시트에 저장되고 Gemini 사진 판독 초안이 나온다 | `milestone-5` |
+| 6 | [session-6.md](session-6.md) | 48 | 직접 학습한 Teachable Machine 모델의 예측이 상세와 홈에 나온다 | `main` |
 
 ## 준비물
 
