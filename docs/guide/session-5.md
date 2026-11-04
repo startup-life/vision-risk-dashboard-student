@@ -76,8 +76,8 @@ STORAGE_MODE=live인데 GAS_WEBAPP_URL이 비어 있으면 사건 저장·조회
 
 내 컴퓨터 저장소의 모의 사진 설명은 모델 이름 gemini-3.8-flash-synthetic, 이력 작업자 "gemini-3.8-flash (Synthetic)"입니다. 사건 종류별 글은 아래에 적었습니다.
 
-- 산업안전 사건: 관찰 사실 "중앙 작업자의 머리가 충분히 식별되나 안전모가 관찰되지 않습니다.", 의심 위험 "머리 보호구 미착용 위험 (C-01)", 위치 "화면 중앙 작업자의 머리", 불확실성 "작업 구역 진입 직후 탈모인지 일시적 미착용인지 원인 불명확", 추가 확인 "해당 작업 라인의 안전모 착용 의무 및 현장 관리자 확인"
-- 택배 발송 확인 사건: 관찰 사실 "출하 대기 완제품 상자의 모서리가 안쪽으로 함몰되어 있습니다.", 의심 위험 "포장 손상 결함 (C-05)", 위치 "화면 우측 하단 적재 상자", 불확실성 "내부 완충재 및 제품 본체 손상 여부는 외부 관찰로 확인 불가", 추가 확인 "품질 관리자 입회 하에 개봉 재검수 필요"
+- 산업안전 사건(category 값 safety): 관찰 사실 "중앙 작업자의 머리가 충분히 식별되나 안전모가 관찰되지 않습니다.", 의심 위험 "머리 보호구 미착용 위험 (C-01)", 위치 "화면 중앙 작업자의 머리", 불확실성 "작업 구역 진입 직후 탈모인지 일시적 미착용인지 원인 불명확", 추가 확인 "해당 작업 라인의 안전모 착용 의무 및 현장 관리자 확인"
+- 택배 발송 확인 사건(category 값 quality): 관찰 사실 "출하 대기 완제품 상자의 모서리가 안쪽으로 함몰되어 있습니다.", 의심 위험 "포장 손상 결함 (C-05)", 위치 "화면 우측 하단 적재 상자", 불확실성 "내부 완충재 및 제품 본체 손상 여부는 외부 관찰로 확인 불가", 추가 확인 "품질 관리자 입회 하에 개봉 재검수 필요"
 
 ### 사진 판독 요청
 
@@ -85,7 +85,7 @@ POST /api/records/(사건번호)/analyze: 4회차의 관련 기준 확인 요청
 
 - 판독 작업의 종류(job_type)는 "analyze"로 따로 둡니다. 4회차의 기준 확인 작업은 "evidence_check" 그대로입니다. 기준 확인의 작업 목록, 요청 상태 줄, 최신 결과 계산은 job_type이 "evidence_check"인 것만 봅니다.
 - GET /api/jobs에는 두 종류가 다 나옵니다. 4회차의 ?record_id, ?status처럼 ?job_type=(종류)로도 거릅니다. 화면은 작업마다 job_type을 보고 나눕니다.
-- 판독 작업은 요청한 때의 사건 정보 버전과 사진 목록을 고정해 analyze_gemini를 부릅니다. 보내는 항목은 record_id, request_id, input_version, image_ids(사진 목록), input_snapshot(version, updated_at, location, category, memo, image_ids)입니다. 성공하면 답의 draft를 작업 결과로 둡니다. 실패하면 답의 오류 코드와 문장을 작업에 남기고 작업을 failed로 끝냅니다. 답에 문장이 없으면 "Gemini 사진 설명을 받지 못했습니다. 잠시 뒤 다시 요청하세요."를, 코드가 없으면 PROVIDER_ERROR를 씁니다. 답의 interrupted가 true이거나 오류 코드가 NETWORK_TIMEOUT이면 failed 대신 interrupted로 끝냅니다.
+- 판독 작업은 요청한 때의 사건 정보 버전과 사진 목록을 고정해 analyze_gemini를 부릅니다. 보내는 항목은 record_id, request_id, input_version, image_ids(사진 목록. 사건에 Drive 파일 목록 drive_file_ids가 있으면 그 목록), input_snapshot(version, updated_at, location, category, memo, image_ids)입니다. 성공하면 답의 draft를 작업 결과로 둡니다. 실패하면 답의 오류 코드와 문장을 작업에 남기고 작업을 failed로 끝냅니다. 답에 문장이 없으면 "Gemini 사진 설명을 받지 못했습니다. 잠시 뒤 다시 요청하세요."를, 코드가 없으면 PROVIDER_ERROR를 씁니다. 답의 interrupted가 true이거나 오류 코드가 NETWORK_TIMEOUT이면 failed 대신 interrupted로 끝냅니다.
 - 저장소 동작 reconcile_job은 request_id, record_id, job_type을 받습니다. 저장된 것이 있으면 analyze는 `{"success": true, "reconciled": true, "job_type": "analyze", "draft_id": "...", "record_id": "...", "model": "...", "draft": {...}}`, evidence_check는 `{"success": true, "reconciled": true, "job_type": "evidence_check", "check_id": "...", "record_id": "...", "check": {...}}`, 없으면 `{"success": true, "reconciled": false}`입니다.
 - 서버를 다시 켤 때 끝나지 않은 판독 작업은 4회차처럼 정리합니다. 같은 request_id의 사진 설명이 저장돼 있으면 완료, 없으면 중단입니다.
 - GEMINI_MODE=off이면 409와 `{"error": "Gemini 연동이 꺼져 있습니다(GEMINI_MODE=off). 사진 설명을 받으려면 GEMINI_MODE를 바꾸고 로컬 서버를 다시 시작하세요.", "error_code": "INTEGRATION_OFF"}`로 거절합니다.
@@ -133,6 +133,8 @@ POST /api/records/(사건번호)/analyze: 4회차의 관련 기준 확인 요청
 2xx 답을 받았는데 작업 번호를 읽지 못하면 같은 방법으로 찾고, 없으면 3번 상태로 두되 설명은 "서버 접수는 되었으나 작업 정보를 수신하지 못했습니다. 작업 대기열 상태 확인이 필요합니다."입니다. 서버가 4xx나 5xx로 거절하면 실패로 보여 주고 이유는 답의 error, 없으면 "서버 거절 (HTTP (번호))"입니다.
 
 보내는 중에 새로고침했으면 다시 열 때 3번 상태("페이지 새로고침으로 전송 상태 확인이 필요합니다.")로 되살립니다. 페이지를 열 때 3번 상태인 요청은 1번부터 다시 정합니다. 그래서 서버를 켠 뒤 새로고침하면 작업을 찾거나 2번 상태로 바뀝니다.
+
+이 요청은 공통 요청 함수를 거치지 않고 직접 보내 연결 실패와 서버 거절을 나눕니다. 공통 요청 함수는 연결 실패를 일반 오류로 바꾸기 때문입니다.
 
 ### 요청 알림 패널의 판독 요청
 
@@ -306,6 +308,8 @@ Google 로그인 화면은 이동할 주소의 호스트가 accounts.google.com�
 
 status가 "interrupted"인 답에는 interrupted를 true로 둡니다.
 
+다른 주소로 넘어간 뒤 받은 401, 403, 404, 429는 위 목록의 status를 따르고, 그 밖의 HTTP 오류만 interrupted입니다.
+
 ### 저장소 고르기
 
 앞의 "저장소 동작 이름"을 부르는 자리에서 고릅니다. STORAGE_MODE=live이면 사건 등록, 정보 수정, 목록, 상세, 판단·조치 저장, 사진 판독, 기준 확인 결과 저장, 작업 맞춰 보기를 내 컴퓨터 저장소 대신 Google 쪽에 같은 action 이름으로 보냅니다. live 전용 처리를 따로 만들지 않습니다. mock이면 GAS_WEBAPP_URL에 값이 있어도 Google 쪽을 부르지 않습니다. 어느 쪽을 쓸지는 서버 한 곳에서 고릅니다.
@@ -337,6 +341,8 @@ clasp는 npx --yes @google/clasp@3.4.1로 부르고 묻는 질문 없이 끝나�
 ### 로그인, 올리기, 편집기 열기
 
 gas:login은 clasp login, gas:push는 clasp push --force(--force를 빼지 않음), gas:editor는 clasp open-script입니다. 이 셋은 package.json에 npx 명령을 바로 적고 나머지 다섯은 도우미 스크립트로 만듭니다.
+
+도우미 스크립트는 프로젝트 맨 위 scripts 폴더에 둡니다.
 
 ### gas:create (도우미 스크립트)
 
