@@ -46,6 +46,20 @@ STORAGE_MODE=live인데 GAS_WEBAPP_URL이 비어 있으면 사건 저장·조회
 
 화면은 status가 "setup_required"인 오류나 503 오류를 받으면 머리말 연결 표시를 "설정 필요 (GAS Web App 배포 대기)"로 바꾸고 다음에 조회가 성공하면 원래 표시로 돌립니다. 저장소 사진 목록(GET /api/repository-images)을 못 받은 503은 여기서 뺍니다. 2회차 문서대로 그 칸에만 보여 줍니다.
 
+## 저장소 동작 이름
+
+서버의 데이터 주소는 입력을 검사한 뒤 저장소 일을 아래 동작 이름으로 부릅니다. 지금은 모든 동작이 내 컴퓨터 저장소를 읽고 씁니다. 뒤에서 저장소 스위치가 live일 때 같은 이름을 Google 쪽 코드로 보내려면 이 층이 먼저 있어야 합니다. 화면과 기능은 바뀌지 않고 이미 이렇게 나뉘어 있으면 그대로 둡니다.
+
+- create_record: 받는 항목은 request_id, location, category, memo, images(사진마다 base64, mimeType, filename)입니다. 답은 `{"success": true, "idempotent": false, "record_id": "...", "request_id": "...", "status": "REGISTERED", "created_at": "...", "image_count": 1, "drive_file_ids": [...], "version": 1, "updated_at": "...", "record": {...}}`입니다. 같은 request_id로 다시 오면 idempotent를 true로 두고 저장된 사건을 돌려줍니다.
+- update_record: 받는 항목은 record_id, request_id, operator와 바꾸는 값(location, category, memo)입니다. 답은 `{"success": true, "idempotent": false, "status": "updated", "record_id": "...", "version": 2, "updated_at": "...", "record": {...}}`입니다.
+- get_records: 받는 항목이 없습니다. 답은 `{"success": true, "queue_counts": {...}, "records": [...]}`이고 사건마다 review_summary를 붙이며 최근 사건이 위에 옵니다.
+- get_record: record_id를 받습니다. 답은 `{"success": true, "record": {...}, "ai_draft": {...}, "evidence_check": {...}, "final_review": {...}, "actions": [...], "history": [...]}`이고 없는 값은 null입니다. 사건이 없으면 `{"success": false, "status": "error", "error_code": "NOT_FOUND", "error": "기록을 찾지 못했습니다. 목록에서 다시 골라 주세요."}`입니다. evidence_by_standard는 이 답에 넣지 않고 서버가 끝난 작업 결과로 채워 데이터 주소의 답에 더합니다.
+- save_evidence_check: 받는 항목은 record_id, request_id, input_version, standard_id, notebook_id, source_id, source_name, answer, references, quote, match, sufficient, notes입니다. 답은 `{"success": true, "check_id": "...", "record_id": "...", "input_version": 1}`입니다.
+- save_review: 받는 항목은 record_id, request_id, decision, basis, followup_note, reviewer입니다. 답은 `{"success": true, "review_id": "...", "record_id": "...", "status": "(처리 상태)"}`입니다.
+- save_action: 받는 항목은 record_id, request_id, action_type, description, evidence_note, actor입니다. 답은 `{"success": true, "action_id": "...", "record_id": "...", "status": "(처리 상태)"}`입니다.
+
+저장하는 세 동작은 같은 request_id로 다시 오면 새 줄을 더하지 않고 idempotent를 true로 두어 저장된 번호를 돌려줍니다. 사진 판독에 쓰는 analyze_gemini와 작업 맞춰 보기에 쓰는 reconcile_job은 아래 절에 적었습니다.
+
 ## 내 컴퓨터 저장소의 사진 설명과 판독 요청
 
 ### 사진 설명(AI 초안) 저장
@@ -54,7 +68,8 @@ STORAGE_MODE=live인데 GAS_WEBAPP_URL이 비어 있으면 사건 저장·조회
 
 - 내 컴퓨터 저장소에 사진 설명 목록 ai_drafts를 더합니다. 예전 기록 파일에 이 목록이 없으면 빈 목록으로 읽습니다.
 - 저장소 동작 이름은 analyze_gemini입니다. 같은 request_id로 다시 오면 새로 만들지 않고 저장된 설명을 돌려줍니다.
-- 저장하면 사건의 처리 상태(status)를 AI_DRAFTED로 바꾸고 이력에 단계 AI_ANALYSIS, 작업 이름 "AI 초안 생성", 내용 "Gemini 판독: (의심 위험)"을 남깁니다.
+- 저장하면 사건의 처리 상태(status)를 AI_DRAFTED로 바꾸고 이력에 단계 AI_ANALYSIS, 작업 이름 "AI 초안 생성", 내용 "Gemini 판독: (의심 위험)"을 남깁니다. 판단이나 조치를 저장한 사건을 다시 판독해도 처리 상태를 AI_DRAFTED로 바꿉니다.
+- 답은 `{"success": true, "draft_id": "...", "record_id": "...", "model": "(모델 이름)", "input_version": 1, "draft": {...}}`입니다. draft에는 관찰 사실부터 추가 확인까지의 글과 model이 들어 있습니다. 번호 draft_id는 "DRAFT-(1970년부터 센 밀리초)" 모양입니다.
 - 사건 상세 데이터에는 가장 최근 사진 설명(ai_draft)을 함께 담습니다.
 
 ### 연습용(모의) 사진 설명
@@ -68,9 +83,9 @@ STORAGE_MODE=live인데 GAS_WEBAPP_URL이 비어 있으면 사건 저장·조회
 
 POST /api/records/(사건번호)/analyze: 4회차의 관련 기준 확인 요청처럼 작업 대기열에 넣고 바로 202와 `{"success": true, "status": "(작업 상태)", "job_id": "(작업 번호)", "request_id": "(요청 번호)"}`를 돌려줍니다. 요청 본문의 request_id를 쓰고 없으면 서버가 만듭니다.
 
-- 판독 작업의 종류(job_type)는 "analyze"로 따로 둡니다. 4회차의 기준 확인 작업은 "evidence_check" 그대로입니다. 기준 확인의 작업 목록, 진행 표시, 최신 결과 계산은 job_type이 "evidence_check"인 것만 봅니다.
+- 판독 작업의 종류(job_type)는 "analyze"로 따로 둡니다. 4회차의 기준 확인 작업은 "evidence_check" 그대로입니다. 기준 확인의 작업 목록, 요청 상태 줄, 최신 결과 계산은 job_type이 "evidence_check"인 것만 봅니다.
 - GET /api/jobs에는 두 종류가 다 나옵니다. 4회차의 ?record_id, ?status처럼 ?job_type=(종류)로도 거릅니다. 화면은 작업마다 job_type을 보고 나눕니다.
-- 판독 작업은 요청한 때의 사건 정보 버전과 사진 목록을 고정해 analyze_gemini를 부릅니다. 보내는 항목은 record_id, request_id, input_version, image_ids(사진 목록), input_snapshot(version, updated_at, location, category, memo, image_ids)입니다. 실패하면 오류 코드와 문장을 작업에 남기고, 답의 draft를 작업 결과로 둡니다.
+- 판독 작업은 요청한 때의 사건 정보 버전과 사진 목록을 고정해 analyze_gemini를 부릅니다. 보내는 항목은 record_id, request_id, input_version, image_ids(사진 목록), input_snapshot(version, updated_at, location, category, memo, image_ids)입니다. 성공하면 답의 draft를 작업 결과로 둡니다. 실패하면 답의 오류 코드와 문장을 작업에 남기고 작업을 failed로 끝냅니다. 답에 문장이 없으면 "Gemini 사진 설명을 받지 못했습니다. 잠시 뒤 다시 요청하세요."를, 코드가 없으면 PROVIDER_ERROR를 씁니다. 답의 interrupted가 true이거나 오류 코드가 NETWORK_TIMEOUT이면 failed 대신 interrupted로 끝냅니다.
 - 저장소 동작 reconcile_job은 request_id, record_id, job_type을 받습니다. 저장된 것이 있으면 analyze는 `{"success": true, "reconciled": true, "job_type": "analyze", "draft_id": "...", "record_id": "...", "model": "...", "draft": {...}}`, evidence_check는 `{"success": true, "reconciled": true, "job_type": "evidence_check", "check_id": "...", "record_id": "...", "check": {...}}`, 없으면 `{"success": true, "reconciled": false}`입니다.
 - 서버를 다시 켤 때 끝나지 않은 판독 작업은 4회차처럼 정리합니다. 같은 request_id의 사진 설명이 저장돼 있으면 완료, 없으면 중단입니다.
 - GEMINI_MODE=off이면 409와 `{"error": "Gemini 연동이 꺼져 있습니다(GEMINI_MODE=off). 사진 설명을 받으려면 GEMINI_MODE를 바꾸고 로컬 서버를 다시 시작하세요.", "error_code": "INTEGRATION_OFF"}`로 거절합니다.
@@ -83,7 +98,7 @@ POST /api/records/(사건번호)/analyze: 4회차의 관련 기준 확인 요청
 
 "지금 버전"의 설명이나 결과는 판독하거나 확인한 사건 정보 버전이 지금 사건 버전과 같은 것입니다. 다르면 "수정 전" 것입니다.
 
-- 처음 열 때 단계: 사진이 없으면 1, 지금 버전의 사진 설명이 없으면 2, 지금 버전의 기준 확인 결과가 없으면 3, 아니면 4입니다. 꺼진 연동의 단계는 건너뜁니다. 판단을 이미 저장한 사건은 4회차처럼 완료·조치 상태를 따릅니다.
+- 처음 열 때 단계: 사진이 없으면 1, 지금 버전의 사진 설명이 없으면 2, 지금 버전의 기준 확인 결과가 없으면 3, 아니면 4입니다. 꺼진 연동의 단계는 건너뜁니다. 연동 상태(GET /api/health)를 받기 전에 정한 처음 단계는 사용자가 "다음" 단추를 누르기 전이면 연동 상태를 받은 뒤 다시 정합니다. 판단을 이미 저장한 사건은 4회차처럼 완료·조치 상태를 따릅니다.
 - 안내 문구: 2단계 "Gemini 사진 설명을 확인해 주세요.", 3단계 "AI 결과를 확인했다면, NotebookLM으로 관련 기준을 찾아 사진과 비교해 주세요.", 4단계 "사진과 기준을 비교하고, 직접 확인한 판단을 남겨주세요."
 - 2번 구역 끝에 "다음: 관련 기준 확인"(누르면 3단계), 3번 구역 끝에 "다음: 내 판단 남기기"(누르면 4단계) 단추를 둡니다.
 - 4번 구역 제목 아래 설명은 "AI 결과와 기준을 참고해, 직접 확인한 판단을 기록하세요."입니다.
@@ -94,29 +109,42 @@ POST /api/records/(사건번호)/analyze: 4회차의 관련 기준 확인 요청
 
 칸 안에 보이는 것:
 
-- 진행 표시 자리와 판독 요청 단추를 둡니다. 단추 이름은 설명이 없으면 "사진 설명 더 보기", 있으면 "사진 설명 다시 보기"입니다.
+- 요청 상태 줄 자리와 판독 요청 단추를 둡니다. 요청 상태 줄은 4회차 문서의 2번 칸 요청 상태 줄과 같은 모양과 문장을 씁니다. 단추 이름은 설명이 없으면 "사진 설명 더 보기", 있으면 "사진 설명 다시 보기"입니다.
 - 설명이 있으면 이 칸 안의 "Gemini 관찰 초안" 아래에 "판독 모델: (모델 이름)", 관찰 사실, "확인할 점: (의심 위험)", "추가 확인: (추가 확인)"을 보여 줍니다. 위치와 불확실성은 접는 칸 "관찰 위치와 한계"를 펼치면 보입니다.
 - 설명이 수정 전 것이면 이 칸 안의 "Gemini 관찰 초안" 바로 위에 "수정 전 결과입니다. 현재 사진과 내용을 다시 확인해 주세요."를 보여 줍니다.
 - GEMINI_MODE=off이면 단추를 끄고 "Gemini 연동이 꺼져 있습니다(GEMINI_MODE=off)."를 보여 줍니다.
 
 단추를 눌렀을 때:
 
-- 판독을 요청합니다. 요청 번호 만들기, 보내는 중 끊긴 요청 처리, 2초마다 상태 확인, 새로고침 뒤 이어 보기는 4회차 관련 기준 확인과 같은 방식입니다.
-- 기다리는 동안 단추를 끄고 이름을 "AI 초안 분석 중..."으로 바꾸며 진행 표시에 지금 상태를 보여 줍니다.
-- 끝나면 상세 오른쪽 검토 영역(진행 표시와 2·3·4번 구역)만 다시 그리고 2번 칸을 펼칩니다.
+- 판독을 요청합니다. 요청 번호는 화면이 "req_ai_(사건 번호)_(UUID)" 모양으로 만들어 보내기 전에 브라우저 탭 저장 공간에 남기고 본문 {"request_id": "(요청 번호)"}로 보냅니다.
+- 상태 확인과 새로고침 뒤 이어 보기는 4회차 문서의 "요청 상태 줄과 결과", "새로고침 뒤 이어 받기"와 같은 방식입니다. 요청하고 1.2초 뒤에 처음 확인하고 그 뒤로는 2초마다 확인합니다.
+- 기다리는 동안 단추를 끄고 이름을 "AI 초안 분석 중..."으로 바꾸며 요청 상태 줄에 지금 상태를 보여 줍니다.
+- 끝나면 상세 오른쪽 검토 영역(확인 순서 줄과 2·3·4번 구역)만 다시 그리고 2번 칸을 펼칩니다. 관련 기준 확인 요청은 그대로 동작해야 합니다.
 - 사진을 읽을 수 없는 사건은 사진 파일이 열렸지만 가로나 세로가 1픽셀 이하인 사건입니다. 상세의 사진 자리에 "사진 내용을 확인할 수 없습니다."를 보여 주는 코드가 없으면 더합니다. 이런 사건은 요청하지 않고 화면 안 문구로 "사진 내용을 확인할 수 없어 AI 분석을 요청할 수 없습니다. 다른 사진으로 새 사건을 등록해 주세요."를 보여 줍니다. 브라우저 팝업이 아닙니다.
+
+### 보내는 중 끊긴 판독 요청
+
+이 처리는 4회차 문서에 없어 여기에 적습니다. 요청을 보내다 응답을 받지 못하면 저절로 다시 보내지 않고 아래 순서로 정합니다.
+
+1. GET /api/jobs?record_id=(사건번호)에서 같은 요청 번호를 찾습니다. 있으면 그 작업을 이어서 봅니다.
+2. 목록을 받았는데 없으면 서버에 닿지 않은 요청입니다. 알림 제목은 "AI 초안 요청을 다시 보내 주세요", 설명과 요청 상태 줄은 "요청이 서버에 닿지 않았습니다. 다시 요청해 주세요."입니다. 단추를 다시 켜고 다시 누르면 같은 요청 번호를 씁니다.
+3. 목록도 받지 못하면 닿았는지 알 수 없습니다. 알림 제목은 "전송 상태 확인 필요 (동일 요청 중복 방지)", 설명은 "네트워크 연결 불안정으로 요청 도달 여부가 확인되지 않았습니다. 작업 상태를 먼저 확인해 주세요.", 요청 상태 줄은 "전송 상태 확인 필요 (동일 요청 중복 방지). 작업 목록에서 확인해 주세요."입니다. 이때는 그 사건의 새 판독 요청을 막습니다.
+
+2xx 답을 받았는데 작업 번호를 읽지 못하면 같은 방법으로 찾고, 없으면 3번 상태로 두되 설명은 "서버 접수는 되었으나 작업 정보를 수신하지 못했습니다. 작업 대기열 상태 확인이 필요합니다."입니다. 서버가 4xx나 5xx로 거절하면 실패로 보여 주고 이유는 답의 error, 없으면 "서버 거절 (HTTP (번호))"입니다.
+
+보내는 중에 새로고침했으면 다시 열 때 3번 상태("페이지 새로고침으로 전송 상태 확인이 필요합니다.")로 되살립니다. 페이지를 열 때 3번 상태인 요청은 1번부터 다시 정합니다. 그래서 서버를 켠 뒤 새로고침하면 작업을 찾거나 2번 상태로 바뀝니다.
 
 ### 요청 알림 패널의 판독 요청
 
-- 4회차 문서의 "기준 확인 작업"으로 만드는 알림 목록은 판독 작업도 함께 담는 것으로 바꿉니다. 제목과 설명은 작업의 job_type으로 고릅니다.
-- 판독 요청의 알림 제목: 보내는 중 "AI 초안 요청 전송 중...", 대기 "AI 초안 요청 접수", 진행 "AI 초안 분석 중", 완료 "AI 초안이 준비됐습니다.", 실패 "AI 초안 생성 실패", 서버에 닿지 않음 "AI 초안 요청을 다시 보내 주세요".
-- 판독이 NETWORK_TIMEOUT으로 중단되면 제목은 "AI 초안 요청이 중단됐습니다", 설명은 "Gemini 응답이 늦거나 연결이 끊겨 AI 초안을 받지 못했습니다. Gemini가 붐빌 때 생길 수 있습니다. 3분쯤 뒤 이 사건을 다시 열어 AI 초안이 없으면 다시 요청해 주세요."입니다. 2번 구역 진행 표시도 같은 설명을 씁니다.
+- 4회차 문서의 "기준 확인 작업"으로 만드는 알림 목록은 판독 작업도 함께 담는 것으로 바꿉니다. 제목은 작업의 job_type으로 고르고 설명은 4회차 알림과 같은 문장을 씁니다. 실패의 설명은 실패 이유입니다.
+- 판독 요청의 알림 제목: 보내는 중 "AI 초안 요청 전송 중...", 대기 "AI 초안 요청 접수", 진행 "AI 초안 분석 중", 완료 "AI 초안이 준비됐습니다.", 실패 "AI 초안 생성 실패", 서버에 닿지 않음 "AI 초안 요청을 다시 보내 주세요"(위 "보내는 중 끊긴 판독 요청").
+- 판독이 NETWORK_TIMEOUT으로 중단되면 제목은 "AI 초안 요청이 중단됐습니다", 설명은 "Gemini 응답이 늦거나 연결이 끊겨 AI 초안을 받지 못했습니다. Gemini가 붐빌 때 생길 수 있습니다. 3분쯤 뒤 이 사건을 다시 열어 AI 초안이 없으면 다시 요청해 주세요."입니다. 2번 칸 요청 상태 줄도 같은 설명을 씁니다. NETWORK_TIMEOUT이 아닌 중단은 4회차 알림과 같은 "처리가 중단됐습니다"입니다.
 - 결과 보기, 닫기, 경과 시간, 새로고침 뒤 이어 보기는 4회차 기준 확인 알림과 같습니다.
 
 ### 사건 상태 요약
 
 - 사건 상태 요약에 ai(facts, suspected_risk, locations, uncertainty, additional_checks, input_version, created_at)를 더합니다.
-- 설명을 받은 뒤 사건 정보를 고쳤으면 기준 확인·판단처럼 "수정 전 자료"로 표시하고 상세 위쪽의 정보가 바뀌었다는 경고에도 넣습니다.
+- 설명을 받은 뒤 사건 정보를 고쳤으면 기준 확인·판단처럼 "수정 전 자료"로 표시하고 상세 위쪽의 정보가 바뀌었다는 경고에도 넣습니다. context_changed에 after_ai를 더합니다. 설명의 input_version보다 사건 버전이 크면 참입니다.
 - "추가 확인" 사건의 확인 이유는 판단 기록에 적은 내용이 없으면 사진 설명의 추가 확인 글을 씁니다.
 
 ### 관련 기준 확인은 사진 설명이 먼저
@@ -155,7 +183,7 @@ doPost는 받은 JSON의 action 이름으로 일을 나누고 늘 JSON으로 답
 
 doGet은 기록을 읽지 않고 `{"status": "ok", "message": "권한 승인이 끝났습니다. 이 창을 닫고 터미널로 돌아가세요."}`만 돌려줍니다.
 
-action은 setup, set_gemini_key, create_record, update_record, get_records, get_record, get_image, save_evidence_check, save_review, save_action, reconcile_job, analyze_gemini, gemini_settings입니다. 이름은 서버의 내 컴퓨터 저장소 동작 이름과 같고 입력 검사·답 모양·이력도 내 컴퓨터 저장소와 같게 합니다. 저장만 시트와 Drive로 합니다. 요청 항목 이름은 서버가 내 컴퓨터 저장소 동작에 넘기는 이름을 그대로 쓰고 각 일의 항목은 아래 절에 적었습니다. 입력 검사의 오류 문장은 서버의 같은 검사 문장을 그대로 쓰고 error_code는 BAD_REQUEST입니다. 없는 사건은 NOT_FOUND입니다.
+action은 setup, set_gemini_key, create_record, update_record, get_records, get_record, get_image, save_evidence_check, save_review, save_action, reconcile_job, analyze_gemini, gemini_settings입니다. 이름은 서버의 내 컴퓨터 저장소 동작 이름과 같고 입력 검사·답 모양·이력도 내 컴퓨터 저장소와 같게 합니다. 저장만 시트와 Drive로 합니다. 요청 항목 이름은 서버가 내 컴퓨터 저장소 동작에 넘기는 이름을 그대로 쓰고 각 일의 항목은 아래 절에 적었습니다. 입력 검사의 오류 문장은 서버의 같은 검사 문장을 그대로 쓰고 error_code는 BAD_REQUEST입니다. 없는 사건은 NOT_FOUND와 "기록을 찾지 못했습니다. 목록에서 다시 골라 주세요."입니다. 이 문서에 없는 입력 규칙과 문장은 session-2.md, session-3.md, session-4.md와 서버 코드에서 찾습니다.
 
 시트 읽기·쓰기 공통 규칙을 아래에 적었습니다. 뒤의 일들이 함께 쓰므로 이 틀에 도우미로 만듭니다(시트 값 넣기와 읽기, 잠금 잡기, 탭 가져오기, 사건 번호로 탭의 줄을 항목 이름 객체로 읽기, 이력 한 줄 더하기, 사건 처리 상태 바꾸기).
 
@@ -200,13 +228,14 @@ update_record의 요청 항목은 record_id, request_id, operator와 바꾸는 �
 ### 목록·상세·사진 꺼내기
 
 - get_records는 요청 항목이 없습니다. 탭마다 한 번씩만 읽어 사건별로 묶고 사건마다 상태 요약을, 전체에는 queue_counts를 붙입니다. 최근 사건이 위에 옵니다.
-- get_record는 record_id를 받아 최신 사진 설명·기준 확인·판단과 조치 목록, 이력을 담아 `{"success": true, "record": {...}, "review_summary": {...}, "ai_draft": {...}, "evidence_check": {...}, "final_review": {...}, "actions": [...], "history": [...]}`로 답합니다. 없는 값은 null입니다.
+- get_record는 record_id를 받아 최신 사진 설명·기준 확인·판단과 조치 목록, 이력을 담아 `{"success": true, "record": {...}, "review_summary": {...}, "ai_draft": {...}, "evidence_check": {...}, "final_review": {...}, "actions": [...], "history": [...]}`로 답합니다. 없는 값은 null입니다. evidence_by_standard는 서버가 채우므로 넣지 않습니다.
 - get_image는 record_id와 index(0부터)를 받아 사건에서 그 순서의 사진을 Drive에서 읽어 `{"success": true, "record_id": "...", "index": 0, "mime_type": "image/png", "base64": "..."}`로 돌려줍니다. 번호가 벗어나거나 파일이 없으면 NOT_FOUND입니다.
 
 ### 기준 확인·판단·조치 저장과 작업 맞춰 보기
 
 - 요청 항목은 셋 다 record_id, request_id에 더해 save_evidence_check가 input_version, standard_id, notebook_id, source_id, source_name, answer, references, quote, match, sufficient, notes, save_review가 decision, basis, followup_note, reviewer, save_action이 action_type(REQUEST 또는 COMPLETE), description, evidence_note, actor입니다.
-- save_evidence_check, save_review, save_action은 해당 탭에 한 줄씩 더합니다. 판정이 네 가지 밖이거나 근거가 비었을 때, 조치 유형·내용이 없거나 조치 완료인데 완료 증빙 메모가 없을 때는 거절합니다. 같은 request_id로 다시 오면 새 줄을 더하지 않고 저장된 것을 돌려줍니다.
+- save_evidence_check, save_review, save_action은 해당 탭에 한 줄씩 더합니다. 판정이 네 가지 밖이거나 근거가 비었을 때, 조치 유형·내용이 없거나 조치 완료인데 완료 증빙 메모가 없을 때는 거절합니다. 같은 request_id로 다시 오면 새 줄을 더하지 않고 저장된 것을 돌려줍니다. 답 모양은 위 "저장소 동작 이름"과 같습니다.
+- 시트에 쓰다 실패하면 save_evidence_check는 INTERNAL_ERROR와 "근거 확인 저장 실패: (이유)", save_review는 STORAGE_FAILED와 "판단 기록을 시트에 저장하지 못했습니다: (이유)", save_action은 STORAGE_FAILED와 "조치 기록을 시트에 저장하지 못했습니다: (이유)"입니다.
 - reconcile_job은 판독(analyze)과 기준 확인 작업(evidence_check)의 저장 결과를 request_id로 찾아 돌려줍니다. 요청 항목과 답은 위 "사진 판독 요청"의 저장소 동작 reconcile_job과 같고 job_type이 없으면 analyze로 봅니다.
 
 ## Google 쪽의 Gemini 판독(analyze_gemini)
@@ -215,14 +244,20 @@ update_record의 요청 항목은 record_id, request_id, operator와 바꾸는 �
 
 요청 항목은 record_id, request_id, input_version, image_ids, input_snapshot입니다(서버가 보내는 이름 그대로입니다). 같은 request_id의 설명이 이미 있으면 그것을 돌려줍니다. 스크립트 속성 GEMINI_API_KEY가 없으면 SETUP_REQUIRED와 "GAS 스크립트 속성에 GEMINI_API_KEY가 없습니다. npm.cmd run gas:init(macOS: npm run gas:init)으로 Gemini API 키를 넣어 주세요."입니다.
 
-- 서버가 보낸 사진 목록(image_ids, 없으면 사건의 drive_file_ids)을 Drive에서 순서대로 읽고 사진마다 앞에 "[사진 프레임 1/3]"처럼 번호 글을 붙입니다. 사진이 없으면 NO_IMAGES("분석할 원본 사진이 없습니다: (사건번호)"), 읽지 못하면 IMAGE_READ_FAILED입니다.
+- 서버가 보낸 사진 목록(image_ids, 없으면 사건의 drive_file_ids)을 Drive에서 순서대로 읽고 사진마다 앞에 "[사진 프레임 1/3]"처럼 번호 글을 붙입니다. 사진이 없으면 NO_IMAGES("분석할 원본 사진이 없습니다: (사건번호)"), 읽지 못하면 IMAGE_READ_FAILED("Drive 원본 사진(프레임 (번호), fileId: (파일 ID)) 읽기 실패: (이유)")입니다. status는 둘 다 "error"입니다.
 - 지시문은 materials/gemini-prompt.txt의 글을 Code.gs 안에 상수로 글자 그대로 옮겨 사진 뒤에 넣습니다. Google 쪽은 이 PC의 파일을 읽지 못합니다. temperature는 0.1이고 답은 JSON으로만 받습니다(responseMimeType "application/json").
 - 모델은 gemini-3.8-flash와 gemini-3.5-flash-lite 두 개만 씁니다. 스크립트 속성 GEMINI_MODEL(기본 gemini-3.8-flash)과 GEMINI_FALLBACK_MODEL(기본 gemini-3.5-flash-lite, off면 쓰지 않음)로 바꿀 수 있고 목록 밖의 값이면 SETUP_REQUIRED와 "GAS 스크립트 속성의 GEMINI_MODEL·GEMINI_FALLBACK_MODEL은 gemini-3.8-flash, gemini-3.5-flash-lite 중 하나여야 합니다(대체 모델은 off도 됩니다). 값을 고치거나 지우면 기본 모델을 씁니다."를 돌려줍니다.
 - 키는 주소에 넣지 않고 x-goog-api-key 헤더로 보냅니다. 주소는 https://generativelanguage.googleapis.com/v1beta/models/(모델):generateContent입니다. 보내다 예외가 나면 NETWORK_TIMEOUT(status "interrupted", interrupted true, 문장 "Gemini API 호출 중 네트워크 오류가 발생했습니다.")입니다.
 
 ### 답 읽기와 저장
 
-Gemini 답에서 JSON을 꺼내 facts가 비어 있지 않을 때만 설명으로 받습니다. 차단은 CONTENT_BLOCKED, 빈 답은 EMPTY_RESPONSE, JSON 없음은 INVALID_JSON, 읽기 실패는 PARSE_FAILED, facts 없음은 INVALID_DRAFT_SCHEMA입니다.
+Gemini 답에서 JSON을 꺼내 facts가 비어 있지 않을 때만 설명으로 받습니다. HTTP 200을 받은 답의 오류는 아래와 같고 status는 모두 "error"입니다. 답 글 안에서 맨 앞 { 부터 맨 뒤 } 까지를 JSON으로 읽습니다.
+
+- 차단(promptFeedback.blockReason이 있음): CONTENT_BLOCKED, "Gemini 콘텐츠 차단됨: (이유)"
+- 빈 답(candidates나 parts가 없음): EMPTY_RESPONSE, "Gemini 응답에 내용이 없습니다 (finishReason: (이유, 없으면 unknown))"
+- JSON 없음: INVALID_JSON, "Gemini 응답에서 JSON 형식을 추출할 수 없습니다: (답 글 앞 100글자)"
+- 읽기 실패: PARSE_FAILED, "Gemini 응답 JSON 파싱 실패: (이유)"
+- facts 없음: INVALID_DRAFT_SCHEMA, "Gemini 초안에 필수 문자열 필드(facts)가 없거나 유효하지 않습니다."
 
 받은 설명은 ai_drafts 탭에 한 줄 더하고(raw_response는 비움) 사건의 처리 상태를 AI_DRAFTED로 바꿉니다. 이력에는 단계 AI_ANALYSIS, 작업 이름 "AI 초안 생성", 내용 "Gemini 판독((모델)): (의심 위험)", 작업자 "Gemini AI"를 남깁니다. 답 모양은 내 컴퓨터 저장소의 판독과 같은 `{"success": true, "draft_id": "...", "record_id": "...", "model": "(실제 모델)", "input_version": 1, "draft": {...}}`입니다. 이미 있는 설명을 돌려줄 때는 idempotent를 true로 더합니다.
 
@@ -230,7 +265,7 @@ Gemini 답에서 JSON을 꺼내 facts가 비어 있지 않을 때만 설명으�
 
 판독 모델이 HTTP 503이나 429를 돌려주면 대체 모델로 한 번만 다시 보내고, 실제로 답한 모델 이름을 설명과 이력에 남깁니다. 대체 모델을 쓰지 않으면(off이거나 판독 모델과 같으면) 다시 보내지 않습니다. 그래도 실패하면 아래 문장으로 답합니다((모델)은 실제로 부른 모델). status는 "error"이고 오류 코드는 429가 RATE_LIMIT_EXCEEDED, 그 밖의 HTTP 오류는 모두 GEMINI_API_ERROR입니다.
 
-- 429: RATE_LIMIT_EXCEEDED, "Gemini API 호출 한도를 초과했습니다 (HTTP 429). (N)초 뒤 다시 시도해주세요."(Gemini가 알려 준 초가 없으면 "(N)초 뒤" 대신 "잠시 후")
+- 429: RATE_LIMIT_EXCEEDED, "Gemini API 호출 한도를 초과했습니다 (HTTP 429). (N)초 뒤 다시 시도해주세요."(Gemini가 알려 준 초가 없으면 "(N)초 뒤" 대신 "잠시 후"). 초는 답 본문 error.details의 RetryInfo에 있는 retryDelay에서 읽고 올림합니다. 없으면 Retry-After 헤더를 봅니다.
 - 503: "Gemini 서버가 붐벼 판독하지 못했습니다(HTTP 503, (모델)). 잠시 뒤 다시 판독을 요청하세요."
 - 400: "Gemini API 키가 올바르지 않거나 요청을 받아 주지 않았습니다(HTTP 400, (모델)). config/local-connection.json의 GEMINI_API_KEY를 확인하고 npm.cmd run gas:init(macOS: npm run gas:init)을 다시 실행하세요."
 - 403: "Gemini API 키에 이 요청을 할 권한이 없습니다(HTTP 403, (모델)). AI Studio에서 새 키를 만들어 npm.cmd run gas:init(macOS: npm run gas:init)으로 다시 넣으세요."
@@ -245,15 +280,35 @@ gemini_settings는 요청 항목이 없고 `{"success": true, "model": "(판독 
 
 ### 요청 보내기와 실패 이름
 
-보낼 때는 JSON을 POST로 보내고 302 이동이 오면 직접 따라가 결과 주소를 GET으로 받습니다. 주소는 https만 받습니다(127.0.0.1·localhost 시험 서버만 http 허용). 제한 시간은 create_record와 analyze_gemini가 300초, 나머지는 120초입니다.
+이 기능은 서버 코드와 뒤의 gas:init 명령이 함께 쓰므로 서버를 켜지 않고도 부를 수 있게 따로 둡니다. 여기서는 요청을 보내는 부품만 만들고 저장소 고르기에는 아직 잇지 않습니다.
+
+보낼 때는 JSON에 action을 넣어 POST로 보내고 301·302·303·307·308 이동이 오면 직접 따라가 결과 주소를 GET으로 받습니다. 주소는 https만 받습니다(127.0.0.1·localhost 시험 서버만 http 허용). 제한 시간은 create_record와 analyze_gemini가 300초, 나머지는 120초입니다.
 
 Google 로그인 화면은 이동할 주소의 호스트가 accounts.google.com이거나 받은 글에 accounts.google.com/ServiceLogin이나 accounts.google.com/signin(가운데 v3/가 있어도)이 들어 있는 경우입니다.
 
 실패는 이렇게 바꿉니다. Google 로그인 화면으로 이동하거나 401·403이면 GAS_AUTH_REQUIRED, 접속을 못 하면 GAS_UNREACHABLE, 404면 GAS_URL_INVALID, 429면 RATE_LIMIT_EXCEEDED, JSON이 아니면 GAS_NON_JSON_RESPONSE, 그 밖의 HTTP 오류는 GAS_HTTP_ERROR, 시간 초과면 NETWORK_TIMEOUT입니다. 302를 받은 뒤의 실패와 시간 초과는 Google 쪽이 이미 실행했을 수 있으니 status "interrupted"로 둡니다. 오류 문장에 웹앱 주소를 넣지 않습니다.
 
+오류 코드마다 status와 문장은 아래와 같습니다.
+
+- 주소가 https가 아니거나 형식이 틀림: GAS_URL_INVALID, "setup_required", "설정 파일의 GAS_WEBAPP_URL이 GAS 웹 앱 주소 형식이 아닙니다. GAS 배포에서 받은 https://…/exec 주소를 넣고 로컬 서버를 다시 시작하세요."
+- Google 로그인 화면: GAS_AUTH_REQUIRED, "setup_required", "GAS 웹 앱이 Google 로그인을 요구합니다. Apps Script에서 웹 앱 배포 액세스를 '모든 사용자'로 바꾸고 /exec 주소를 쓰세요."
+- 401·403: GAS_AUTH_REQUIRED, "setup_required", "GAS 웹 앱이 요청을 거부했습니다(HTTP (번호)). 첫 권한 승인 전이면 npm.cmd run gas:open으로 웹앱 주소를 열어 허용하세요. 승인했는데도 같으면 Apps Script 배포 관리에서 액세스가 '모든 사용자'인지 보고 /exec 주소를 쓰세요."
+- 접속 실패(첫 POST): GAS_UNREACHABLE, "error", "GAS 웹 앱에 연결하지 못했습니다((원인 코드)). 네트워크와 설정 파일의 GAS_WEBAPP_URL을 확인해 주세요."
+- 404: GAS_URL_INVALID, "setup_required", "GAS 웹 앱을 찾지 못했습니다(HTTP 404). 설정 파일의 GAS_WEBAPP_URL과 배포가 활성 상태인지 확인해 주세요."
+- 429: RATE_LIMIT_EXCEEDED, "error", "GAS 웹 앱이 요청이 너무 많다며 거부했습니다(HTTP 429). 잠시 후 다시 시도해 주세요."
+- 그 밖의 HTTP 오류: GAS_HTTP_ERROR, "GAS 웹 앱이 HTTP (번호) 오류를 돌려주었습니다. 기록을 확인한 뒤 다시 시도해 주세요." 5xx와 이동 뒤의 오류는 "interrupted", 그 밖은 "error"입니다.
+- 이동인데 결과 주소가 없음: GAS_HTTP_ERROR, "interrupted", "GAS 웹 앱이 결과 주소 없이 HTTP (번호)를 돌려주었습니다. 요청이 이미 처리됐을 수 있으니 기록을 확인한 뒤 다시 시도해 주세요."
+- JSON이 아닌 HTML: GAS_NON_JSON_RESPONSE, "interrupted", "GAS 웹 앱이 JSON이 아닌 응답((종류))을 돌려주었습니다. 배포 상태와 Apps Script 실행 기록을 확인해 주세요."
+- 읽을 수 없는 JSON: GAS_NON_JSON_RESPONSE, "interrupted", "GAS 웹 앱의 응답이 올바른 JSON이 아닙니다((종류)). 기록을 확인한 뒤 다시 시도해 주세요."
+- 시간 초과: NETWORK_TIMEOUT, "interrupted", "GAS 응답이 (N)초 안에 오지 않았습니다. 요청이 이미 처리됐을 수 있으니 기록을 확인한 뒤 다시 시도해 주세요."
+- 이동 뒤 결과를 받지 못함: NETWORK_TIMEOUT, "interrupted", "GAS가 요청을 처리했지만 결과를 받아 오지 못했습니다((원인 코드)). 기록을 확인한 뒤 다시 시도해 주세요."
+- 보낸 뒤 연결이 끊김: NETWORK_TIMEOUT, "interrupted", "GAS 요청 중 연결이 끊겼습니다((이유)). 요청이 처리됐는지 알 수 없으니 기록을 확인한 뒤 다시 시도해 주세요."
+
+status가 "interrupted"인 답에는 interrupted를 true로 둡니다.
+
 ### 저장소 고르기
 
-STORAGE_MODE=live이면 사건 등록, 정보 수정, 목록, 상세, 판단·조치 저장, 사진 판독, 기준 확인 결과 저장, 작업 맞춰 보기를 내 컴퓨터 저장소 대신 Google 쪽에 같은 action 이름으로 보냅니다. mock이면 GAS_WEBAPP_URL에 값이 있어도 Google 쪽을 부르지 않습니다. 어느 쪽을 쓸지는 서버 한 곳에서 고릅니다.
+앞의 "저장소 동작 이름"을 부르는 자리에서 고릅니다. STORAGE_MODE=live이면 사건 등록, 정보 수정, 목록, 상세, 판단·조치 저장, 사진 판독, 기준 확인 결과 저장, 작업 맞춰 보기를 내 컴퓨터 저장소 대신 Google 쪽에 같은 action 이름으로 보냅니다. live 전용 처리를 따로 만들지 않습니다. mock이면 GAS_WEBAPP_URL에 값이 있어도 Google 쪽을 부르지 않습니다. 어느 쪽을 쓸지는 서버 한 곳에서 고릅니다.
 
 서버를 켤 때는 연동 상태 줄을 먼저 보여 줍니다. Gemini가 live이면 이어서 gemini_settings로 판독 모델을 물어 "연동 상태: 저장소 Google 시트 · Gemini live(gemini-3.8-flash, 대체 gemini-3.5-flash-lite) · NotebookLM live"처럼 모델을 붙인 줄을 한 번 더 보여 주고 /api/health의 integration_status에도 같은 줄을 씁니다. 대체 모델이 없으면 ", 대체 …"를 뺍니다. 묻지 못하면 "Gemini 판독 모델을 GAS에서 확인하지 못했습니다: (이유)"를 보여 주고 서버는 그대로 켜 둡니다.
 
@@ -267,11 +322,11 @@ live일 때도 작업 기록은 지금 쓰는 작업 폴더(4회차 문서의 ru
 
 ### Drive 사진과 사건 정보
 
-live에서 사건 사진 주소를 열면 서버가 get_image로 Drive 사진을 받아 보여 줍니다. 받은 사진은 Drive 파일 ID를 기준으로 runtime 폴더 안 image-cache 폴더에 저장해 두고 다음부터 씁니다. 저장해 둔 사진을 읽을 때도 JPG·PNG인지 다시 확인하고, 저장이 실패해도 사진은 보여 줍니다.
+live에서 사건 사진 주소를 열면 서버가 get_image로 Drive 사진을 받아 보여 줍니다. 받은 사진은 Drive 파일 ID를 기준으로 runtime 폴더 안 image-cache 폴더에 저장해 두고 다음부터 씁니다. 파일 이름에는 Drive 파일 ID를 그대로 쓰지 않고 사건 번호, 사진 순서, Drive 파일 ID를 합친 글자의 SHA-256 값을 씁니다. 받은 사진이 2MB를 넘거나 JPG·PNG가 아니면 보여 주지 않습니다. 저장해 둔 사진을 읽을 때도 JPG·PNG인지 다시 확인하고, 저장이 실패해도 사진은 보여 줍니다.
 
 등록 화면의 직접 파일 업로드 탭 사진 칸 아래 안내는 "현장 사진은 Google Drive 비공개 폴더에 즉시 격리 보존됩니다."입니다(다른 안내가 이미 있으면 바꿉니다).
 
-"이전 기록과 사건 정보" 칸의 사건 번호 줄 아래에 "Drive 폴더 ID:"와 "Drive 파일 목록:" 두 줄을 두고(사진 파일 줄이 이미 있으면 이 두 줄로 바꿉니다) 저장소와 관계없이 늘 보여 줍니다. 서버와 Code.gs 모두 목록·상세의 사건 정보에 drive_folder_id와 drive_file_ids를 넣습니다. 내 컴퓨터 저장이면 빈 값이어도 됩니다. 사건 상태 요약에는 넣지 않습니다.
+"이전 기록과 사건 정보" 칸의 사건 번호 줄 아래에 "Drive 폴더 ID:"와 "Drive 파일 목록:" 두 줄을 두고(사진 파일 줄이 이미 있으면 이 두 줄로 바꿉니다) 저장소와 관계없이 늘 보여 줍니다. 값이 비면 폴더 ID는 "없음", 파일 목록은 []입니다. 서버와 Code.gs 모두 목록·상세의 사건 정보에 drive_folder_id와 drive_file_ids를 넣습니다. 내 컴퓨터 저장이면 빈 값이어도 됩니다. 사건 상태 요약에는 넣지 않습니다.
 
 ## Google 쪽 명령(package.json의 npm.cmd run gas:…)
 
@@ -281,7 +336,7 @@ clasp는 npx --yes @google/clasp@3.4.1로 부르고 묻는 질문 없이 끝나�
 
 ### 로그인, 올리기, 편집기 열기
 
-gas:login은 clasp login, gas:push는 clasp push --force(--force를 빼지 않음), gas:editor는 clasp open-script입니다.
+gas:login은 clasp login, gas:push는 clasp push --force(--force를 빼지 않음), gas:editor는 clasp open-script입니다. 이 셋은 package.json에 npx 명령을 바로 적고 나머지 다섯은 도우미 스크립트로 만듭니다.
 
 ### gas:create (도우미 스크립트)
 
@@ -305,7 +360,7 @@ clasp create-deployment --description vision-risk로 새 웹앱 배포를 만들
 
 ### gas:init
 
-설정 파일의 GAS_WEBAPP_URL로 Google 쪽에 setup을 보내고, GEMINI_API_KEY에 값이 있으면 set_gemini_key로 키를 보냅니다. 다시 실행해도 됩니다. 키는 설정 파일에서만 읽고 같은 이름의 환경 변수는 읽지 않습니다. 아래 순서로 진행합니다.
+서버의 Google 쪽 요청 부품을 함께 씁니다. 설정 파일의 GAS_WEBAPP_URL로 Google 쪽에 setup을 보내고, GEMINI_API_KEY에 값이 있으면 set_gemini_key로 키를 보냅니다. 다시 실행해도 됩니다. 키는 설정 파일에서만 읽고 같은 이름의 환경 변수는 읽지 않습니다. 아래 순서로 진행합니다.
 
 1. GAS_WEBAPP_URL이 비어 있으면 "GAS_WEBAPP_URL이 비어 있습니다. npm.cmd run gas:deploy로 배포하면 자동으로 적힙니다. 편집기에서 배포했다면 웹 앱 URL을 config/local-connection.json의 GAS_WEBAPP_URL에 넣으세요."를 보여 주고 끝납니다.
 2. setup을 보내기 전에 키 형식을 검사합니다. 키가 있는데 형식이 틀리면 "GEMINI_API_KEY 값이 Gemini API 키 형식이 아닙니다(영문·숫자·-·_ 20자 이상). AI Studio에서 복사한 키를 따옴표 안에 그대로 넣었는지 확인하세요. 아무것도 보내지 않았습니다."를 보여 주고 아무것도 보내지 않습니다.
