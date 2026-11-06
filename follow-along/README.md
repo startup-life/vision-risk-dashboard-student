@@ -64,8 +64,8 @@ git clone https://github.com/startup-life/vision-risk-student-images.git
 
 ### 비밀 값
 
-설정 파일 `config/local-connection.json`에는 Gemini API 키, Google 웹앱 주소, NotebookLM 노트북·소스 ID 같은 비밀 값이 들어갑니다. 이 값은 설정 파일에만 두고 화면 공유·메신저·문서에 옮기지 않습니다. 설정 파일은 Git에 올라가지 않습니다.
-Gemini 키만은 5회차 안내대로 AI 대화에 붙여 넣고, AI가 설정 파일의 그 줄만 바꿉니다. AI는 답에 키 값을 다시 쓰지 않습니다.
+설정 파일 `config/local-connection.json`에는 OnePort API 키, Google 웹앱 주소, NotebookLM 노트북·소스 ID 같은 비밀 값이 들어갑니다. 이 값은 설정 파일에만 두고 화면 공유·메신저·문서에 옮기지 않습니다. 설정 파일은 Git에 올라가지 않습니다.
+OnePort 키만은 5회차 안내대로 AI 대화에 붙여 넣고, AI가 설정 파일의 그 줄만 바꿉니다. AI는 답에 키 값을 다시 쓰지 않습니다.
 
 ## 내 코드로 이어 갈 때: 다음 회차 보충 문서 받기
 

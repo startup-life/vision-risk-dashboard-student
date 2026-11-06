@@ -2,11 +2,12 @@
 
 - 시작 상태: 4회차를 끝낸 프로젝트 폴더(`C:\vision-ai\vision-risk-dashboard-student`)에서 이어 합니다. 4회차를 다 끝내지 못했으면 README의 "완료 브랜치로 옮기기"대로 `milestone-4`로 옮겨 시작합니다.
 - 끝나면 되는 것: 사건 상세가 네 단계(1 사진, 2 AI 사진 설명 (Gemini), 3 관련 기준 확인 (NotebookLM), 4 내 판단 남기기)가 되고, 2번 구역에서 판독을 요청하면 Gemini가 쓴 사진 설명이 나옵니다. 관련 기준 확인은 이 설명이 있어야 할 수 있습니다. 사건 기록은 내 Google 시트와 Drive 비공개 폴더에 저장됩니다.
-- 준비물: 개인 Google 계정 하나, 4회차까지 쓴 설정 파일(`config/local-connection.json`)과 사진 저장소 폴더, 켜 둔 서버 창.
+- 준비물: 개인 Google 계정 하나, OnePort API 키(`sk-`로 시작, 받는 방법은 강사 안내를 따릅니다), 4회차까지 쓴 설정 파일(`config/local-connection.json`)과 사진 저장소 폴더, 켜 둔 서버 창.
 
 ## 먼저 알아 둘 말
 
 - **Gemini**: 사진을 보고 관찰한 내용을 글로 써 주는 Google의 AI입니다. 이 앱에서는 "AI 사진 설명"(AI 초안)을 씁니다.
+- **OnePort**: 여러 AI를 한 곳에서 부를 수 있게 이어 주는 서비스입니다. 이 앱은 OnePort 키로 OnePort에 사진을 보내고, OnePort가 Gemini에 판독을 맡깁니다.
 - **Google 시트·Drive**: 내 Google 계정의 표 문서와 파일 보관함입니다. 이 회차가 끝나면 사건 기록은 시트에, 사진은 Drive 비공개 폴더에 저장됩니다.
 - **Google 쪽 코드(GAS)**: Google에서 돌아가는 코드(Apps Script)입니다. 내 컴퓨터의 서버가 이 코드에 시트 저장과 Gemini 판독을 맡깁니다. 내 컴퓨터에서는 실행해 볼 수 없어서 5-39에서 Google에 올린 뒤에 동작합니다.
 - **웹앱 주소**: Google 쪽 코드를 부르는 주소입니다. 주소를 아는 사람은 누구나 내 시트 기록을 읽고 쓸 수 있으니 비밀 값으로 다룹니다.
@@ -72,7 +73,7 @@ Google 계정 준비가 안 됐으면 5-35까지 하고 "5회차 끝 확인"으�
 ```
 - 직접 하기: Chrome에서 http://127.0.0.1:8765/api/health 를 엽니다.
 - 확인:
-  - `config/local-connection.example.json`을 열면 `GAS_WEBAPP_URL`, `GEMINI_API_KEY`, `STORAGE_MODE`, `GEMINI_MODE`가 빈 값(`""`)으로 들어 있습니다.
+  - `config/local-connection.example.json`을 열면 `GAS_WEBAPP_URL`, `ONEPORT_API_KEY`, `STORAGE_MODE`, `GEMINI_MODE`가 빈 값(`""`)으로 들어 있습니다.
   - 서버 창과 화면 알림 줄에 "연동 상태: 저장소 로컬 저장 · Gemini mock · NotebookLM mock"이 보이고, 지난 회차 사건이 그대로 보입니다.
   - 연 주소에 `"storage":"mock"`과 `"gas_configured":false`가 보입니다.
   - 지금은 연습 조합이라 서버가 그대로 켜집니다. 막히는 모습은 5-3에서 봅니다.
@@ -272,14 +273,14 @@ Google에서 실행될 코드(Apps Script)를 담을 gas 폴더와 파일 두 �
 ```
 - 확인: 탐색기에서 `gas` 폴더를 열면 `Code.gs`와 `appsscript.json` 두 파일만 있고, `appsscript.json`에서 Ctrl+F로 `Asia/Seoul`과 `ANYONE_ANONYMOUS`를 찾으면 나옵니다. `Code.gs`에서 Ctrl+F로 `Unknown action`, `권한 승인이 끝났습니다`, `LOCK_TIMEOUT`, `INTERNAL_ERROR`를 찾으면 나옵니다.
 
-## 5-19. 시트와 비공개 폴더 준비, Gemini 키 저장
+## 5-19. 시트와 비공개 폴더 준비, OnePort 키 저장
 
 ```text
 Google 쪽 코드에 내 Drive의 스프레드시트와 비공개 폴더를 준비하는 일을 만들어 주세요. 탭 여섯 개와 열 제목도 만들고, 이미 있으면 빠진 것만 더합니다.
-Gemini 키를 받아 Google 쪽 설정에 저장하는 일도 만듭니다. 키 값은 답과 오류 문구에 넣지 않습니다.
-자세한 내용은 docs/guide/session-5.md의 "시트와 비공개 폴더 준비"와 "Gemini 키 저장"을 참고해 주세요.
+OnePort 키를 받아 Google 쪽 설정에 저장하는 일도 만듭니다. 키 값은 답과 오류 문구에 넣지 않습니다.
+자세한 내용은 docs/guide/session-5.md의 "시트와 비공개 폴더 준비"와 "OnePort 키 저장"을 참고해 주세요.
 ```
-- 확인: `Code.gs`에서 Ctrl+F로 `initialSetup`, `Vision_Risk_Records_Master`, `raw_response`, `set_gemini_key`를 찾으면 나옵니다.
+- 확인: `Code.gs`에서 Ctrl+F로 `initialSetup`, `Vision_Risk_Records_Master`, `raw_response`, `set_oneport_key`를 찾으면 나옵니다.
 
 ## 5-20. 사건 상태 계산 옮기기
 
@@ -293,10 +294,10 @@ Gemini 키를 받아 Google 쪽 설정에 저장하는 일도 만듭니다. 키 
 
 ```text
 Google 쪽 코드에 사건 등록과 정보 수정을 만들어 주세요. 사진은 비공개 Drive 폴더에 비공개 파일로 올리고, 사건은 시트에 한 줄로 적습니다.
-같은 등록 요청이 다시 와도 사건이 하나만 생기게 하고, 사진만 올라가고 멈춘 요청이면 이미 올린 사진을 다시 씁니다. 입력이 틀렸을 때의 오류 문장은 서버의 같은 검사 문장을 그대로 씁니다.
+같은 등록 요청이 다시 와도 사건이 하나만 생기게 하고, 사진만 올라가고 멈춘 요청이면 이미 올린 사진을 다시 씁니다. 사진 합계 3MB 검사를 포함해, 입력이 틀렸을 때의 오류 문장은 서버의 같은 검사 문장을 그대로 씁니다.
 자세한 내용은 docs/guide/session-5.md의 "사건 등록과 정보 수정"과 "기본 틀과 답 모양"을 참고해 주세요.
 ```
-- 확인: `Code.gs`에서 Ctrl+F로 `create_record`, `update_record`, `idempotent`를 찾으면 나옵니다. 사진이 Drive 폴더에 올라가는 것과 사건이 한 줄만 생기는 것은 5-46에서 시트를 열어 봅니다.
+- 확인: `Code.gs`에서 Ctrl+F로 `create_record`, `update_record`, `idempotent`, `사진 합계가 3MB보다`를 찾으면 나옵니다. 사진이 Drive 폴더에 올라가는 것과 사건이 한 줄만 생기는 것은 5-46에서 시트를 열어 봅니다.
 
 ## 5-22. 목록·상세·사진 꺼내기
 
@@ -317,30 +318,30 @@ Google 쪽 코드에 관련 기준 확인 결과, 판단, 조치를 저장하는
 ## 5-24. Gemini 판독 1: 사진과 지시문 보내기
 
 ```text
-Google 쪽 코드에 Gemini 사진 판독을 만들어 주세요. 이번에는 사건 사진과 강사가 준 Gemini 지시문을 Gemini에 보내는 데까지 합니다.
-지시문은 글자 그대로 코드 안에 옮겨 넣고, 판독할 때 사진 뒤에 붙여 보냅니다.
+Google 쪽 코드에 Gemini 사진 판독을 만들어 주세요. 이번에는 사건 사진과 강사가 준 Gemini 지시문을 OnePort를 거쳐 Gemini에 보내는 데까지 합니다.
+지시문은 글자 그대로 코드 안에 옮겨 넣고, 판독할 때 사진 뒤에 붙여 보냅니다. 답은 관찰 사실 등 다섯 칸을 담은 JSON으로만 받게 합니다.
 자세한 내용은 docs/guide/session-5.md의 "사진과 지시문 보내기"를 참고해 주세요.
 ```
-- 확인: `Code.gs`에서 Ctrl+F로 `analyze_gemini`, `x-goog-api-key`, `사진 프레임`, `산업안전 관찰을 보조하는 AI`를 찾으면 나옵니다.
+- 확인: `Code.gs`에서 Ctrl+F로 `analyze_gemini`, `oneport.kr`, `json_schema`, `사진 프레임`, `산업안전 관찰을 보조하는 AI`를 찾으면 나옵니다.
 
 ## 5-25. Gemini 판독 2: 답 저장
 
 ```text
 Gemini 답에서 사진 설명을 꺼내 시트에 저장하고, 사건 이력도 남겨 주세요.
 답이 차단됐거나 비었거나 관찰 사실이 없으면 저장하지 않고 정해진 오류로 답합니다.
-대체 모델과 HTTP 오류 안내는 다음 번호에서 합니다.
+HTTP 오류 안내는 다음 번호에서 합니다.
 자세한 내용은 docs/guide/session-5.md의 "답 읽기와 저장"을 참고해 주세요.
 ```
 - 확인: `Code.gs`에서 Ctrl+F로 `INVALID_DRAFT_SCHEMA`, `CONTENT_BLOCKED`, `AI_DRAFTED`를 찾으면 나옵니다.
 
-## 5-26. Gemini 판독 3: 대체 모델, 오류 안내, 모델 설정
+## 5-26. Gemini 판독 3: 오류 안내, 모델 설정
 
 ```text
-Gemini가 붐비거나 한도에 걸리면 대체 모델로 한 번만 다시 보내 주세요. 그래도 안 되면 오류 번호마다 정해진 한국어 안내로 답합니다.
+판독 요청은 한 번만 보내고, 실패해도 다른 모델로 다시 보내지 마세요. 실패하면 오류 번호마다 정해진 한국어 안내로 답합니다.
 지금 쓰는 판독 모델 설정을 알려 주는 일도 Google 쪽 코드에 만듭니다.
-자세한 내용은 docs/guide/session-5.md의 "대체 모델과 오류 안내"와 "모델 설정 알려 주기"를 참고해 주세요.
+자세한 내용은 docs/guide/session-5.md의 "오류 안내"와 "모델 설정 알려 주기"를 참고해 주세요.
 ```
-- 확인: `Code.gs`에서 Ctrl+F로 `GEMINI_FALLBACK_MODEL`, `RATE_LIMIT_EXCEEDED`, `GEMINI_API_ERROR`, `gemini_settings`를 찾으면 나옵니다.
+- 확인: `Code.gs`에서 Ctrl+F로 `크레딧이 부족해`, `RATE_LIMIT_EXCEEDED`, `GEMINI_API_ERROR`, `gemini_settings`를 찾으면 나옵니다.
 
 ## 5-27. Google 쪽 요청 부품
 
@@ -414,7 +415,7 @@ Google 쪽 명령 세 개(웹앱 배포, 같은 주소로 갱신, 웹앱 주소 
 ## 5-34. Google 쪽 명령 3: 초기화
 
 ```text
-Google 쪽에 시트를 준비하고 설정 파일의 Gemini 키를 보내는 초기화 명령을 만들어 주세요. 서버의 Google 쪽 요청 부품을 함께 씁니다.
+Google 쪽에 시트를 준비하고 설정 파일의 OnePort 키를 보내는 초기화 명령을 만들어 주세요. 서버의 Google 쪽 요청 부품을 함께 씁니다.
 키가 비어 있으면 키는 보내지 않고 안내합니다. 키 형식이 틀리면 아무것도 보내지 않고 안내합니다. 웹앱 주소와 키는 출력하지 않습니다.
 명령은 실행하지 않습니다.
 자세한 내용은 docs/guide/session-5.md의 "gas:init"을 참고해 주세요.
@@ -433,12 +434,12 @@ git commit -m "5회차 Google 쪽 코드"
 
 - 확인: `git status`를 치면 "nothing to commit"이 나옵니다.
 
-## 5-36. Gemini 키 만들기와 Apps Script API 켜기 (직접 하기)
+## 5-36. OnePort 키 준비와 Apps Script API 켜기 (직접 하기)
 
 프롬프트는 없습니다. 키는 비밀번호와 같습니다. 화면을 공유하는 중이면 먼저 멈춥니다.
-- 직접 하기: Chrome에서 https://aistudio.google.com 을 열고 준비한 Google 계정으로 로그인한 뒤, Gemini API 키를 만들어 복사해 둡니다. 키는 5-43에서만 씁니다. 메뉴 이름은 바뀔 수 있습니다.
+- 직접 하기: OnePort API 키를 준비합니다. 키를 받는 방법은 강사 안내를 따릅니다. 키는 5-43에서만 씁니다.
+- 확인: 준비한 키가 `sk-`로 시작합니다.
 - 직접 하기: Chrome에서 https://script.google.com/home/usersettings 를 열고 **Google Apps Script API**를 켭니다.
-- 무료 키로 보낸 사진은 Google 제품 개선에 쓰일 수 있습니다. 실제 고객 자료나 개인정보가 든 사진은 올리지 않습니다.
 - 확인: 그 화면의 Google Apps Script API가 켜져 있습니다.
 
 ## 5-37. Google 로그인 (직접 하기)
@@ -499,15 +500,15 @@ npm.cmd run gas:deploy를 한 번만 실행하고 마지막 결과 줄만 알려
 - 직접 하기: 승인 화면이 나오지 않으면 `npm.cmd run gas:editor`로 편집기를 열고 함수 목록에서 `initialSetup`을 골라 **실행**한 뒤 같은 방법으로 허용합니다.
 - 확인: 브라우저에 "권한 승인이 끝났습니다. 이 창을 닫고 터미널로 돌아가세요."가 든 글자 한 줄(`{"status":"ok","message":"..."}` 모양)이 보입니다.
 
-## 5-43. Gemini 키 넣기
+## 5-43. OnePort 키 넣기
 
 키를 붙여 넣는 대화는 화면 공유하거나 캡처하지 않습니다.
 
 ```text
-지금부터 Gemini 키를 이 대화에 붙여 넣을 테니 기다려 주세요. 받으면 설정 파일의 Gemini 키 값만 그 키로 바꾸고, 답에 키를 다시 쓰지 마세요.
+지금부터 OnePort 키를 이 대화에 붙여 넣을 테니 기다려 주세요. 받으면 설정 파일의 OnePort 키 값만 그 키로 바꾸고, 답에 키를 다시 쓰지 마세요.
 자세한 내용은 docs/guide/session-5.md의 "설정 파일의 새 키와 스위치"를 참고해 주세요.
 ```
-- 직접 하기: AI가 기다리겠다고 답하면, 5-36에서 복사한 키를 다음 메시지로 붙여 넣어 보냅니다.
+- 직접 하기: AI가 기다리겠다고 답하면, 5-36에서 준비한 키를 다음 메시지로 붙여 넣어 보냅니다.
 - 확인: AI가 키 값을 쓰지 않고 설정 파일을 바꿨다고만 알립니다.
 
 ## 5-44. 시트 준비와 키 보내기
@@ -517,7 +518,7 @@ npm.cmd run gas:init을 한 번 실행하고 출력 줄을 알려 주세요.
 자세한 내용은 docs/guide/session-5.md의 "gas:init"과 "AI가 명령을 실행할 때"를 참고해 주세요.
 ```
 - 막히면: "권한 승인 전입니다"가 나오면 5-42를 다시 한 뒤 이 번호를 다시 보냅니다. 키 형식이 아니라고 나오면 5-43부터 다시 합니다.
-- 확인: "Google 시트와 비공개 Drive 폴더를 준비했습니다."와 "Gemini API 키를 GAS 스크립트 속성 GEMINI_API_KEY에 저장했습니다."가 나옵니다. 내 Google Drive에 `Vision_Risk_Records_Master_날짜` 스프레드시트가 생기고, 열면 `records`, `ai_drafts`, `evidence_checks`, `final_reviews`, `actions`, `history` 탭이 있습니다. 처음부터 있던 빈 탭이 하나 더 있어도 됩니다.
+- 확인: "Google 시트와 비공개 Drive 폴더를 준비했습니다."와 "OnePort API 키를 GAS 스크립트 속성 ONEPORT_API_KEY에 저장했습니다."가 나옵니다. 내 Google Drive에 `Vision_Risk_Records_Master_날짜` 스프레드시트가 생기고, 열면 `records`, `ai_drafts`, `evidence_checks`, `final_reviews`, `actions`, `history` 탭이 있습니다. 처음부터 있던 빈 탭이 하나 더 있어도 됩니다.
 
 ## 5-45. 실제 연결로 바꾸기
 
@@ -534,10 +535,10 @@ npm.cmd run gas:init을 한 번 실행하고 출력 줄을 알려 주세요.
 - 직접 하기: 사진 1장으로 새 사건을 등록합니다.
 - 확인: 스프레드시트 `records` 탭에 한 줄이 생기고, Drive의 `Vision_Risk_Records_Private_`로 시작하는 폴더에 사진 파일이 생깁니다. 상세 화면에 그 사진이 보입니다.
 - 직접 하기: 상세에서 "사진 설명 더 보기"를 누르고, 기다리는 동안 벨을 눌러 알림 패널을 본 뒤 상세를 한 번 새로고침합니다.
-- 확인: 알림 패널에 "AI 초안 분석 중"과 지난 시간이 보이고, 새로고침한 뒤에도 같은 요청이 이어 보입니다. 끝나면 "Gemini 관찰 초안"과 "판독 모델: gemini-3.8-flash"(붐비면 gemini-3.5-flash-lite)가 보이고 `ai_drafts` 탭에 한 줄이 생깁니다.
+- 확인: 알림 패널에 "AI 초안 분석 중"과 지난 시간이 보이고, 새로고침한 뒤에도 같은 요청이 이어 보입니다. 끝나면 "Gemini 관찰 초안"과 "판독 모델: gemini-3.8-flash"가 보이고 `ai_drafts` 탭에 한 줄이 생깁니다.
 - 직접 하기: "관련 기준 찾기"와 "판단 기록하기"를 합니다(NotebookLM을 off로 했으면 "판단 기록하기"만 합니다).
 - 확인: `evidence_checks` 탭과 `final_reviews` 탭에 줄이 생깁니다.
-- 막히면: 판독이 "Gemini API 호출 한도를 초과했습니다"로 끝나면 안내된 시간 뒤 다시 요청합니다. "AI 초안 요청이 중단됐습니다"가 나오면 안내대로 3분쯤 뒤 사건을 다시 엽니다. 한도 안내가 계속되면 강사에게 알립니다. Google 쪽 코드를 고쳤으면 맨 아래 "Google 쪽 코드 다시 올리기"의 "가. 다시 올리기" 프롬프트를 보냅니다.
+- 막히면: 판독이 "OnePort 호출 한도를 초과했습니다"로 끝나면 안내된 시간 뒤 다시 요청합니다. "AI 초안 요청이 중단됐습니다"가 나오면 안내대로 3분쯤 뒤 사건을 다시 엽니다. 한도 안내가 계속되거나 "OnePort 크레딧이 부족해"로 시작하는 안내가 나오면 강사에게 알립니다. Google 쪽 코드를 고쳤으면 맨 아래 "Google 쪽 코드 다시 올리기"의 "가. 다시 올리기" 프롬프트를 보냅니다.
 
 ## 5-47. 연습 조합 다시 보기
 
@@ -622,8 +623,8 @@ Google 연결 설정 파일이 있으면 이 브랜치의 Google 쪽 코드 폴�
 npm.cmd run gas:push, npm.cmd run gas:redeploy, npm.cmd run gas:init을 차례로 한 번씩 실행하고 각 명령의 마지막 결과 줄만 알려 주세요. gas:deploy는 실행하지 마세요.
 자세한 내용은 docs/guide/session-5.md의 "gas:redeploy"와 "AI가 명령을 실행할 때"를 참고해 주세요.
 ```
-- 확인: `Pushed 2 files`, "같은 배포를 새 버전으로 갱신했습니다. 주소는 그대로입니다.", "Google 시트와 비공개 Drive 폴더를 준비했습니다."가 차례로 나옵니다. Gemini 키를 넣었으면 "Gemini API 키를 GAS 스크립트 속성 GEMINI_API_KEY에 저장했습니다."도 나옵니다.
-- 막히면: `invalid_grant`가 나오면 5-37로 다시 로그인한 뒤 이 프롬프트를 다시 보냅니다. "권한 승인 전입니다"가 나오면 5-42를 한 뒤 `npm.cmd run gas:init`만 다시 실행해 달라고 보냅니다. Gemini 키를 아직 넣지 않았으면 5-43과 5-44를 합니다.
+- 확인: `Pushed 2 files`, "같은 배포를 새 버전으로 갱신했습니다. 주소는 그대로입니다.", "Google 시트와 비공개 Drive 폴더를 준비했습니다."가 차례로 나옵니다. OnePort 키를 넣었으면 "OnePort API 키를 GAS 스크립트 속성 ONEPORT_API_KEY에 저장했습니다."도 나옵니다.
+- 막히면: `invalid_grant`가 나오면 5-37로 다시 로그인한 뒤 이 프롬프트를 다시 보냅니다. "권한 승인 전입니다"가 나오면 5-42를 한 뒤 `npm.cmd run gas:init`만 다시 실행해 달라고 보냅니다. OnePort 키를 아직 넣지 않았으면 5-43과 5-44를 합니다.
 - 서버를 켜서 서버 창의 연동 상태를 봅니다. 저장소가 "로컬 저장"이면 5-45를 보냅니다.
 - 내 코드로 시트에 저장한 기록은 이 브랜치의 코드에서 일부 칸이 비어 보이거나, 새 스프레드시트가 생겨 보이지 않을 수 있습니다. 새 사건을 하나 등록해 5-46처럼 확인합니다.
 
