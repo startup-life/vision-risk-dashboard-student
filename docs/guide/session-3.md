@@ -99,7 +99,7 @@ phase 값과 화면 이름은 다음과 같습니다. 모르는 값은 그대로
 
 - review: 마지막 판단의 decision, basis, followup_note, reviewer, created_at. 없으면 null입니다.
 - latest_action: 마지막 조치의 action_type, description, evidence_note, created_at. 없으면 null입니다.
-- context_changed: {"after_review", "after_action", "version_time_unknown"} 참·거짓.
+- context_changed: {"after_review", "after_action"} 참·거짓.
 - queue: 큐(확인을 기다리는 줄) 값입니다. additional_check(추가 확인), awaiting_review(검토 대기), confirmed_risk(대응 필요), null(어느 큐에도 없음, 확인 완료).
 - completion_recorded_after_review: 참·거짓·null.
 
@@ -112,7 +112,7 @@ phase 값과 화면 이름은 다음과 같습니다. 모르는 값은 그대로
 - 판단이 없으면 awaiting_review입니다.
 - 판단 시각을 읽을 수 없거나 넷에 없는 판정이면 additional_check입니다.
 - 판단 보류면 additional_check, 위험 확인이면 confirmed_risk, 기준 충족과 해당 없음은 null입니다.
-- 이 묶음까지만 만든 동안 context_changed 셋은 모두 거짓입니다. completion_recorded_after_review는 판단이 위험 확인이면 거짓, 그 밖에는 null입니다.
+- 이 묶음까지만 만든 동안 context_changed 둘은 모두 거짓입니다. completion_recorded_after_review는 판단이 위험 확인이면 거짓, 그 밖에는 null입니다.
 
 ### 조치 완료 규칙
 
@@ -127,13 +127,12 @@ phase 값과 화면 이름은 다음과 같습니다. 모르는 값은 그대로
 
 수정 전 내용을 보고 남긴 판단과 조치는 지금 정보에 맞는지 알 수 없어서 다시 확인하게 합니다.
 
-- 판단 뒤 수정: 버전이 2 이상이고 updated_at이 판단 시각보다 늦으면 after_review가 참이고 queue는 additional_check입니다. 판단 시각을 읽을 수 없어도 after_review는 참입니다. 그 뒤에 판단을 다시 남기면 새 판단으로 다시 정합니다. 이 부분까지만 만든 동안 after_action과 version_time_unknown은 거짓입니다.
-- 조치 뒤 수정: 버전이 2 이상이고 updated_at이 마지막 조치 시각보다 늦으면 after_action이 참이고 그 조치는 조치 완료 규칙에 쓰지 않습니다. 조치 시각을 읽을 수 없어도 after_action은 참입니다.
-- 수정 시각 모름: 버전이 2 이상인데 updated_at을 읽을 수 없으면 version_time_unknown이 참입니다. 판단이 있으면 after_review, 조치가 있으면 after_action도 참이고, 판단이 있으면 queue는 additional_check입니다.
+- 판단 뒤 수정: 버전이 2 이상이고 updated_at이 판단 시각보다 늦으면 after_review가 참이고 queue는 additional_check입니다. 그 뒤에 판단을 다시 남기면 새 판단으로 다시 정합니다. 이 부분까지만 만든 동안 after_action은 거짓입니다.
+- 조치 뒤 수정: 버전이 2 이상이고 updated_at이 마지막 조치 시각보다 늦으면 after_action이 참이고 그 조치는 조치 완료 규칙에 쓰지 않습니다.
 
 ### 판단이 있을 때 보는 순서
 
-수정 시각을 모름, 판단 시각을 모름이나 넷에 없는 판정, 판단 보류, 판단 뒤 수정, 위험 확인(조치 완료 규칙), 기준 충족과 해당 없음.
+판단 시각을 모름이나 넷에 없는 판정, 판단 보류, 판단 뒤 수정, 위험 확인(조치 완료 규칙), 기준 충족과 해당 없음.
 
 ## 여러 화면이 함께 쓰는 규칙
 
@@ -177,7 +176,7 @@ additional_check "추가 확인", awaiting_review "검토 대기", confirmed_ris
 
 - 검토 대기: "사진과 사건 정보를 확인하고 판단을 남겨주세요"
 - 대응 필요: "확인된 위험의 대응 기록을 확인하세요"
-- 추가 확인: 수정 시각을 모르면 "판단·조치 기록의 시점을 확인해야 합니다", 판단 뒤 수정이면 "판단 후 정보가 바뀌어 다시 확인해야 합니다", 조치 뒤 수정이면 "조치 후 정보가 바뀌어 다시 확인해야 합니다", 판단 보류면 판단 근거(없으면 후속 확인 메모, 둘 다 없으면 "판단 보류된 사건으로 추가 확인이 필요합니다"), 그 밖에는 "추가 확인이 필요한 사건입니다".
+- 추가 확인: 판단 뒤 수정이면 "판단 후 정보가 바뀌어 다시 확인해야 합니다", 조치 뒤 수정이면 "조치 후 정보가 바뀌어 다시 확인해야 합니다", 판단 보류면 판단 근거(없으면 후속 확인 메모, 둘 다 없으면 "판단 보류된 사건으로 추가 확인이 필요합니다"), 그 밖에는 "추가 확인이 필요한 사건입니다".
 - 상태 없음: 조치 완료로 끝났으면 "대응 조치 완료가 확인된 사건입니다", 아니면 판단 근거(없으면 "확인이 완료된 사건입니다").
 
 ### 저장하는 세 화면
@@ -230,8 +229,8 @@ additional_check "추가 확인", awaiting_review "검토 대기", confirmed_ris
 
 ### 다시 확인하라는 경고
 
-- context_changed의 셋 중 하나라도 참이면 상세 화면 위쪽, 제목과 상태 줄 아래이자 안내 글 위에 "정보가 수정됐습니다. 현재 사진과 내용을 다시 확인해 주세요."를 보여 줍니다.
-- 판단이 있고 after_review나 version_time_unknown이 참이면 판단 칸의 판정 결과 위에 "수정 전 결과입니다. 현재 사진과 내용을 다시 확인해 주세요."를 보여 줍니다.
+- context_changed의 값 중 하나라도 참이면 상세 화면 위쪽, 제목과 상태 줄 아래이자 안내 글 위에 "정보가 수정됐습니다. 현재 사진과 내용을 다시 확인해 주세요."를 보여 줍니다.
+- 판단이 있고 after_review가 참이면 판단 칸의 판정 결과 위에 "수정 전 결과입니다. 현재 사진과 내용을 다시 확인해 주세요."를 보여 줍니다.
 
 ### 이전 기록과 사건 정보
 
@@ -292,3 +291,7 @@ additional_check "추가 확인", awaiting_review "검토 대기", confirmed_ris
 ## 서버 켜기
 
 서버가 켜지면 1회차 문서의 시작 줄 바로 다음 줄에 "연동 상태: 저장소 로컬 저장"을 보여 줍니다.
+
+## 만들지 않는 것
+
+- 정보를 고친 시각을 읽을 수 없을 때 따로 다시 확인하게 하는 처리("판단·조치 기록의 시점을 확인해야 합니다" 문구 포함): 혼자 쓰는 연습용 앱에서는 서버가 그 시각을 늘 적어 두어 만들지 않습니다.

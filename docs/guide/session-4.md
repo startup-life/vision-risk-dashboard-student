@@ -233,14 +233,6 @@ review_summary에는 evidence(가장 최근 결과의 standard_id, source_id, qu
 - 여러 기준에 함께 있을 때: "인용한 문장이 여러 기준(C-01 머리 보호구, C-03 통로 적치)에 함께 있어 C-01 머리 보호구 기준의 근거로 확정하지 않습니다."
 - 어느 기준에도 없을 때: "인용한 문장을 확인 기준 목록에서 찾지 못해 C-01 머리 보호구 기준의 근거로 보지 않습니다. 노트북 소스와 기준 버전이 같은지 확인해 주세요."
 
-## 답변 글 모양
-
-"전체 답변"과 답변 앞부분에서 "#"으로 시작하는 제목 줄은 굵게, "* "나 "- "로 시작하는 목록 줄은 "• "로, "**글자**"는 굵게 보여 줍니다.
-
-답변 앞부분은 서식을 바꾸기 전의 글에서 240자를 자르고, 자른 자리 끝에 남은 *는 지웁니다.
-
-"> " 다음에 따옴표나 글자가 오는 줄만 인용 모양으로 보여 줍니다. "> 5bar" 같은 비교는 그대로 둡니다. 그 밖의 글은 HTML로 해석하지 않고 글자 그대로 넣습니다.
-
 ## 요청 알림 패널
 
 ### 벨과 패널
@@ -319,7 +311,7 @@ NotebookLM 도구는 notebooklm-mcp-cli 0.15.6입니다. uv 설치, uv tool inst
 
 실행 파일은 설정의 NOTEBOOKLM_MCP_COMMAND를 먼저 쓰고 비어 있으면 PATH에서 notebooklm-mcp(Windows는 notebooklm-mcp.exe)를 찾습니다. 찾지 못하면 실행하지 않습니다.
 
-실행 파일에는 실행에 필요한 기본 값(PATH 등)과 NOTEBOOKLM_로 시작하는 값, 그리고 NOTEBOOKLM_HL=ko, NOTEBOOKLM_RATE_LIMIT_MAX_RETRIES=0, NOTEBOOKLM_DISABLE_HEADLESS_REFRESH=1만 넘깁니다. REPOSITORY_IMAGES_ROOT 같은 다른 설정 값은 넘기지 않습니다.
+실행 파일에는 실행에 필요한 기본 값(PATH 등)과 NOTEBOOKLM_로 시작하는 값, 그리고 NOTEBOOKLM_HL=ko, NOTEBOOKLM_RATE_LIMIT_MAX_RETRIES=0, NOTEBOOKLM_DISABLE_HEADLESS_REFRESH=1만 넘깁니다. 그 밖의 설정 값은 넘기지 않습니다.
 
 ### 연결 상태
 
@@ -374,26 +366,7 @@ live에서 match와 sufficient는 같은 값입니다. 근거 충분이면 둘 �
 - 질문 오류면 "NotebookLM 질의가 실패했습니다: (이유)"입니다.
 - 시간이 지나면 "NotebookLM 응답 시간이 지났습니다. 잠시 뒤 관련 기준 찾기를 다시 눌러 주세요."입니다.
 
-## README
+## 만들지 않는 것
 
-README의 4회차 절에는 다음을 적습니다.
-
-- 사건 상세 세 단계
-- NOTEBOOKLM_MODE(off·mock·live)
-- 처음에는 mock으로 켜는 법
-- 실제 연결 준비(uv 설치, uv tool install notebooklm-mcp-cli==0.15.6, nlm login --storage protected, 노트북 만들기, materials/factory-criteria-v1.txt 올리기, 설정 파일에 ID 넣기)
-- MCP 실행 파일을 찾는 순서와 못 찾을 때 할 일
-- 노트북·소스 ID는 설정 파일에만 두고 커밋하거나 대화창에 붙여 넣지 않는다는 안내
-- Git이 추적하지 않는 파일 목록에 runtime/jobs 폴더(작업 기록)
-- "NotebookLM 결과는 참고 자료이며 발송 승인이나 안전 인증을 대신하지 않습니다." 문장
-
-실제 연결 준비의 명령은 아래 글자 그대로 적고 다른 명령을 지어내지 않습니다. AI는 이 명령을 실행하지 않습니다. <노트북 ID>는 꺾쇠까지 그대로 적습니다.
-
-- uv 설치: powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
-- 도구 설치: uv tool install notebooklm-mcp-cli==0.15.6
-- 로그인: nlm login --storage protected
-- 노트북 만들기: nlm notebook create "현장 리스크 기준" --json
-- 기준 원문 올리기: nlm source add <노트북 ID> --file materials/factory-criteria-v1.txt --wait
-- 소스 ID 보기: nlm source list <노트북 ID>
-
-실제 연결을 건너뛰어 그 코드가 아직 없으면 실제 연결 준비 앞에 "아직 이 프로젝트에 실제 NotebookLM을 연결하지 않았습니다. 지금은 예시 결과(mock)만 동작합니다."를 적습니다.
+- 답변 글 꾸밈(제목 줄 굵게, 목록 줄을 "• "로, 굵은 글씨, 인용 줄 모양): 혼자 쓰는 연습용 앱이라 만들지 않습니다. 답변은 받은 글자 그대로 보여 주고 `**` 같은 기호가 보여도 됩니다.
+- README의 4회차 절(NotebookLM 연결 안내): 혼자 쓰는 연습용 앱이라 만들지 않습니다. 실제 연결 준비 명령은 사용자가 직접 칩니다.
