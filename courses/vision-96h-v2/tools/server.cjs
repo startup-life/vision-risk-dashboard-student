@@ -15,6 +15,8 @@ const { RepositoryImages } = require('./repository-images.cjs');
 
 const PREVIEW_ROOT = path.resolve(__dirname, '../preview');
 const MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2 MiB
+// 한 사건의 사진 합계 한도. 5회차에 판독할 때 사진을 base64로 한 요청에 모두 싣는데, 요청 본문이 4.5MB를 넘으면 거절된다.
+const MAX_TOTAL_IMAGE_SIZE = 3 * 1024 * 1024; // 3 MiB
 // 화면의 분류 이름. 오류 문구에 분류 코드 대신 쓴다.
 const CATEGORY_LABELS = { safety: '산업안전', quality: '택배 발송 확인' };
 // 서버 기동 때 찍고 /api/health가 돌려주는 상태 줄. 저장소는 로컬 저장 하나뿐이다.
@@ -594,6 +596,9 @@ function createServer(options = {}) {
               }
               selectedFiles.push(fileData);
             }
+            if (selectedFiles.reduce((sum, f) => sum + f.buffer.length, 0) > MAX_TOTAL_IMAGE_SIZE) {
+              return sendJson({ error: '고른 저장소 사진의 합계가 3MB보다 큽니다. 사진 수를 줄여 합계 3MB 이하로 골라 주세요.' }, 400);
+            }
 
             // 서버가 검증된 images 배열 구성
             payload.images = selectedFiles.map(f => ({
@@ -612,8 +617,9 @@ function createServer(options = {}) {
             payload.memo = payload.memo ? `${String(payload.memo).trim()}\n\n${provenanceBlock}` : provenanceBlock;
             delete payload.repository_image_ids;
           } else {
-            // 직접 업로드 유효성 검사 (1~5장, 2MiB, 매직 바이트)
+            // 직접 업로드 유효성 검사 (1~5장, 장당 2MiB, 합계 3MiB, 매직 바이트)
             const images = payload.images || [];
+            let totalBytes = 0;
             if (images.length < 1 || images.length > 5) {
               return sendJson({ error: '사진은 1장 이상 5장 이하로 올려 주세요.' }, 400);
             }
@@ -630,6 +636,10 @@ function createServer(options = {}) {
               if (!validateImageMagicBytes(buf, img.mimeType)) {
                 return sendJson({ error: `${i + 1}번째 파일은 사진 파일이 아닙니다. JPG나 PNG 사진을 올려 주세요.` }, 400);
               }
+              totalBytes += buf.length;
+            }
+            if (totalBytes > MAX_TOTAL_IMAGE_SIZE) {
+              return sendJson({ error: '사진 합계가 3MB보다 큽니다. 사진 수를 줄이거나 작은 사진으로 바꿔 합계 3MB 이하로 올려 주세요.' }, 400);
             }
           }
 

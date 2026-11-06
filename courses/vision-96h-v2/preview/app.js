@@ -987,7 +987,7 @@
         repoPickerHtml = `
           <div style="margin-bottom:16px;">
             <label class="field">
-              <span><b>현장 사진 첨부 (1~5장, JPG/PNG 2MB 이하) *</b></span>
+              <span><b>현장 사진 첨부 (1~5장, JPG/PNG 장당 2MB 이하, 합계 3MB 이하) *</b></span>
               <input type="file" id="new-files" multiple accept="image/png,image/jpeg">
               <small class="meta">현장 사진은 이 PC의 로컬 저장소에 보존됩니다.</small>
             </label>
