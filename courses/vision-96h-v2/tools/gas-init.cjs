@@ -1,14 +1,14 @@
 'use strict';
 // npm run gas:init — prepares the deployed GAS web app from the local side. Running it again is safe.
 //   1) setup action: makes the Google Sheet and the private Drive folder, or keeps the ones already made
-//   2) set_gemini_key action: copies GEMINI_API_KEY from config/local-connection.json into the GAS script property
+//   2) set_oneport_key action: copies ONEPORT_API_KEY from config/local-connection.json into the GAS script property
 // The web app URL and the key are never printed; failure lines carry the error code and mask long IDs.
-// The key is read from the config file only: a GEMINI_API_KEY environment variable set for other tools is not sent.
+// The key is read from the config file only: an ONEPORT_API_KEY environment variable set for other tools is not sent.
 const { loadLocalConfig, LocalConfigError } = require('./local-config.cjs');
 const { requestGas } = require('./server.cjs');
 
-// Same shape as GEMINI_API_KEY_PATTERN in gas/Code.gs.
-const GEMINI_API_KEY_PATTERN = /^[A-Za-z0-9_-]{20,200}$/;
+// Same shape as ONEPORT_API_KEY_PATTERN in gas/Code.gs.
+const ONEPORT_API_KEY_PATTERN = /^sk-[A-Za-z0-9_-]{20,200}$/;
 // Before the first authorization the web app answers with a sign-in or authorization page instead of JSON.
 const APPROVAL_CODES = new Set(['GAS_AUTH_REQUIRED', 'GAS_NON_JSON_RESPONSE']);
 
@@ -45,14 +45,14 @@ async function init({ env = process.env, platform = process.platform, log = cons
   for (const line of config.notices) log(line);
   for (const line of config.warnings) warn(`설정 경고: ${line}`);
   const url = config.values.GAS_WEBAPP_URL || String(env.GAS_WEBAPP_URL || '');
-  const key = String(config.values.GEMINI_API_KEY || '').trim();
+  const key = String(config.values.ONEPORT_API_KEY || '').trim();
   const secrets = [url, key];
   if (!url) {
     warn('GAS_WEBAPP_URL이 비어 있습니다. npm run gas:deploy로 배포하면 자동으로 적힙니다. 편집기에서 배포했다면 웹 앱 URL을 config/local-connection.json의 GAS_WEBAPP_URL에 넣으세요.');
     return 1;
   }
-  if (key && !GEMINI_API_KEY_PATTERN.test(key)) {
-    warn('GEMINI_API_KEY 값이 Gemini API 키 형식이 아닙니다(영문·숫자·-·_ 20자 이상). AI Studio에서 복사한 키를 따옴표 안에 그대로 넣었는지 확인하세요. 아무것도 보내지 않았습니다.');
+  if (key && !ONEPORT_API_KEY_PATTERN.test(key)) {
+    warn('ONEPORT_API_KEY 값이 OnePort API 키 형식이 아닙니다(sk-로 시작하고 영문·숫자·-·_ 20자 이상이 이어짐). sk-로 시작하는 OnePort 키를 따옴표 안에 그대로 넣었는지 확인하세요. 아무것도 보내지 않았습니다.');
     return 1;
   }
 
@@ -61,12 +61,12 @@ async function init({ env = process.env, platform = process.platform, log = cons
   log('Google 시트와 비공개 Drive 폴더를 준비했습니다. 이미 있으면 그대로 씁니다.');
 
   if (!key) {
-    log('GEMINI_API_KEY가 비어 있어 키는 보내지 않았습니다. AI 판독을 쓰려면 config/local-connection.json의 GEMINI_API_KEY에 키를 넣고 npm run gas:init을 다시 실행하세요. 기록 저장은 키 없이도 됩니다.');
+    log('ONEPORT_API_KEY가 비어 있어 키는 보내지 않았습니다. AI 판독을 쓰려면 config/local-connection.json의 ONEPORT_API_KEY에 OnePort 키를 넣고 npm run gas:init을 다시 실행하세요. 기록 저장은 키 없이도 됩니다.');
     return 0;
   }
-  const saved = await request(url, { action: 'set_gemini_key', api_key: key });
-  if (!saved || saved.success !== true) { warn(failureLine('set_gemini_key', saved, secrets, platform)); return 1; }
-  log('Gemini API 키를 GAS 스크립트 속성 GEMINI_API_KEY에 저장했습니다. 다음 할 일: npm start');
+  const saved = await request(url, { action: 'set_oneport_key', api_key: key });
+  if (!saved || saved.success !== true) { warn(failureLine('set_oneport_key', saved, secrets, platform)); return 1; }
+  log('OnePort API 키를 GAS 스크립트 속성 ONEPORT_API_KEY에 저장했습니다. 다음 할 일: npm start');
   return 0;
 }
 

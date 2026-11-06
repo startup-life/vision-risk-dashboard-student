@@ -3,10 +3,12 @@
 // Messages name keys and file paths only; setting values are never printed because they hold secrets.
 const fs = require('node:fs');
 const path = require('node:path');
-const CONFIG_KEYS = ['GAS_WEBAPP_URL', 'GEMINI_API_KEY', 'NOTEBOOKLM_NOTEBOOK_ID', 'NOTEBOOKLM_SOURCE_IDS', 'NOTEBOOKLM_MCP_COMMAND', 'REPOSITORY_IMAGES_ROOT', 'STORAGE_MODE', 'GEMINI_MODE', 'NOTEBOOKLM_MODE'];
-// Keys only `npm run gas:init` reads. The Gemini key goes to the GAS script property; the local server never needs it,
+const CONFIG_KEYS = ['GAS_WEBAPP_URL', 'ONEPORT_API_KEY', 'NOTEBOOKLM_NOTEBOOK_ID', 'NOTEBOOKLM_SOURCE_IDS', 'NOTEBOOKLM_MCP_COMMAND', 'REPOSITORY_IMAGES_ROOT', 'STORAGE_MODE', 'GEMINI_MODE', 'NOTEBOOKLM_MODE'];
+// Keys only `npm run gas:init` reads. The OnePort key goes to the GAS script property; the local server never needs it,
 // so it is not copied into the server's environment (and from there into child processes).
-const GAS_INIT_ONLY_KEYS = ['GEMINI_API_KEY'];
+const GAS_INIT_ONLY_KEYS = ['ONEPORT_API_KEY'];
+// Keys that were renamed. An old settings file gets a hint that names the new key instead of the generic unknown-key line.
+const RENAMED_KEYS = { GEMINI_API_KEY: '더 이상 쓰지 않는다. 사진 판독은 OnePort를 거치므로 OnePort 키를 ONEPORT_API_KEY에 넣고 npm run gas:init을 다시 실행한다. GEMINI_API_KEY 줄은 지운다.' };
 const DEFAULT_CONFIG_PATH = path.resolve(__dirname, '../../../config/local-connection.json');
 const LEGACY_CONFIG_PATH = path.resolve(__dirname, '../scratch/local-connection.json');
 const EXAMPLE_CONFIG_PATH = path.resolve(__dirname, '../../../config/local-connection.example.json');
@@ -53,6 +55,7 @@ function validateConfig(config) {
   for (const [key, value] of Object.entries(config)) {
     // A value pasted into the key position must not reach the console, so only key-shaped names are shown.
     if (!CONFIG_KEYS.includes(key) && !KEY_SHAPE.test(key)) malformedKeys++;
+    else if (Object.hasOwn(RENAMED_KEYS, key)) warnings.push(`설정 키 ${key}는 ${RENAMED_KEYS[key]}`);
     else if (!CONFIG_KEYS.includes(key)) warnings.push(`알 수 없는 설정 키 ${key}는 무시한다.`);
     else if (typeof value !== 'string') warnings.push(`${key} 값은 문자열이어야 한다. 이 값은 무시한다.`);
     // A single backslash such as "C:\new" parses as a control character instead of failing.
@@ -135,10 +138,10 @@ function resolveModes(env = process.env) {
   return checkModes({ storage, gemini: modeValue(env, 'GEMINI_MODE') || storage, notebooklm: modeValue(env, 'NOTEBOOKLM_MODE') || storage });
 }
 
-// geminiModels: GAS가 알려 준 판독 모델({ model, fallback_model }). 받기 전이거나 live가 아니면 모델을 적지 않는다.
+// geminiModels: GAS가 알려 준 판독 모델({ model }). 받기 전이거나 live가 아니면 모델을 적지 않는다.
 function describeModes(modes, geminiModels) {
   const label = mode => mode === 'off' ? '꺼짐' : mode;
-  const models = modes.gemini === 'live' && geminiModels?.model ? `(${geminiModels.model}${geminiModels.fallback_model ? `, 대체 ${geminiModels.fallback_model}` : ''})` : '';
+  const models = modes.gemini === 'live' && geminiModels?.model ? `(${geminiModels.model})` : '';
   return `연동 상태: 저장소 ${modes.storage === 'mock' ? '로컬 저장' : 'Google 시트'} · Gemini ${label(modes.gemini)}${models} · NotebookLM ${label(modes.notebooklm)}`;
 }
 
