@@ -24,7 +24,7 @@ cd vision-risk-dashboard-student
 
 ## 따라하기 자료
 
-- 따라하기 프롬프트는 `main` 브랜치의 `follow-along/` 폴더에 있습니다.
+- 따라하기 프롬프트는 `main` 브랜치의 `follow-along/` 폴더에 회차마다 한 파일씩 있습니다. [1회차 파일](https://github.com/startup-life/vision-risk-dashboard-student/blob/main/follow-along/session-1.md)의 "시작 전에"부터 시작합니다.
 - 공통 규칙은 `AGENTS.md`에, 회차별 자세한 내용은 `docs/guide/`에, 원문 자료는 `materials/`에 있습니다.
 
 ## 회차를 놓쳤을 때
