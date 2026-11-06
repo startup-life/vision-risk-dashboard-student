@@ -1,6 +1,6 @@
 # 2회차: 사건 등록과 목록, 내 컴퓨터 저장
 
-- 시작 상태: 1회차를 끝낸 프로젝트 폴더 `C:\vision-ai\vision-risk-dashboard-student`에서 시작합니다. 1회차를 다 못 끝냈으면 1회차 파일 맨 끝의 "다 끝내지 못했으면" 안내대로 `milestone-1` 브랜치로 옮긴 뒤 시작합니다.
+- 시작 상태: 1회차를 끝낸 프로젝트 폴더 `C:\vision-ai\vision-risk-dashboard`에서 시작합니다.
 - 끝나면 되는 것: 사진 파일을 올리거나 사진 저장소의 사진을 골라 사건을 등록하면, 사건 목록과 홈의 "확인이 필요한 현장"에 "검토 대기"로 나옵니다. 기록과 사진은 이 PC의 `runtime` 폴더에 저장되어 서버를 껐다 켜도 남습니다.
 - 준비물: AI 도구에서 연 프로젝트 폴더, 서버 창(서버를 켜 두는 PowerShell 창), 프로젝트 폴더 옆에 받은 사진 저장소(`C:\vision-ai\vision-risk-student-images`, 아래 "시작 전에"에서 받습니다).
 
@@ -12,23 +12,15 @@
 
 ## 시작 전에 (프롬프트 없이 직접 합니다)
 
-1. 보충 문서 받기: 시작 메뉴에서 PowerShell 창을 새로 열고 아래 세 줄을 한 줄씩 칩니다. 2회차 보충 문서가 `docs/guide` 폴더에 들어오고 내 코드는 바뀌지 않습니다. 탐색기에서 `docs\guide` 폴더에 `session-2.md`가 보이면 됩니다. 1회차를 못 끝내서 `milestone-1`로 옮겼으면 문서가 이미 있으니 건너뜁니다.
-
-```powershell
-cd C:\vision-ai\vision-risk-dashboard-student
-git fetch origin
-git checkout origin/milestone-1 -- docs/guide
-```
-
-2. 서버 켜 보기: 서버 창에서 `npm.cmd start`를 치고 Chrome에서 http://127.0.0.1:8765 를 엽니다. 서버 창이 없으면 시작 메뉴에서 PowerShell 창을 새로 열고 `cd C:\vision-ai\vision-risk-dashboard-student`를 친 뒤 그 창을 서버 창으로 씁니다. 1회차 홈과 "확인 기준 보기" 단추가 보이면 됩니다.
-3. 사진 저장소 받기: `C:\vision-ai` 안에 `vision-risk-student-images` 폴더가 이미 있으면 건너뜁니다. 없으면 서버 창이 아닌 PowerShell 창에서 아래 두 줄을 한 줄씩 칩니다. ZIP으로 받으면 쓰지 못하니 꼭 이 명령으로 받고, 폴더 이름은 바꾸지 않습니다.
+1. 서버 켜 보기: 서버 창에서 `npm.cmd start`를 치고 Chrome에서 http://127.0.0.1:8765 를 엽니다. 서버 창이 없으면 시작 메뉴에서 PowerShell 창을 새로 열고 `cd C:\vision-ai\vision-risk-dashboard`를 친 뒤 그 창을 서버 창으로 씁니다. 1회차 홈과 "확인 기준 보기" 단추가 보이면 됩니다.
+2. 사진 저장소 받기: `C:\vision-ai` 안에 `vision-risk-student-images` 폴더가 이미 있으면 건너뜁니다. 없으면 서버 창이 아닌 PowerShell 창에서 아래 두 줄을 한 줄씩 칩니다. ZIP으로 받으면 쓰지 못하니 꼭 이 명령으로 받고, 폴더 이름은 바꾸지 않습니다.
 
 ```powershell
 cd C:\vision-ai
 git clone https://github.com/startup-life/vision-risk-student-images.git
 ```
 
-4. 사진 수 확인: 서버 창이 아닌 PowerShell 창에서 아래 한 줄을 칩니다. `210`이 나와야 합니다.
+3. 사진 수 확인: 서버 창이 아닌 PowerShell 창에서 아래 한 줄을 칩니다. `210`이 나와야 합니다.
 
 ```powershell
 (Get-ChildItem C:\vision-ai\vision-risk-student-images\assets\dataset\images -Filter *.png).Count
@@ -50,10 +42,11 @@ git clone https://github.com/startup-life/vision-risk-student-images.git
 ## 2-1. 지침 세팅
 
 ```text
-이 프로젝트의 AGENTS.md를 작업 지침으로 삼아 주세요. 프롬프트에 없는 상세 구현(주소, 화면 문구, 파일 이름, 거절 규칙)은 docs/guide의 회차 문서와 그 회차 완료 브랜치 코드(origin/milestone-2)에서 확인합니다.
+이번 회차 문서를 이 프로젝트로 가져오기 위해, 수업 저장소(class)를 다시 받아 class/milestone-1의 docs/guide와 AGENTS.md를 이 프로젝트로 가져와 주세요(브랜치는 옮기지 않습니다).
+그다음 AGENTS.md를 작업 지침으로 삼아 주세요. 프롬프트에 없는 상세 구현(주소, 화면 문구, 파일 이름, 거절 규칙)은 docs/guide의 회차 문서와 그 회차 완료 브랜치 코드(class/milestone-2)에서 확인합니다.
 지금은 AGENTS.md, docs/guide/session-1.md, docs/guide/session-2.md를 읽기만 하고, 읽은 파일 이름만 한 줄로 알려 주세요.
 ```
-- 확인: AI 답에 `AGENTS.md`, `session-1.md`, `session-2.md`가 나옵니다. 새 대화를 열 때마다 이 프롬프트를 먼저 보냅니다.
+- 확인: 탐색기에서 `docs\guide` 폴더에 `session-2.md`가 생기고, AI 답에 `AGENTS.md`, `session-1.md`, `session-2.md`가 나옵니다. 새 대화를 열 때마다 이 프롬프트를 먼저 보냅니다.
 
 ## 2-2. 사진 저장소 읽기
 
@@ -272,25 +265,13 @@ git add -A
 git commit -m "2회차 사건 등록과 목록"
 ```
 
-- 확인: `git status`를 치면 "nothing to commit"이 나오고 `runtime`은 보이지 않습니다. "시작 전에"에서 받은 보충 문서도 이 커밋에 함께 저장됩니다.
+- 확인: `git status`를 치면 "nothing to commit"이 나오고 `runtime`은 보이지 않습니다. 2-1에서 가져온 보충 문서도 이 커밋에 함께 저장됩니다.
 
 ## 2회차 끝 확인
 
 - [ ] 서버를 켜면 서버 창에 "사진 저장소: 사진 180장을 읽었습니다."가 나온다.
-  milestone-2로 갈아탔으면 이 줄은 글이 달라도 됩니다(사진 목록이 화면에 보이면 됩니다).
 - [ ] 사진 파일을 올려 등록한 사건과 저장소 사진을 골라 등록한 사건이 모두 사건 목록에 "검토 대기"로 나온다.
 - [ ] 홈 "확인이 필요한 현장"에 검토 대기 사건이 사진 카드로 나오고, "검토 대기" 단추의 숫자가 사건 수와 같다.
 - [ ] 홈 "등록할 사진 찾기"의 "사진 선택"을 누르면 그 사진이 골라진 등록 화면이 열린다.
 - [ ] 서버를 껐다 켜도 사건과 사진이 그대로 있다.
 - [ ] 2-25에서 내 코드를 커밋했다.
-
-다 끝내지 못했으면 3회차 전에 서버를 끄고 PowerShell 창에서 아래를 한 줄씩 칩니다. 내가 만든 코드는 지금 브랜치에 남고, 완료 브랜치 `milestone-2`로 옮겨 갑니다. 이 브랜치의 `docs/guide` 폴더에는 2회차까지의 보충 문서가 들어 있습니다. `git commit`에서 "nothing to commit"이 나와도 그대로 다음 줄을 칩니다. 사진 저장소는 브랜치를 옮겨도 그대로 남습니다. 완료 브랜치는 사건 기록을 다른 곳에 저장할 수 있어서, 옮긴 뒤 사건 목록이 비어 있으면 3회차 "시작 전에"에서 사건을 다시 등록합니다.
-
-```powershell
-cd C:\vision-ai\vision-risk-dashboard-student
-git add -A
-git commit -m "2회차 내 작업"
-git fetch origin
-git switch milestone-2
-npm.cmd install
-```

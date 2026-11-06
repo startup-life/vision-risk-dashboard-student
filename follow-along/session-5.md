@@ -1,6 +1,6 @@
 # 5회차: 사진 판독(Gemini)과 Google 시트 저장
 
-- 시작 상태: 4회차를 끝낸 프로젝트 폴더(`C:\vision-ai\vision-risk-dashboard-student`)에서 이어 합니다. 4회차를 다 끝내지 못했으면 4회차 파일 맨 끝의 "다 끝내지 못했으면" 안내대로 `milestone-4`로 옮겨 시작합니다.
+- 시작 상태: 4회차를 끝낸 프로젝트 폴더(`C:\vision-ai\vision-risk-dashboard`)에서 이어 합니다.
 - 끝나면 되는 것: 사건 상세가 네 단계(1 사진, 2 AI 사진 설명 (Gemini), 3 관련 기준 확인 (NotebookLM), 4 내 판단 남기기)가 되고, 2번 구역에서 판독을 요청하면 Gemini가 쓴 사진 설명이 나옵니다. 관련 기준 확인은 이 설명이 있어야 할 수 있습니다. 사건 기록은 내 Google 시트와 Drive 비공개 폴더에 저장됩니다.
 - 준비물: 개인 Google 계정 하나, OnePort API 키(`sk-`로 시작, 받는 방법은 강사 안내를 따릅니다), 4회차까지 쓴 설정 파일(`config/local-connection.json`)과 사진 저장소 폴더, 켜 둔 서버 창.
 
@@ -16,16 +16,8 @@
 
 ## 시작 전에 (프롬프트 없이 직접 합니다)
 
-1. 보충 문서 받기: 시작 메뉴에서 PowerShell 창을 새로 열고 아래 세 줄을 한 줄씩 칩니다. 세 줄을 꼭 함께 칩니다. 5회차의 자세한 내용을 적은 문서가 `docs/guide` 폴더에 들어오고 내 코드는 바뀌지 않습니다. 탐색기에서 `docs\guide` 폴더를 열어 `session-5.md`가 보이면 됩니다. 이 문서는 회차 끝 커밋 때 함께 저장됩니다. 4회차를 못 끝내서 `milestone-4`로 옮겼으면 문서가 이미 있으니 건너뜁니다.
-
-```powershell
-cd C:\vision-ai\vision-risk-dashboard-student
-git fetch origin
-git checkout origin/milestone-4 -- docs/guide
-```
-
-2. 서버 켜고 지난 회차 확인: 서버 창(1번의 PowerShell 창을 그대로 써도 됩니다)에서 `npm.cmd start`를 치고 Chrome에서 http://127.0.0.1:8765 를 엽니다. 사건 상세에서 "관련 기준 찾기"를 누르면 결과가 나오는지 봅니다.
-3. Google 계정 준비: 개인 Google 계정 하나를 준비하고 Chrome에서 로그인해 둡니다. 4회차 NotebookLM에 쓴 계정이어도 됩니다. 학교·회사 계정은 웹앱을 "모든 사용자"로 여는 설정이 막힐 수 있습니다.
+1. 서버 켜고 지난 회차 확인: 서버 창(서버 창을 닫았으면 PowerShell 창을 새로 열어 `cd C:\vision-ai\vision-risk-dashboard`로 이동한 창)에서 `npm.cmd start`를 치고 Chrome에서 http://127.0.0.1:8765 를 엽니다. 사건 상세에서 "관련 기준 찾기"를 누르면 결과가 나오는지 봅니다.
+2. Google 계정 준비: 개인 Google 계정 하나를 준비하고 Chrome에서 로그인해 둡니다. 4회차 NotebookLM에 쓴 계정이어도 됩니다. 학교·회사 계정은 웹앱을 "모든 사용자"로 여는 설정이 막힐 수 있습니다.
 
 ## 진행 방법
 
@@ -52,10 +44,11 @@ Google 계정 준비가 안 됐으면 5-19까지 하고 5-29(내 코드 남겨 �
 ## 5-1. 지침 세팅
 
 ```text
-이 프로젝트의 AGENTS.md를 작업 지침으로 삼아 주세요. 프롬프트에 없는 상세 구현(주소, 화면 문구, 파일 이름, 거절 규칙)은 docs/guide의 회차 문서와 그 회차 완료 브랜치 코드(origin/milestone-5)에서 확인합니다.
+이번 회차 문서를 이 프로젝트로 가져오기 위해, 수업 저장소(class)를 다시 받아 class/milestone-4의 docs/guide와 AGENTS.md를 이 프로젝트로 가져와 주세요(브랜치는 옮기지 않습니다).
+그다음 AGENTS.md를 작업 지침으로 삼아 주세요. 프롬프트에 없는 상세 구현(주소, 화면 문구, 파일 이름, 거절 규칙)은 docs/guide의 회차 문서와 그 회차 완료 브랜치 코드(class/milestone-5)에서 확인합니다.
 지금은 AGENTS.md, docs/guide/session-1.md, docs/guide/session-5.md를 읽기만 하고, 읽은 파일 이름만 한 줄로 알려 주세요.
 ```
-- 확인: AI 답에 `AGENTS.md`, `session-1.md`, `session-5.md`가 나옵니다. 앞 회차 문서 이름이 더 나와도 됩니다. 새 대화를 열 때마다 이 프롬프트를 먼저 보냅니다.
+- 확인: 탐색기에서 `docs\guide` 폴더에 `session-5.md`가 생기고, AI 답에 `AGENTS.md`, `session-1.md`, `session-5.md`가 나옵니다. 앞 회차 문서 이름이 더 나와도 됩니다. 새 대화를 열 때마다 이 프롬프트를 먼저 보냅니다.
 
 ## 5-2. 연결 스위치
 
@@ -242,7 +235,7 @@ Google 쪽 코드를 내 Google 계정에 올리기 위해, package.json에 Goog
 - 직접 하기: 시작 메뉴에서 PowerShell 창을 새로 엽니다(서버 창은 그대로 둡니다). 이 창에서 아래를 한 줄씩 칩니다.
 
 ```powershell
-cd C:\vision-ai\vision-risk-dashboard-student
+cd C:\vision-ai\vision-risk-dashboard
 npm.cmd run gas:login
 ```
 
@@ -342,28 +335,15 @@ git commit -m "5회차 사진 판독과 시트 저장"
 - [ ] (Google에 연결한 경우) 새로 등록한 사건이 내 스프레드시트의 `records` 탭과 Drive 비공개 폴더에 저장되고, 상세 화면에 그 사진이 보인다.
 - [ ] 5-29에서 내 코드를 커밋했다.
 
-다 끝내지 못했으면 6회차 전에 서버를 끄고 PowerShell 창에서 아래를 한 줄씩 칩니다. 내가 만든 코드는 지금 브랜치에 남고, 완료 브랜치 `milestone-5`로 옮겨 갑니다. 이 브랜치에는 `AGENTS.md`와 6회차까지의 보충 문서(`docs/guide`)가 들어 있습니다. `git commit`에서 "nothing to commit"이 나와도 그대로 다음 줄을 칩니다.
+## Google 쪽 코드 다시 올리기
 
-```powershell
-cd C:\vision-ai\vision-risk-dashboard-student
-git add -A
-git commit -m "5회차 내 작업"
-git fetch origin
-git switch milestone-5
-npm.cmd install
-```
-
-옮긴 뒤에는 바로 아래 "Google 쪽 코드 다시 올리기"를 합니다.
-
-## Google 쪽 코드 다시 올리기 (milestone-5로 옮겼을 때)
-
-`milestone-5`로 옮기면 내 컴퓨터의 코드는 바뀌지만, Google에 올려 둔 코드는 내가 만든 그대로입니다. 설정 파일(`config/local-connection.json`)과 Google 연결 설정 파일(`.clasp.json`)은 Git에 들어 있지 않아 옮긴 뒤에도 그대로 남습니다. AI 도구에서 새 대화를 열고 5-1의 프롬프트를 먼저 보낸 뒤 아래를 차례로 합니다.
+5-28에서 Google 쪽 코드를 고쳤을 때, 또는 Google 연결을 어디까지 했는지 모를 때 합니다. AI 도구에서 새 대화를 열고 5-1의 프롬프트를 먼저 보낸 뒤 아래를 차례로 합니다.
 
 1. 어디까지 했는지 AI에게 물어보고 Google 연결 설정을 맞춥니다.
 
 ```text
-milestone-5의 Google 쪽 코드를 어떻게 올릴지 정하기 위해, 설정 파일에 Google 웹앱 주소가 들어 있는지, 프로젝트 맨 위에 Google 연결 설정 파일이 있는지 "있음" 또는 "없음"으로만 알려 주세요. 값은 쓰지 마세요.
-Google 연결 설정 파일이 있으면 이 브랜치의 Google 쪽 코드 폴더를 가리키는지 보고 아니면 그 폴더로 바꿔 주세요. 프로젝트 ID는 바꾸지 말고 답에 쓰지 마세요.
+Google 쪽 코드를 어떻게 올릴지 정하기 위해, 설정 파일에 Google 웹앱 주소가 들어 있는지, 프로젝트 맨 위에 Google 연결 설정 파일이 있는지 "있음" 또는 "없음"으로만 알려 주세요. 값은 쓰지 마세요.
+Google 연결 설정 파일이 있으면 이 프로젝트의 Google 쪽 코드 폴더를 가리키는지 보고 아니면 그 폴더로 바꿔 주세요. 프로젝트 ID는 바꾸지 말고 답에 쓰지 마세요.
 자세한 내용은 docs/guide/session-5.md의 "Google 쪽 명령(package.json의 npm.cmd run gas:…)"과 "gas:create (도우미 스크립트)"를 참고해 주세요.
 ```
 
@@ -378,17 +358,16 @@ Google 연결 설정 파일이 있으면 이 브랜치의 Google 쪽 코드 폴�
 
 ### 가. 다시 올리기
 
-이 브랜치의 Google 쪽 코드를 올리고 같은 주소로 갱신한 뒤 시트를 맞춥니다. 5-28에서 Google 쪽 코드를 고쳤을 때도 이 프롬프트를 보냅니다.
+이 프로젝트의 Google 쪽 코드를 올리고 같은 주소로 갱신한 뒤 시트를 맞춥니다. 5-28에서 Google 쪽 코드를 고쳤을 때도 이 프롬프트를 보냅니다.
 
 ```text
-이 브랜치의 Google 쪽 코드로 같은 웹앱 주소를 갱신하기 위해, npm.cmd run gas:push, npm.cmd run gas:redeploy, npm.cmd run gas:init을 차례로 한 번씩 실행하고 각 명령의 마지막 결과 줄만 알려 주세요.
+이 프로젝트의 Google 쪽 코드로 같은 웹앱 주소를 갱신하기 위해, npm.cmd run gas:push, npm.cmd run gas:redeploy, npm.cmd run gas:init을 차례로 한 번씩 실행하고 각 명령의 마지막 결과 줄만 알려 주세요.
 gas:deploy는 실행하지 마세요.
 자세한 내용은 docs/guide/session-5.md의 "gas:redeploy"와 "AI가 명령을 실행할 때"를 참고해 주세요.
 ```
 - 확인: `Pushed 2 files`, "같은 배포를 새 버전으로 갱신했습니다. 주소는 그대로입니다.", "Google 시트와 비공개 Drive 폴더를 준비했습니다."가 차례로 나옵니다. OnePort 키를 넣었으면 "OnePort API 키를 GAS 스크립트 속성 ONEPORT_API_KEY에 저장했습니다."도 나옵니다.
 - 막히면: `invalid_grant`가 나오면 5-21로 다시 로그인한 뒤 이 프롬프트를 다시 보냅니다. "권한 승인 전입니다"가 나오면 5-25의 첫 권한 승인을 한 뒤 `npm.cmd run gas:init`만 다시 실행해 달라고 보냅니다. OnePort 키를 아직 넣지 않았으면 5-26을 합니다.
 - 서버를 켜서 서버 창의 연동 상태를 봅니다. 저장소가 "로컬 저장"이면 5-27의 프롬프트를 보냅니다.
-- 내 코드로 시트에 저장한 기록은 이 브랜치의 코드에서 일부 칸이 비어 보이거나, 새 스프레드시트가 생겨 보이지 않을 수 있습니다. 새 사건을 하나 등록해 5-28처럼 확인합니다.
 
 ### 나. 이어서 배포하기
 
@@ -396,7 +375,7 @@ Google 프로젝트는 만들었지만 웹앱 배포 전인 경우입니다. 5-2
 
 ### 다. 처음부터 하거나 연습 조합으로 두기
 
-- Google 계정이 준비됐으면 5-20부터 5-28까지 차례로 합니다. `milestone-5`에는 Google 쪽 코드와 명령이 이미 들어 있으므로 5-11~5-19는 하지 않습니다.
+- Google 계정이 준비됐으면 5-20부터 5-28까지 차례로 합니다. 5-19까지 하지 않았으면 5-11부터 합니다.
 - 아직 준비되지 않았으면 아래 프롬프트를 보내 연습 조합으로 두고 6회차로 갑니다. 연습 조합에서도 6회차를 할 수 있습니다.
 
 ```text

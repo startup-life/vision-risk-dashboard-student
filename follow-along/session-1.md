@@ -1,8 +1,8 @@
 # 1회차: 준비와 화면 틀, 확인 기준 목록
 
-- 시작 상태: 수업 저장소의 `milestone-0` 브랜치에서 시작합니다. 안내 파일, 강사가 준 자료(`materials` 폴더), 프로젝트 규칙(`AGENTS.md`), 1회차 보충 문서(`docs/guide` 폴더)만 있고 코드는 하나도 없습니다.
-- 끝나면 되는 것: `npm.cmd start`로 서버를 켜면 브라우저에 화면 틀(머리말, 홈, 확인 기준 화면)이 보이고, 확인 기준 화면에 기준 9개가 표로 나옵니다. 만든 코드는 내 작업 브랜치(`my-work`)에 저장합니다.
-- 준비물: 인터넷이 되는 Windows 10·11 PC, 수업에 쓸 Google 계정 1개. 프로그램은 아래 "시작 전에"에서 설치합니다.
+- 시작 상태: 빈 폴더에 만든 내 저장소에서 시작합니다. 코드는 하나도 없습니다. 1-1에서 AI가 수업 저장소의 `milestone-0` 브랜치에서 강사가 준 자료(`materials` 폴더), 프로젝트 규칙(`AGENTS.md`), 1회차 보충 문서(`docs/guide` 폴더)를 가져옵니다.
+- 끝나면 되는 것: `npm.cmd start`로 서버를 켜면 브라우저에 화면 틀(머리말, 홈, 확인 기준 화면)이 보이고, 확인 기준 화면에 기준 9개가 표로 나옵니다. 만든 코드는 내 저장소에 커밋해 둡니다.
+- 준비물: 인터넷이 되는 Windows 10·11 PC, 수업에 쓸 Google 계정 1개, 강사에게 초대받은 GitHub 계정(초대 메일의 수락까지 해 둡니다). 프로그램은 아래 "시작 전에"에서 설치합니다.
 
 ## 먼저 알아 둘 말
 
@@ -10,9 +10,10 @@
 - **서버**: 앱 뒤에서 일하는 프로그램입니다. 서버를 켜 두면 Chrome에서 http://127.0.0.1:8765 주소로 앱을 엽니다.
 - **터미널**: 명령을 치는 검은 창입니다. 이 수업에서는 시작 메뉴에서 여는 PowerShell 창을 씁니다.
 - **서버 창**: 서버를 켜 두는 PowerShell 창입니다. 1-3에서 하나 정하고, 수업 내내 서버는 이 창에서만 켜고 끕니다. 다른 명령은 서버 창이 아닌 터미널에서 칩니다.
-- **프로젝트 폴더**: `C:\vision-ai\vision-risk-dashboard-student`입니다. AI 도구에서 이 폴더를 열어 두고 작업합니다.
-- **지침**: AI가 일하는 방식을 적은 `AGENTS.md` 파일입니다. 수업 저장소에 이미 들어 있고, 1-1에서 AI에게 이 지침을 따르게 합니다.
-- **보충 문서**: 주소, 화면 문구, 거절 규칙처럼 세부 조건을 적은 문서입니다. `docs/guide` 폴더에 있습니다. 프롬프트는 무엇을 위해 어디에 어떤 기능을 더할지만 말하고, 세부 조건은 AI가 이 문서와 회차 완료 브랜치(1회차는 `milestone-1`)의 코드를 찾아 따릅니다. 사람은 읽지 않아도 따라 할 수 있습니다.
+- **프로젝트 폴더**: `C:\vision-ai\vision-risk-dashboard`입니다. "시작 전에"에서 빈 폴더로 만들고, AI 도구에서 이 폴더를 열어 두고 작업합니다.
+- **수업 저장소**: 강사가 GitHub에 둔 비공개 저장소입니다. 지침, 보충 문서, 강사 자료와 회차별 완료 코드가 들어 있고, 초대받은 GitHub 계정으로만 받을 수 있습니다. 이 프로젝트에서는 `class`라는 이름으로 부릅니다.
+- **지침**: AI가 일하는 방식을 적은 `AGENTS.md` 파일입니다. 1-1에서 AI가 수업 저장소에서 가져와 이 지침을 따르게 합니다.
+- **보충 문서**: 주소, 화면 문구, 거절 규칙처럼 세부 조건을 적은 문서입니다. `docs/guide` 폴더에 있습니다. 프롬프트는 무엇을 위해 어디에 어떤 기능을 더할지만 말하고, 세부 조건은 AI가 이 문서와 회차 완료 브랜치(1회차는 수업 저장소의 `milestone-1`)의 코드를 찾아 따릅니다. 사람은 읽지 않아도 따라 할 수 있습니다.
 
 ## 시작 전에 (프롬프트 없이 직접 합니다)
 
@@ -23,20 +24,17 @@
    - AI 도구: 강사가 안내한 AI 도구를 설치하고 로그인합니다.
    - 탐색기 보기 메뉴에서 "파일 확장명"을 켭니다.
 2. 설치 확인: 열려 있던 터미널과 AI 도구를 모두 닫습니다. 시작 메뉴에서 새 PowerShell을 열고 `node -v`와 `git --version`을 차례로 칩니다. `v24.`처럼 22.9 이상인 번호와 `git version`으로 시작하는 줄이 나와야 합니다. "인식되지 않습니다"가 나오면 PowerShell을 닫고 다시 엽니다.
-3. 수업 저장소 받기: 같은 PowerShell에서 아래를 한 줄씩 칩니다. 바탕 화면이나 문서 폴더(OneDrive가 동기화하는 곳), 한글이 든 경로는 쓰지 않습니다. 마지막 두 줄은 출발점 브랜치로 옮긴 뒤 내 작업 브랜치(`my-work`)를 만듭니다.
+3. 내 저장소 만들기: 같은 PowerShell에서 아래를 한 줄씩 칩니다. 바탕 화면이나 문서 폴더(OneDrive가 동기화하는 곳), 한글이 든 경로는 쓰지 않습니다. 빈 프로젝트 폴더를 만들고 그 안에 내 저장소를 만듭니다.
 
 ```powershell
-mkdir C:\vision-ai
-cd C:\vision-ai
-git clone https://github.com/startup-life/vision-risk-dashboard-student.git
-cd vision-risk-dashboard-student
-git switch milestone-0
-git switch -c my-work
+mkdir C:\vision-ai\vision-risk-dashboard
+cd C:\vision-ai\vision-risk-dashboard
+git init
 ```
 
-   다 치고 `dir`을 치면 `AGENTS.md`, `README.md`, `docs`, `materials`가 보여야 합니다.
-4. AI 도구로 폴더 열기: AI 도구에서 프로젝트 폴더 `C:\vision-ai\vision-risk-dashboard-student`를 엽니다. 폴더를 신뢰할지 물으면 신뢰합니다. AI가 명령을 실행하기 전에 내 승인을 받게 합니다(도구마다 메뉴가 다릅니다). 그다음 새 대화를 시작합니다.
-5. 탐색기로 폴더 열기: 탐색기에서도 프로젝트 폴더를 열어 둡니다. 파일이 생겼는지는 이 창에서 봅니다. `AGENTS.md`, `README.md`, `docs`, `materials`가 보이면 됩니다.
+   마지막 줄을 치면 `Initialized empty Git repository`로 시작하는 줄이 나와야 합니다. 폴더는 아직 비어 있고, 수업 자료는 1-1에서 AI가 가져옵니다.
+4. AI 도구로 폴더 열기: AI 도구에서 프로젝트 폴더 `C:\vision-ai\vision-risk-dashboard`를 엽니다. 폴더를 신뢰할지 물으면 신뢰합니다. AI가 명령을 실행하기 전에 내 승인을 받게 합니다(도구마다 메뉴가 다릅니다). 그다음 새 대화를 시작합니다.
+5. 탐색기로 폴더 열기: 탐색기에서도 프로젝트 폴더를 열어 둡니다. 파일이 생겼는지는 이 창에서 봅니다. 지금은 비어 있으면 됩니다.
 
 ## 진행 방법
 
@@ -53,10 +51,12 @@ git switch -c my-work
 ## 1-1. 지침 세팅
 
 ```text
-이 프로젝트의 AGENTS.md를 작업 지침으로 삼아 주세요. 프롬프트에 없는 상세 구현(주소, 화면 문구, 파일 이름, 거절 규칙)은 docs/guide의 회차 문서와 그 회차 완료 브랜치 코드(origin/milestone-1)에서 확인합니다.
+수업 자료를 이 프로젝트로 가져오기 위해, 수업 저장소 https://github.com/startup-life/vision-risk-dashboard-student 를 이 프로젝트에 class라는 이름의 원격 저장소로 더해 받아 오고, class/milestone-0의 AGENTS.md, docs/guide, materials를 이 프로젝트로 가져와 주세요(브랜치는 옮기지 않습니다).
+그다음 AGENTS.md를 작업 지침으로 삼아 주세요. 프롬프트에 없는 상세 구현(주소, 화면 문구, 파일 이름, 거절 규칙)은 docs/guide의 회차 문서와 그 회차 완료 브랜치 코드(class/milestone-1)에서 확인합니다.
 지금은 AGENTS.md와 docs/guide/session-1.md를 읽기만 하고, 읽은 파일 이름만 한 줄로 알려 주세요.
 ```
-- 확인: AI 답에 `AGENTS.md`와 `session-1.md`가 나옵니다. 새 대화를 열 때마다 이 프롬프트를 먼저 보냅니다.
+- 직접 하기: 수업 저장소를 처음 받을 때 GitHub 로그인 창이 뜨면 강사에게 초대받은 GitHub 계정으로 로그인합니다.
+- 확인: 탐색기의 프로젝트 폴더에 `AGENTS.md`, `docs`, `materials`가 생기고, AI 답에 `AGENTS.md`와 `session-1.md`가 나옵니다. 새 대화를 열 때마다 이 프롬프트를 먼저 보냅니다.
 
 
 ## 1-2. 앱 뼈대
@@ -75,7 +75,7 @@ git switch -c my-work
 - 직접 하기: 시작 메뉴에서 PowerShell 창을 새로 열고 아래를 칩니다. 이 창이 서버 창입니다.
 
 ```powershell
-cd C:\vision-ai\vision-risk-dashboard-student
+cd C:\vision-ai\vision-risk-dashboard
 npm.cmd start
 ```
 
@@ -196,14 +196,3 @@ git commit -m "1회차 화면 틀과 확인 기준"
 - [ ] http://127.0.0.1:8765/api/health 는 `{"status":"ok"}`, `/api/standards`는 기준 목록을 보여 준다.
 - [ ] `config` 폴더에 `local-connection.json`(내 설정 파일)과 `local-connection.example.json`(예시 파일)이 있다.
 - [ ] 1-14에서 내 코드를 커밋했고, `config/local-connection.json`은 커밋에 들어가지 않았다.
-
-다 끝내지 못했으면 2회차 전에 서버를 끄고 터미널에서 아래를 한 줄씩 칩니다. 내가 만든 코드는 `my-work` 브랜치에 남고, 완료 브랜치 `milestone-1`로 옮겨 갑니다. 이 브랜치에는 `AGENTS.md`와 2회차 보충 문서까지 들어 있으니, 2회차 "시작 전에"의 문서 받기는 건너뜁니다. 1-14를 하지 못했으면 아래 `cd` 줄을 친 다음 1-14의 앞 두 줄(`git config`)을 치고 이어 갑니다. `git commit`에서 "nothing to commit"이 나와도 그대로 다음 줄을 칩니다. 1-13을 하지 못했으면 옮긴 뒤 1-13의 첫 줄대로 내 설정 파일을 만들어 둡니다.
-
-```powershell
-cd C:\vision-ai\vision-risk-dashboard-student
-git add -A
-git commit -m "1회차 내 작업"
-git fetch origin
-git switch milestone-1
-npm.cmd install
-```

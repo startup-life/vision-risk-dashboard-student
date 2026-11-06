@@ -1,22 +1,14 @@
 # 3회차: 사건 상세, 정보 수정, 판단과 조치 기록
 
-- 시작 상태: 2회차를 끝낸 프로젝트 폴더 `C:\vision-ai\vision-risk-dashboard-student`에서 시작합니다. 2회차를 다 끝내지 못했으면 2회차 파일 맨 끝의 "다 끝내지 못했으면" 안내대로 `milestone-2`로 옮긴 뒤 시작합니다.
+- 시작 상태: 2회차를 끝낸 프로젝트 폴더 `C:\vision-ai\vision-risk-dashboard`에서 시작합니다.
 - 끝나면 되는 것: 사건을 누르면 상세 화면에서 사진을 보고, 정보를 고치고(버전이 오릅니다), 내 판단과 조치를 남길 수 있습니다. 남긴 판단과 조치에 따라 사건 상태와 홈의 "추가 확인", "검토 대기", "대응 필요" 숫자가 바뀌고, 상세 화면 맨 아래에서 사건 이력을 볼 수 있습니다.
 - 준비물: AI 도구에서 연 프로젝트 폴더, 서버 창, 프로젝트 폴더 옆의 사진 저장소(`vision-risk-student-images`, 2회차에 받음).
 
 ## 시작 전에 (프롬프트 없이 직접 합니다)
 
-1. 보충 문서 받기: 시작 메뉴에서 PowerShell 창을 새로 열고 아래 세 줄을 한 줄씩 칩니다. 3회차 보충 문서가 `docs/guide` 폴더에 들어오고 내 코드는 바뀌지 않습니다. 탐색기에서 `docs\guide` 폴더에 `session-3.md`가 보이면 됩니다. 2회차를 못 끝내서 `milestone-2`로 옮겼으면 문서가 이미 있으니 건너뜁니다.
-
-```powershell
-cd C:\vision-ai\vision-risk-dashboard-student
-git fetch origin
-git checkout origin/milestone-2 -- docs/guide
-```
-
-2. 서버 창에서 `npm.cmd start`로 서버를 켜고 Chrome에서 http://127.0.0.1:8765 를 엽니다. 서버 창을 새로 열었으면 먼저 `cd C:\vision-ai\vision-risk-dashboard-student`로 프로젝트 폴더로 이동합니다.
-3. 홈의 "전체 사건"을 눌러 사건 목록을 봅니다. 사건이 3건보다 적으면 "사진 등록"으로 더 등록해 3건 이상 만듭니다. 그중 한 건은 저장소 사진 탭에서 사진을 2장 이상 골라 등록한 사건이어야 합니다. `milestone-2`로 옮겼으면 목록이 비어 보이니 여기서 새로 등록합니다.
-4. 사건 번호 하나(예: `R-101`)를 적어 둡니다. 이 파일의 `R-101`은 예시이니 내 사건 번호로 바꿔 엽니다.
+1. 서버 창에서 `npm.cmd start`로 서버를 켜고 Chrome에서 http://127.0.0.1:8765 를 엽니다. 서버 창을 새로 열었으면 먼저 `cd C:\vision-ai\vision-risk-dashboard`로 프로젝트 폴더로 이동합니다.
+2. 홈의 "전체 사건"을 눌러 사건 목록을 봅니다. 사건이 3건보다 적으면 "사진 등록"으로 더 등록해 3건 이상 만듭니다. 그중 한 건은 저장소 사진 탭에서 사진을 2장 이상 골라 등록한 사건이어야 합니다.
+3. 사건 번호 하나(예: `R-101`)를 적어 둡니다. 이 파일의 `R-101`은 예시이니 내 사건 번호로 바꿔 엽니다.
 
 ## 진행 방법
 
@@ -32,10 +24,11 @@ git checkout origin/milestone-2 -- docs/guide
 ## 3-1. 지침 세팅
 
 ```text
-이 프로젝트의 AGENTS.md를 작업 지침으로 삼아 주세요. 프롬프트에 없는 상세 구현(주소, 화면 문구, 파일 이름, 거절 규칙)은 docs/guide의 회차 문서와 그 회차 완료 브랜치 코드(origin/milestone-3)에서 확인합니다.
+이번 회차 문서를 이 프로젝트로 가져오기 위해, 수업 저장소(class)를 다시 받아 class/milestone-2의 docs/guide와 AGENTS.md를 이 프로젝트로 가져와 주세요(브랜치는 옮기지 않습니다).
+그다음 AGENTS.md를 작업 지침으로 삼아 주세요. 프롬프트에 없는 상세 구현(주소, 화면 문구, 파일 이름, 거절 규칙)은 docs/guide의 회차 문서와 그 회차 완료 브랜치 코드(class/milestone-3)에서 확인합니다.
 지금은 AGENTS.md, docs/guide/session-1.md, docs/guide/session-3.md를 읽기만 하고, 읽은 파일 이름만 한 줄로 알려 주세요.
 ```
-- 확인: AI 답에 `AGENTS.md`, `session-1.md`, `session-3.md`가 나옵니다. 앞 회차 문서 이름이 더 나와도 됩니다. 새 대화를 열 때마다 이 프롬프트를 먼저 보냅니다.
+- 확인: 탐색기에서 `docs\guide` 폴더에 `session-3.md`가 생기고, AI 답에 `AGENTS.md`, `session-1.md`, `session-3.md`가 나옵니다. 앞 회차 문서 이름이 더 나와도 됩니다. 새 대화를 열 때마다 이 프롬프트를 먼저 보냅니다.
 
 ## 3-2. 사건 상세 화면
 
@@ -265,7 +258,7 @@ git checkout origin/milestone-2 -- docs/guide
 ## 3-25. 내 코드 남겨 두기 (직접 하기)
 
 프롬프트는 없습니다.
-- 직접 하기: 서버를 끄고 서버 창에서 아래를 한 줄씩 칩니다. 시작할 때 받은 보충 문서도 이 커밋에 함께 저장됩니다.
+- 직접 하기: 서버를 끄고 서버 창에서 아래를 한 줄씩 칩니다. 3-1에서 가져온 보충 문서도 이 커밋에 함께 저장됩니다.
 
 ```powershell
 git add -A
@@ -282,14 +275,3 @@ git commit -m "3회차 상세·판단·조치"
 - [ ] 홈의 "추가 확인", "검토 대기", "대응 필요" 숫자와 카드, "최근 확인한 사건"이 판단, 조치, 정보 수정에 따라 바뀌고, 서버를 껐다 켜도 기록이 남아 있다.
 - [ ] 서버 창과 화면 본문 맨 위에 "연동 상태: 저장소 로컬 저장"이 보인다.
 - [ ] 3-25에서 내 코드를 커밋했다.
-
-다 끝내지 못했으면 4회차 전에 서버를 끄고 PowerShell 창에서 아래를 한 줄씩 칩니다. 내가 만든 코드는 지금 브랜치에 남고, 완료 브랜치 `milestone-3`으로 옮겨 갑니다. 이 브랜치에는 `AGENTS.md`와 4회차까지의 보충 문서가 들어 있습니다. `git commit`에서 "nothing to commit"이 나와도 그대로 다음 줄을 칩니다.
-
-```powershell
-cd C:\vision-ai\vision-risk-dashboard-student
-git add -A
-git commit -m "3회차 내 작업"
-git fetch origin
-git switch milestone-3
-npm.cmd install
-```

@@ -1,6 +1,6 @@
 # 4회차: 관련 기준 확인(NotebookLM)과 요청 알림
 
-- 시작 상태: 3회차를 끝낸 프로젝트 폴더 `C:\vision-ai\vision-risk-dashboard-student`에서 이어 합니다. 3회차를 다 끝내지 못했으면 3회차 파일 맨 끝의 "다 끝내지 못했으면" 안내대로 `milestone-3`으로 옮긴 뒤 시작합니다.
+- 시작 상태: 3회차를 끝낸 프로젝트 폴더 `C:\vision-ai\vision-risk-dashboard`에서 이어 합니다.
 - 끝나면 되는 것: 사건 상세가 "1. 사진", "2. 관련 기준 확인 (NotebookLM)", "3. 내 판단 남기기" 세 단계가 됩니다. "관련 기준 찾기"를 누르면 요청이 순서를 기다렸다가 처리되고, 머리말의 알림 패널에서 진행 상황과 지난 시간을 봅니다. 끝나면 기준 인용이 상세, 홈 카드, 판단 화면에 나옵니다. 예시 결과(mock)와 실제 NotebookLM(live) 둘 다 됩니다.
 - 준비물: 3회차까지 만든 앱, 켜 둔 서버 창, 옆 폴더의 사진 저장소. 뒷부분(4-22부터)에서 NotebookLM에 로그인할 Google 계정.
 
@@ -13,17 +13,9 @@
 
 ## 시작 전에 (프롬프트 없이 직접 합니다)
 
-1. 보충 문서 받기: 시작 메뉴에서 PowerShell 창을 새로 열고 아래 세 줄을 한 줄씩 칩니다. 세 줄을 꼭 함께 칩니다. 4회차의 자세한 내용을 적은 문서가 `docs/guide` 폴더에 들어오고 내 코드는 바뀌지 않습니다. 탐색기에서 `docs\guide` 폴더를 열어 `session-4.md`가 보이면 됩니다. 이 문서는 회차 끝 커밋 때 함께 저장됩니다. 3회차를 못 끝내서 `milestone-3`로 옮겼으면 문서가 이미 있으니 건너뜁니다.
-
-```powershell
-cd C:\vision-ai\vision-risk-dashboard-student
-git fetch origin
-git checkout origin/milestone-3 -- docs/guide
-```
-
-2. 서버 창(프로젝트 폴더로 이동한 PowerShell 창)에서 `npm.cmd start`로 서버를 켜고 Chrome에서 http://127.0.0.1:8765 를 엽니다. 산업안전 사건과 택배 발송 확인 사건 가운데 없는 것이 있으면 홈의 "사진 등록"으로 만듭니다. 사건을 눌러 상세가 열리고, 정보 수정·판단·조치가 되는지 봅니다.
-3. 탐색기에서 프로젝트 폴더의 `materials` 폴더를 열어 `factory-criteria-v1.txt`가 있는지 봅니다. 뒤에서 NotebookLM에 올릴 기준 원문입니다.
-4. 탐색기에서 `config` 폴더에 `local-connection.json`이 있는지 봅니다. 없으면 1회차처럼 `local-connection.example.json`을 같은 폴더에 복사하고 이름을 `local-connection.json`으로 바꿉니다.
+1. 서버 창(프로젝트 폴더로 이동한 PowerShell 창)에서 `npm.cmd start`로 서버를 켜고 Chrome에서 http://127.0.0.1:8765 를 엽니다. 산업안전 사건과 택배 발송 확인 사건 가운데 없는 것이 있으면 홈의 "사진 등록"으로 만듭니다. 사건을 눌러 상세가 열리고, 정보 수정·판단·조치가 되는지 봅니다.
+2. 탐색기에서 프로젝트 폴더의 `materials` 폴더를 열어 `factory-criteria-v1.txt`가 있는지 봅니다. 뒤에서 NotebookLM에 올릴 기준 원문입니다.
+3. 탐색기에서 `config` 폴더에 `local-connection.json`이 있는지 봅니다. 없으면 1회차처럼 `local-connection.example.json`을 같은 폴더에 복사하고 이름을 `local-connection.json`으로 바꿉니다.
 
 ## 진행 방법
 
@@ -40,10 +32,11 @@ git checkout origin/milestone-3 -- docs/guide
 ## 4-1. 지침 세팅
 
 ```text
-이 프로젝트의 AGENTS.md를 작업 지침으로 삼아 주세요. 프롬프트에 없는 상세 구현(주소, 화면 문구, 파일 이름, 거절 규칙)은 docs/guide의 회차 문서와 그 회차 완료 브랜치 코드(origin/milestone-4)에서 확인합니다.
+이번 회차 문서를 이 프로젝트로 가져오기 위해, 수업 저장소(class)를 다시 받아 class/milestone-3의 docs/guide와 AGENTS.md를 이 프로젝트로 가져와 주세요(브랜치는 옮기지 않습니다).
+그다음 AGENTS.md를 작업 지침으로 삼아 주세요. 프롬프트에 없는 상세 구현(주소, 화면 문구, 파일 이름, 거절 규칙)은 docs/guide의 회차 문서와 그 회차 완료 브랜치 코드(class/milestone-4)에서 확인합니다.
 지금은 AGENTS.md, docs/guide/session-1.md, docs/guide/session-4.md를 읽기만 하고, 읽은 파일 이름만 한 줄로 알려 주세요.
 ```
-- 확인: AI 답에 `AGENTS.md`, `session-1.md`, `session-4.md`가 나옵니다. 앞 회차 문서 이름이 더 나와도 됩니다. 새 대화를 열 때마다 이 프롬프트를 먼저 보냅니다.
+- 확인: 탐색기에서 `docs\guide` 폴더에 `session-4.md`가 생기고, AI 답에 `AGENTS.md`, `session-1.md`, `session-4.md`가 나옵니다. 앞 회차 문서 이름이 더 나와도 됩니다. 새 대화를 열 때마다 이 프롬프트를 먼저 보냅니다.
 
 ## 4-2. NotebookLM 설정 키와 스위치
 
@@ -232,7 +225,7 @@ NotebookLM에 물을 내용을 정하고 실제 연결 없이도 흐름을 연�
 프롬프트는 없습니다.
 - 직접 하기: 설정 파일의 `mock`을 `off`로 바꾸고 서버를 다시 켭니다. Chrome에서 http://127.0.0.1:8765/api/health 를 열고, 판단을 남기지 않은 사건 상세도 엽니다.
 - 확인: `"notebooklm":"off"`가 보이고, 화면 알림 줄의 연동 상태는 "NotebookLM 꺼짐"입니다. 상세의 "관련 기준 찾기" 단추가 흐리게 꺼져 눌리지 않고 "NotebookLM 연동이 꺼져 있습니다(NOTEBOOKLM_MODE=off)."가 보입니다.
-- 직접 하기: `mock`으로 되돌리고 서버를 다시 켭니다. 홈, 상세, 판단 화면, 알림 패널을 한 번씩 돌아봅니다. 서버 창이 아닌 PowerShell 창에서 프로젝트 폴더로 이동(`cd C:\vision-ai\vision-risk-dashboard-student`)한 뒤 `git status`를 칩니다.
+- 직접 하기: `mock`으로 되돌리고 서버를 다시 켭니다. 홈, 상세, 판단 화면, 알림 패널을 한 번씩 돌아봅니다. 서버 창이 아닌 PowerShell 창에서 프로젝트 폴더로 이동(`cd C:\vision-ai\vision-risk-dashboard`)한 뒤 `git status`를 칩니다.
 - 확인: 요청, 알림, 결과 보기, 닫기, 기준 바꾸기가 모두 됩니다. `git status`에 `config/local-connection.json`과 `runtime` 폴더가 나오지 않습니다.
 
 ## 4-22. NotebookLM 도구 설치와 로그인 (직접 하기)
@@ -255,11 +248,11 @@ nlm login --storage protected
 - 직접 하기: nlm 전용 Chrome 창이 뜨면 `Sign in`을 눌러 NotebookLM을 쓸 내 Google 계정으로 로그인합니다. PowerShell 창에 성공 줄이 나올 때까지 두 창을 닫지 않습니다. 그다음 `nlm login --check`를 칩니다. 화면에 나오는 계정 메일은 AI 대화에 옮기지 않습니다.
 - 확인: `nlm --version`이 `0.15.6`이 들어 있는 줄을 보여 주고, `nlm login --check`가 `✓ Authentication valid!`를 보여 줍니다.
 - 막히면: `nlm`을 찾을 수 없다고 나오면 `uv tool update-shell`을 치고 PowerShell 창을 새로 연 뒤 다시 칩니다. 키 저장소 오류와 함께 `--storage file`을 쓰라는 안내가 나오면 `nlm login --storage file`로 다시 합니다.
-- 직접 하기: 서버 창도 Ctrl+C로 서버를 끄고 닫습니다. PowerShell 창을 새로 열고 `cd C:\vision-ai\vision-risk-dashboard-student`로 이동한 뒤 `npm.cmd start`를 칩니다. 이 창이 새 서버 창입니다. 설치 전에 연 창에서 켠 서버는 새로 설치한 프로그램을 찾지 못합니다.
+- 직접 하기: 서버 창도 Ctrl+C로 서버를 끄고 닫습니다. PowerShell 창을 새로 열고 `cd C:\vision-ai\vision-risk-dashboard`로 이동한 뒤 `npm.cmd start`를 칩니다. 이 창이 새 서버 창입니다. 설치 전에 연 창에서 켠 서버는 새로 설치한 프로그램을 찾지 못합니다.
 
 ## 4-23. 노트북 만들고 기준 원문 올리기 (직접 하기)
 
-프롬프트는 없습니다. 서버 창이 아닌 PowerShell 창에서 프로젝트 폴더로 이동(`cd C:\vision-ai\vision-risk-dashboard-student`)한 뒤 칩니다.
+프롬프트는 없습니다. 서버 창이 아닌 PowerShell 창에서 프로젝트 폴더로 이동(`cd C:\vision-ai\vision-risk-dashboard`)한 뒤 칩니다.
 - 직접 하기: 아래 첫 줄을 칩니다. 출력된 `"notebook_id"` 뒤의 글이 노트북 ID입니다.
 
 ```powershell
@@ -348,16 +341,3 @@ git commit -m "4회차 관련 기준 확인과 요청 알림"
 - [ ] 홈 카드의 "출처 대조:"와 판단 화면의 "NotebookLM 기준 확인:"에도 결과가 보인다.
 - [ ] mock과 live 둘 다 결과가 나온다(live를 못 했으면 mock만).
 - [ ] 4-30에서 내 코드를 커밋했고, `git status`에 설정 파일과 `runtime` 폴더가 나오지 않는다.
-
-다 끝내지 못했으면 5회차 전에 서버를 끄고 서버 창에서 아래를 한 줄씩 칩니다. 내가 만든 코드는 지금 브랜치에 남고, 완료 브랜치 `milestone-4`로 옮겨 갑니다. 이 브랜치에는 4회차까지의 보충 문서가 `docs/guide` 폴더에 들어 있습니다. `git commit`에서 "nothing to commit"이 나와도 그대로 다음 줄을 칩니다.
-
-```powershell
-cd C:\vision-ai\vision-risk-dashboard-student
-git add -A
-git commit -m "4회차 내 작업"
-git fetch origin
-git switch milestone-4
-npm.cmd install
-```
-
-설정 파일의 NotebookLM 값(스위치, 노트북 ID, 소스 ID)과 nlm 로그인은 브랜치를 옮겨도 그대로 남습니다. 옮긴 뒤 서버를 켜서 서버 창의 연동 상태 줄을 확인합니다.

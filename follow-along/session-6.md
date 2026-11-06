@@ -1,6 +1,6 @@
 # 6회차: Teachable Machine 모델 학습과 모델 예측
 
-- 시작 상태: 5회차를 끝낸 프로젝트 폴더(`my-work` 브랜치)에서 이어 합니다. 5회차를 다 끝내지 못했으면 5회차 파일 맨 끝의 "다 끝내지 못했으면" 안내대로 `milestone-5`로 옮긴 뒤 시작합니다.
+- 시작 상태: 5회차를 끝낸 프로젝트 폴더(`C:\vision-ai\vision-risk-dashboard`)에서 이어 합니다.
 - 끝나면 되는 것: 모델 학습 화면에서 제공 사진을 내가 직접 분류해 모델을 학습하고, 검증·비교·적용·백업할 수 있습니다. 사건 상세가 다섯 단계가 되어 3단계에 사진별 모델 예측이 보이고, 그 예측이 관련 기준 확인과 판단 화면에 들어갑니다.
 - 준비물: 켜 둔 서버 창과 명령을 칠 PowerShell 창 하나 더, 인터넷(6-3에서 학습 준비 파일을 한 번 받습니다), 프로젝트 옆 사진 저장소 `vision-risk-student-images`(2회차에 받았습니다). 설정 파일은 5회차 그대로 둡니다. 연동이 모두 `mock`이어도 이 회차는 할 수 있습니다. 6-21의 공식 모델 가져오기만 Google 계정으로 로그인한 Chrome이 필요하고, 못 하면 건너뜁니다.
 
@@ -16,15 +16,8 @@
 
 ## 시작 전에 (프롬프트 없이 직접 합니다)
 
-1. 보충 문서 받기: 시작 메뉴에서 PowerShell 창을 새로 엽니다. 이 창이 명령 창입니다. 명령 창에서 아래 세 줄을 한 줄씩 칩니다. 6회차 보충 문서가 `docs/guide` 폴더에 들어오고 내 코드는 바뀌지 않습니다. 탐색기에서 `docs\guide` 폴더를 열어 `session-6.md`가 보이면 됩니다. 5회차를 못 끝내서 `milestone-5`로 옮겼으면 문서가 이미 있으니 첫 줄(`cd`)만 칩니다.
-
-```powershell
-cd C:\vision-ai\vision-risk-dashboard-student
-git fetch origin
-git checkout origin/milestone-5 -- docs/guide
-```
-
-2. 서버 창에서 `npm.cmd start`로 서버를 켜고(서버 창을 닫았으면 PowerShell 창을 새로 열어 `cd C:\vision-ai\vision-risk-dashboard-student`로 프로젝트 폴더로 이동한 뒤 칩니다) Chrome에서 http://127.0.0.1:8765 를 엽니다. 지난 회차에 등록한 사건이 보이면 됩니다.
+1. 명령 창 열기: 시작 메뉴에서 PowerShell 창을 새로 열고 `cd C:\vision-ai\vision-risk-dashboard`를 칩니다. 이 창이 명령 창입니다.
+2. 서버 창에서 `npm.cmd start`로 서버를 켜고(서버 창을 닫았으면 PowerShell 창을 새로 열어 `cd C:\vision-ai\vision-risk-dashboard`로 프로젝트 폴더로 이동한 뒤 칩니다) Chrome에서 http://127.0.0.1:8765 를 엽니다. 지난 회차에 등록한 사건이 보이면 됩니다.
 3. 탐색기에서 `C:\vision-ai` 폴더를 열어 `vision-risk-student-images` 폴더가 프로젝트 폴더 옆에 있는지 봅니다. 없으면 README의 "폴더와 사진 저장소"대로 받습니다.
 
 ## 진행 방법
@@ -51,10 +44,11 @@ git checkout origin/milestone-5 -- docs/guide
 ## 6-1. 지침 세팅
 
 ```text
-이 프로젝트의 AGENTS.md를 작업 지침으로 삼아 주세요. 프롬프트에 없는 상세 구현(주소, 화면 문구, 파일 이름, 거절 규칙)은 docs/guide의 회차 문서와 그 회차 완료 브랜치 코드(origin/main)에서 확인합니다.
+이번 회차 문서를 이 프로젝트로 가져오기 위해, 수업 저장소(class)를 다시 받아 class/milestone-5의 docs/guide와 AGENTS.md를 이 프로젝트로 가져와 주세요(브랜치는 옮기지 않습니다).
+그다음 AGENTS.md를 작업 지침으로 삼아 주세요. 프롬프트에 없는 상세 구현(주소, 화면 문구, 파일 이름, 거절 규칙)은 docs/guide의 회차 문서와 그 회차 완료 브랜치 코드(class/main)에서 확인합니다.
 지금은 AGENTS.md, docs/guide/session-1.md, docs/guide/session-6.md를 읽기만 하고, 읽은 파일 이름만 한 줄로 알려 주세요.
 ```
-- 확인: AI 답에 `AGENTS.md`, `session-1.md`, `session-6.md`가 나옵니다. 앞 회차 문서 이름이 더 나와도 됩니다. 새 대화를 열 때마다 이 프롬프트를 먼저 보냅니다.
+- 확인: 탐색기에서 `docs\guide` 폴더에 `session-6.md`가 생기고, AI 답에 `AGENTS.md`, `session-1.md`, `session-6.md`가 나옵니다. 앞 회차 문서 이름이 더 나와도 됩니다. 새 대화를 열 때마다 이 프롬프트를 먼저 보냅니다.
 
 ## 6-2. 학습용 패키지와 준비 명령
 
@@ -329,19 +323,3 @@ git commit -m "6회차 모델 학습과 예측"
 - [ ] 홈에 분류별 모델 연결 상태가 보이고, 사건 상세가 다섯 단계이며 3단계에 사진별 모델 예측이 보인다.
 - [ ] 모델 예측만 있어도 관련 기준 확인을 할 수 있고, 판단 화면 참고 칸에 모델 예측이 들어간다.
 - [ ] 6-30에서 내 코드를 커밋했다.
-
-다 끝내지 못했으면 서버를 끄고 PowerShell 창에서 아래를 한 줄씩 칩니다. 내가 만든 코드는 `my-work` 브랜치에 남고, 완성본 `main`으로 옮겨 갑니다. `main`은 처음 저장소를 받을 때부터 있던 브랜치라 `git pull`로 최신으로 맞춥니다. `git commit`에서 "nothing to commit"이 나와도 그대로 다음 줄을 칩니다.
-
-```powershell
-cd C:\vision-ai\vision-risk-dashboard-student
-git add -A
-git commit -m "6회차 내 작업"
-git fetch origin
-git switch main
-git pull
-npm.cmd install
-npm.cmd run setup:tm
-```
-
-- `main`의 코드는 학습 준비 파일과 학습 자료를 내 코드와 다른 폴더에 둘 수 있어서 `npm.cmd run setup:tm`을 한 번 더 칩니다. 내가 만든 학습 프로젝트가 `main`에서 보이지 않으면, 옮기기 전에 내 코드에서 "프로젝트 백업"으로 받아 둔 파일을 `main`의 "프로젝트 백업 가져오기"로 넣고 쓸 버전을 다시 적용합니다. 가져오기가 되지 않으면 `main`에서 사진 분류와 학습을 다시 합니다.
-- Google 쪽 코드(Apps Script)는 `milestone-5`와 `main`이 같습니다. 5회차 끝 안내대로 `milestone-5`의 Google 쪽 코드를 이미 올렸으면 다시 올리지 않아도 됩니다. 내 코드의 Google 쪽 코드를 쓰고 있었으면 5회차 파일 끝의 안내대로 다시 올립니다.
