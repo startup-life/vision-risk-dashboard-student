@@ -1,6 +1,6 @@
 # 5회차: 사진 판독(Gemini)과 Google 시트 저장
 
-- 시작 상태: 4회차를 끝낸 프로젝트 폴더(`C:\vision-ai\vision-risk-dashboard-student`)에서 이어 합니다. 4회차를 다 끝내지 못했으면 README의 "완료 브랜치로 옮기기"대로 `milestone-4`로 옮겨 시작합니다.
+- 시작 상태: 4회차를 끝낸 프로젝트 폴더(`C:\vision-ai\vision-risk-dashboard-student`)에서 이어 합니다. 4회차를 다 끝내지 못했으면 4회차 파일 맨 끝의 "다 끝내지 못했으면" 안내대로 `milestone-4`로 옮겨 시작합니다.
 - 끝나면 되는 것: 사건 상세가 네 단계(1 사진, 2 AI 사진 설명 (Gemini), 3 관련 기준 확인 (NotebookLM), 4 내 판단 남기기)가 되고, 2번 구역에서 판독을 요청하면 Gemini가 쓴 사진 설명이 나옵니다. 관련 기준 확인은 이 설명이 있어야 할 수 있습니다. 사건 기록은 내 Google 시트와 Drive 비공개 폴더에 저장됩니다.
 - 준비물: 개인 Google 계정 하나, OnePort API 키(`sk-`로 시작, 받는 방법은 강사 안내를 따릅니다), 4회차까지 쓴 설정 파일(`config/local-connection.json`)과 사진 저장소 폴더, 켜 둔 서버 창.
 
