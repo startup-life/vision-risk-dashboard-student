@@ -9,18 +9,20 @@ Google 쪽 코드는 내 컴퓨터 저장소와 같은 동작 이름, 같은 답
 
 ### 설정 파일의 새 키와 스위치
 
-설정 파일에 GAS_WEBAPP_URL(Google 웹앱 주소), GEMINI_API_KEY(Gemini 키), STORAGE_MODE(저장소 스위치), GEMINI_MODE(Gemini 스위치)를 더합니다.
+설정 파일에 GAS_WEBAPP_URL(Google 웹앱 주소), ONEPORT_API_KEY(OnePort 키), STORAGE_MODE(저장소 스위치), GEMINI_MODE(Gemini 스위치)를 더합니다. 사진 판독은 Google 쪽 코드가 OnePort를 거쳐 Gemini 모델에 보내므로 키는 OnePort 키(sk-로 시작)를 씁니다.
 
 - STORAGE_MODE는 live(Google 쪽 코드를 거쳐 Google 시트와 Drive에 저장) 또는 mock(지금처럼 이 PC의 파일에 저장)입니다. 비워 두면 live입니다.
 - GEMINI_MODE는 off(쓰지 않음), mock(모의 사진 설명), live(실제 Gemini)입니다. 비워 두면 STORAGE_MODE와 같은 값입니다.
 - 4회차 문서에서 비어 있으면 live로 보던 NOTEBOOKLM_MODE("비워 두면 live")는 이제 비워 두면 STORAGE_MODE와 같은 값으로 바꿉니다.
 - 허용하지 않는 값이면 4회차 NOTEBOOKLM_MODE처럼 서버를 켜지 않고 허용 값을 알립니다.
 
-세 스위치(STORAGE_MODE, GEMINI_MODE, NOTEBOOKLM_MODE)의 값은 비밀이 아닙니다. 요청하면 바꾸고 바꾼 값을 답에 알려 줘도 됩니다. 설정 파일의 값을 옮겨 적지 않는다는 지침에서 이 세 값만 예외입니다. GAS_WEBAPP_URL과 GEMINI_API_KEY의 값은 비밀입니다.
+세 스위치(STORAGE_MODE, GEMINI_MODE, NOTEBOOKLM_MODE)의 값은 비밀이 아닙니다. 요청하면 바꾸고 바꾼 값을 답에 알려 줘도 됩니다. 설정 파일의 값을 옮겨 적지 않는다는 지침에서 이 세 값만 예외입니다. GAS_WEBAPP_URL과 ONEPORT_API_KEY의 값은 비밀입니다.
 
-GEMINI_API_KEY는 npm.cmd run gas:init만 읽어 Google 쪽 설정으로 보냅니다. 서버(npm.cmd start)는 이 값을 읽어 쓰지 않고 환경 변수로도 옮기지 않습니다.
+ONEPORT_API_KEY는 npm.cmd run gas:init만 읽어 Google 쪽 설정으로 보냅니다. 서버(npm.cmd start)는 이 값을 읽어 쓰지 않고 환경 변수로도 옮기지 않습니다.
 
-사용자가 대화에 Gemini 키를 붙여 넣으면 설정 파일의 GEMINI_API_KEY 값만 그 키로 바꿉니다. 다른 줄은 그대로 두고 키 값은 답, 화면, 터미널에 다시 쓰지 않습니다.
+사용자가 대화에 OnePort 키를 붙여 넣으면 설정 파일의 ONEPORT_API_KEY 값만 그 키로 바꿉니다. 다른 줄은 그대로 두고 키 값은 답, 화면, 터미널에 다시 쓰지 않습니다.
+
+예전 설정 파일에 GEMINI_API_KEY 줄이 있으면 그 값은 읽지 않고 "알 수 없는 설정 키" 대신 "설정 경고: 설정 키 GEMINI_API_KEY는 더 이상 쓰지 않는다. 사진 판독은 OnePort를 거치므로 OnePort 키를 ONEPORT_API_KEY에 넣고 npm run gas:init을 다시 실행한다. GEMINI_API_KEY 줄은 지운다." 한 줄로 알립니다.
 
 ### 함께 쓸 수 없는 스위치 조합
 
@@ -185,7 +187,7 @@ doPost는 받은 JSON의 action 이름으로 일을 나누고 늘 JSON으로 답
 
 doGet은 기록을 읽지 않고 `{"status": "ok", "message": "권한 승인이 끝났습니다. 이 창을 닫고 터미널로 돌아가세요."}`만 돌려줍니다.
 
-action은 setup, set_gemini_key, create_record, update_record, get_records, get_record, get_image, save_evidence_check, save_review, save_action, reconcile_job, analyze_gemini, gemini_settings입니다. 이름은 서버의 내 컴퓨터 저장소 동작 이름과 같고 입력 검사·답 모양·이력도 내 컴퓨터 저장소와 같게 합니다. 저장만 시트와 Drive로 합니다. 요청 항목 이름은 서버가 내 컴퓨터 저장소 동작에 넘기는 이름을 그대로 쓰고 각 일의 항목은 아래 절에 적었습니다. 입력 검사의 오류 문장은 서버의 같은 검사 문장을 그대로 쓰고 error_code는 BAD_REQUEST입니다. 없는 사건은 NOT_FOUND와 "기록을 찾지 못했습니다. 목록에서 다시 골라 주세요."입니다. 이 문서에 없는 입력 규칙과 문장은 session-2.md, session-3.md, session-4.md와 서버 코드에서 찾습니다.
+action은 setup, set_oneport_key, create_record, update_record, get_records, get_record, get_image, save_evidence_check, save_review, save_action, reconcile_job, analyze_gemini, gemini_settings입니다. 이름은 서버의 내 컴퓨터 저장소 동작 이름과 같고 입력 검사·답 모양·이력도 내 컴퓨터 저장소와 같게 합니다. 저장만 시트와 Drive로 합니다. 요청 항목 이름은 서버가 내 컴퓨터 저장소 동작에 넘기는 이름을 그대로 쓰고 각 일의 항목은 아래 절에 적었습니다. 입력 검사의 오류 문장은 서버의 같은 검사 문장을 그대로 쓰고 error_code는 BAD_REQUEST입니다. 없는 사건은 NOT_FOUND와 "기록을 찾지 못했습니다. 목록에서 다시 골라 주세요."입니다. 이 문서에 없는 입력 규칙과 문장은 session-2.md, session-3.md, session-4.md와 서버 코드에서 찾습니다.
 
 시트 읽기·쓰기 공통 규칙을 아래에 적었습니다. 뒤의 일들이 함께 쓰므로 이 틀에 도우미로 만듭니다(시트 값 넣기와 읽기, 잠금 잡기, 탭 가져오기, 사건 번호로 탭의 줄을 항목 이름 객체로 읽기, 이력 한 줄 더하기, 사건 처리 상태 바꾸기).
 
@@ -211,9 +213,9 @@ setup(함수 이름 initialSetup): 내 Drive에 스프레드시트 "Vision_Risk_
 - history: history_id, record_id, timestamp, phase, action_name, summary, operator
  ai_drafts에는 raw_response 열도 두되 값은 비워 둡니다. Gemini 답 전체는 저장하지 않습니다. 새 스프레드시트에 처음 생기는 빈 기본 탭은 지우지 않고 그대로 둡니다.
 
-### Gemini 키 저장
+### OnePort 키 저장
 
-set_gemini_key: 요청은 `{"action": "set_gemini_key", "api_key": "(키)"}`입니다. api_key의 앞뒤 공백을 뗀 값이 영문·숫자·-·_ 20~200자일 때만 스크립트 속성 GEMINI_API_KEY에 저장하고 `{"success": true, "gemini_key_saved": true}`로 답합니다. 형식이 틀리면 BAD_REQUEST입니다. 키 값은 답과 오류 문장에 넣지 않습니다.
+set_oneport_key: 요청은 `{"action": "set_oneport_key", "api_key": "(키)"}`입니다. api_key의 앞뒤 공백을 뗀 값이 sk-로 시작하고 그 뒤에 영문·숫자·-·_ 20~200자가 올 때만 스크립트 속성 ONEPORT_API_KEY에 저장하고 `{"success": true, "oneport_key_saved": true}`로 답합니다. 형식이 틀리면 BAD_REQUEST입니다. 키 값은 답과 오류 문장에 넣지 않습니다.
 
 ### 사건 상태 계산
 
@@ -221,7 +223,7 @@ set_gemini_key: 요청은 `{"action": "set_gemini_key", "api_key": "(키)"}`입�
 
 ### 사건 등록과 정보 수정
 
-create_record: 요청 항목은 request_id, location, category, memo, images(사진마다 base64, mimeType, filename)입니다. 저장소 사진은 서버가 같은 모양의 images로 바꿔 보냅니다. 사진은 1~5장, JPG·PNG, 장당 2MB 이하입니다. 비공개 폴더에 비공개 파일로 올리고 사건 줄에 drive_folder_id와 drive_file_ids(파일 ID 목록)를 적습니다. 사건 번호는 요청 번호(request_id)로 정해 같은 요청이면 같은 번호가 나옵니다. "R-" 뒤에 요청 번호의 SHA-256 16진수 앞 10글자를 붙입니다. 이미 등록된 요청이면 저장된 사건을 돌려주고 답에 idempotent를 true로 둡니다. Drive 파일 이름은 (사건 번호)_(순서, 1부터)_(원래 파일 이름, 없으면 photo)입니다. 사진만 올라가고 멈춘 요청이 다시 오면 같은 이름의 파일을 찾아 다시 씁니다.
+create_record: 요청 항목은 request_id, location, category, memo, images(사진마다 base64, mimeType, filename)입니다. 저장소 사진은 서버가 같은 모양의 images로 바꿔 보냅니다. 사진은 1~5장, JPG·PNG, 장당 2MB 이하, 합계 3MB 이하입니다. 합계는 사진마다 base64 글자가 담은 원래 바이트 수를 더해 셉니다. 3MB(3×1024×1024바이트)를 넘으면 BAD_REQUEST와 "사진 합계가 3MB보다 큽니다. 사진 수를 줄이거나 작은 사진으로 바꿔 합계 3MB 이하로 올려 주세요."입니다. 판독 때 사진을 한 요청에 모두 실어 OnePort로 보내는데, OnePort가 4.5MB를 넘는 요청을 받지 않기 때문입니다. 비공개 폴더에 비공개 파일로 올리고 사건 줄에 drive_folder_id와 drive_file_ids(파일 ID 목록)를 적습니다. 사건 번호는 요청 번호(request_id)로 정해 같은 요청이면 같은 번호가 나옵니다. "R-" 뒤에 요청 번호의 SHA-256 16진수 앞 10글자를 붙입니다. 이미 등록된 요청이면 저장된 사건을 돌려주고 답에 idempotent를 true로 둡니다. Drive 파일 이름은 (사건 번호)_(순서, 1부터)_(원래 파일 이름, 없으면 photo)입니다. 사진만 올라가고 멈춘 요청이 다시 오면 같은 이름의 파일을 찾아 다시 씁니다.
 
 답은 `{"success": true, "idempotent": false, "record_id": "...", "request_id": "...", "status": "REGISTERED", "created_at": "...", "image_count": 1, "drive_file_ids": [...], "record": {...}}`입니다.
 
@@ -244,39 +246,46 @@ update_record의 요청 항목은 record_id, request_id, operator와 바꾸는 �
 
 ### 사진과 지시문 보내기
 
-요청 항목은 record_id, request_id, input_version, image_ids, input_snapshot입니다(서버가 보내는 이름 그대로입니다). 같은 request_id의 설명이 이미 있으면 그것을 돌려줍니다. 스크립트 속성 GEMINI_API_KEY가 없으면 SETUP_REQUIRED와 "GAS 스크립트 속성에 GEMINI_API_KEY가 없습니다. npm.cmd run gas:init(macOS: npm run gas:init)으로 Gemini API 키를 넣어 주세요."입니다.
+요청 항목은 record_id, request_id, input_version, image_ids, input_snapshot입니다(서버가 보내는 이름 그대로입니다). 같은 request_id의 설명이 이미 있으면 그것을 돌려줍니다. 스크립트 속성 ONEPORT_API_KEY가 없으면 SETUP_REQUIRED와 "GAS 스크립트 속성에 ONEPORT_API_KEY가 없습니다. npm.cmd run gas:init(macOS: npm run gas:init)으로 OnePort API 키를 넣어 주세요."입니다.
 
-- 서버가 보낸 사진 목록(image_ids, 없으면 사건의 drive_file_ids)을 Drive에서 순서대로 읽고 사진마다 앞에 "[사진 프레임 1/3]"처럼 번호 글을 붙입니다. 사진이 없으면 NO_IMAGES("분석할 원본 사진이 없습니다: (사건번호)"), 읽지 못하면 IMAGE_READ_FAILED("Drive 원본 사진(프레임 (번호), fileId: (파일 ID)) 읽기 실패: (이유)")입니다. status는 둘 다 "error"입니다.
-- 지시문은 materials/gemini-prompt.txt의 글을 Code.gs 안에 상수로 글자 그대로 옮겨 사진 뒤에 넣습니다. Google 쪽은 이 PC의 파일을 읽지 못합니다. temperature는 0.1이고 답은 JSON으로만 받습니다(responseMimeType "application/json").
-- 모델은 gemini-3.8-flash와 gemini-3.5-flash-lite 두 개만 씁니다. 스크립트 속성 GEMINI_MODEL(기본 gemini-3.8-flash)과 GEMINI_FALLBACK_MODEL(기본 gemini-3.5-flash-lite, off면 쓰지 않음)로 바꿀 수 있고 목록 밖의 값이면 SETUP_REQUIRED와 "GAS 스크립트 속성의 GEMINI_MODEL·GEMINI_FALLBACK_MODEL은 gemini-3.8-flash, gemini-3.5-flash-lite 중 하나여야 합니다(대체 모델은 off도 됩니다). 값을 고치거나 지우면 기본 모델을 씁니다."를 돌려줍니다.
-- 키는 주소에 넣지 않고 x-goog-api-key 헤더로 보냅니다. 주소는 https://generativelanguage.googleapis.com/v1beta/models/(모델):generateContent입니다. 보내다 예외가 나면 NETWORK_TIMEOUT(status "interrupted", interrupted true, 문장 "Gemini API 호출 중 네트워크 오류가 발생했습니다.")입니다.
+- 서버가 보낸 사진 목록(image_ids, 없으면 사건의 drive_file_ids)을 Drive에서 순서대로 읽고 사진마다 앞에 "[사진 프레임 1/3]"처럼 번호 글을 붙입니다. 번호 글은 `{"type": "text", "text": "[사진 프레임 1/3]"}`, 사진은 `{"type": "image_url", "image_url": {"url": "data:(사진 종류);base64,(사진 내용)"}}` 모양입니다. 사진이 없으면 NO_IMAGES("분석할 원본 사진이 없습니다: (사건번호)"), 읽지 못하면 IMAGE_READ_FAILED("Drive 원본 사진(프레임 (번호), fileId: (파일 ID)) 읽기 실패: (이유)")입니다. status는 둘 다 "error"입니다.
+- 지시문은 materials/gemini-prompt.txt의 글을 Code.gs 안에 상수로 글자 그대로 옮겨 사진 뒤에 `{"type": "text", "text": (지시문)}`으로 넣습니다. Google 쪽은 이 PC의 파일을 읽지 못합니다.
+- 요청 본문은 OpenAI 호환 모양입니다. model(판독 모델), messages(role "user"인 메시지 하나이고 content에 번호 글과 사진을 번갈아 넣은 뒤 지시문을 마지막에 둡니다), temperature 0.1, max_tokens 4000, response_format입니다. Gemini는 생각에 쓰는 토큰도 max_tokens에 넣어 세므로 이 값을 줄이지 않습니다.
+- response_format은 `{"type": "json_schema", "json_schema": {"name": "risk_draft", "strict": true, "schema": (판독 초안 스키마)}}`입니다. 판독 초안 스키마는 type "object"이고 properties에 facts, suspected_risk, locations, uncertainty, additional_checks 다섯 필드를 모두 type "string"으로 두며, required에 다섯 필드를 모두 넣고 additionalProperties는 false입니다. ai_drafts 탭에 저장하는 다섯 필드와 같습니다.
+- 모델은 gemini-3.8-flash 하나만 씁니다. 스크립트 속성 GEMINI_MODEL(기본 gemini-3.8-flash)로 바꿀 수 있고 목록 밖의 값이면 SETUP_REQUIRED와 "GAS 스크립트 속성의 GEMINI_MODEL은 gemini-3.8-flash만 쓸 수 있습니다. 값을 지우면 기본 모델을 씁니다."를 돌려줍니다. 예전 설정의 GEMINI_FALLBACK_MODEL은 읽지 않습니다.
+- 주소는 https://oneport.kr/v1/chat/completions이고 POST로 보냅니다. 키는 주소에 넣지 않고 Authorization 헤더에 "Bearer (키)"로 넣습니다. 한 번만 보내고 다른 모델로 다시 보내지 않습니다. 보내다 예외가 나면 NETWORK_TIMEOUT(status "interrupted", interrupted true, 문장 "OnePort(Gemini) 호출 중 네트워크 오류가 발생했습니다.")입니다.
 
 ### 답 읽기와 저장
 
-Gemini 답에서 JSON을 꺼내 facts가 비어 있지 않을 때만 설명으로 받습니다. HTTP 200을 받은 답의 오류는 아래와 같고 status는 모두 "error"입니다. 답 글 안에서 맨 앞 { 부터 맨 뒤 } 까지를 JSON으로 읽습니다.
+OnePort 답의 choices[0].message.content를 답 글로 읽어 JSON을 꺼내고 facts가 비어 있지 않을 때만 설명으로 받습니다. content는 보통 글자이고, 조각 목록이면 조각마다 text를 이어 붙입니다. HTTP 200을 받은 답의 오류는 아래와 같고 status는 모두 "error"입니다. 답 글 안에서 맨 앞 { 부터 맨 뒤 } 까지를 JSON으로 읽습니다.
 
-- 차단(promptFeedback.blockReason이 있음): CONTENT_BLOCKED, "Gemini 콘텐츠 차단됨: (이유)"
-- 빈 답(candidates나 parts가 없음): EMPTY_RESPONSE, "Gemini 응답에 내용이 없습니다 (finishReason: (이유, 없으면 unknown))"
+- 차단(choices[0].finish_reason이 content_filter): CONTENT_BLOCKED, "Gemini 콘텐츠 차단됨: content_filter"
+- 빈 답(답 글이 비었거나 띄어쓰기뿐): EMPTY_RESPONSE, "Gemini 응답에 내용이 없습니다 (finish_reason: (이유, 없으면 unknown))"
 - JSON 없음: INVALID_JSON, "Gemini 응답에서 JSON 형식을 추출할 수 없습니다: (답 글 앞 100글자)"
 - 읽기 실패: PARSE_FAILED, "Gemini 응답 JSON 파싱 실패: (이유)"
 - facts 없음: INVALID_DRAFT_SCHEMA, "Gemini 초안에 필수 문자열 필드(facts)가 없거나 유효하지 않습니다."
 
 받은 설명은 ai_drafts 탭에 한 줄 더하고(raw_response는 비움) 사건의 처리 상태를 AI_DRAFTED로 바꿉니다. 이력에는 단계 AI_ANALYSIS, 작업 이름 "AI 초안 생성", 내용 "Gemini 판독((모델)): (의심 위험)", 작업자 "Gemini AI"를 남깁니다. 답 모양은 내 컴퓨터 저장소의 판독과 같은 `{"success": true, "draft_id": "...", "record_id": "...", "model": "(실제 모델)", "input_version": 1, "draft": {...}}`입니다. 이미 있는 설명을 돌려줄 때는 idempotent를 true로 더합니다.
 
-### 대체 모델과 오류 안내
+### 오류 안내
 
-판독 모델이 HTTP 503이나 429를 돌려주면 대체 모델로 한 번만 다시 보내고, 실제로 답한 모델 이름을 설명과 이력에 남깁니다. 대체 모델을 쓰지 않으면(off이거나 판독 모델과 같으면) 다시 보내지 않습니다. 그래도 실패하면 아래 문장으로 답합니다((모델)은 실제로 부른 모델). status는 "error"이고 오류 코드는 429가 RATE_LIMIT_EXCEEDED, 그 밖의 HTTP 오류는 모두 GEMINI_API_ERROR입니다.
+판독 요청은 한 번만 보내고 실패해도 다른 모델로 다시 보내지 않으며 설명을 남기지 않습니다. 같은 request_id로 다시 오면 다시 판독합니다. 실패하면 아래 문장으로 답합니다. status는 "error"이고 오류 코드는 429가 RATE_LIMIT_EXCEEDED, 그 밖의 HTTP 오류는 모두 GEMINI_API_ERROR입니다.
 
-- 429: RATE_LIMIT_EXCEEDED, "Gemini API 호출 한도를 초과했습니다 (HTTP 429). (N)초 뒤 다시 시도해주세요."(Gemini가 알려 준 초가 없으면 "(N)초 뒤" 대신 "잠시 후"). 초는 답 본문 error.details의 RetryInfo에 있는 retryDelay에서 읽고 올림합니다. 없으면 Retry-After 헤더를 봅니다.
-- 503: "Gemini 서버가 붐벼 판독하지 못했습니다(HTTP 503, (모델)). 잠시 뒤 다시 판독을 요청하세요."
-- 400: "Gemini API 키가 올바르지 않거나 요청을 받아 주지 않았습니다(HTTP 400, (모델)). config/local-connection.json의 GEMINI_API_KEY를 확인하고 npm.cmd run gas:init(macOS: npm run gas:init)을 다시 실행하세요."
-- 403: "Gemini API 키에 이 요청을 할 권한이 없습니다(HTTP 403, (모델)). AI Studio에서 새 키를 만들어 npm.cmd run gas:init(macOS: npm run gas:init)으로 다시 넣으세요."
-- 404: "Gemini 판독 모델을 찾지 못했습니다(HTTP 404, (모델)). 스크립트 속성 GEMINI_MODEL·GEMINI_FALLBACK_MODEL을 지우거나 gemini-3.8-flash, gemini-3.5-flash-lite 중 하나로 두세요."
-- 그 밖의 HTTP 오류: "Gemini API 분석 요청 중 오류가 발생했습니다 (HTTP (번호), (모델))."
+OnePort 오류 답의 본문은 `{"error": {"type": "...", "code": "...", "message": "..."}}` 모양입니다. 아래 (오류 코드)는 error.code(없으면 error.reason, 그것도 없으면 error.type)이고, (정보)는 "HTTP (번호)", (오류 코드), (모델)을 ", "로 이은 글입니다(예: "HTTP 402, insufficient_credit, gemini-3.8-flash"). 오류 코드가 없으면 그 칸은 뺍니다. 413은 본문이 JSON이 아닌 글자로 오므로 오류 코드를 넣지 않습니다. GEMINI_API_ERROR 답의 details에는 답 본문 앞 300글자를 넣습니다.
+
+- 429: RATE_LIMIT_EXCEEDED, "OnePort 호출 한도를 초과했습니다 (HTTP 429, (오류 코드)). (N)초 뒤 다시 시도해주세요."(오류 코드가 없으면 ", (오류 코드)"를 빼고, 초가 없으면 "(N)초 뒤" 대신 "잠시 후"). 초는 Retry-After 헤더에서 읽고 올림합니다. 오류 코드가 key_limit_exceeded이면 끝에 " 계속 같으면 OnePort 대시보드에서 이 키의 사용 한도를 확인하세요."를 붙입니다. 답에 retryable true, retry_after_seconds(초, 없으면 null), details(오류 본문의 error.message 앞 300글자)를 넣습니다.
+- 503: "OnePort(Gemini) 서버가 붐벼 판독하지 못했습니다((정보)). 잠시 뒤 다시 판독을 요청하세요."
+- 401: "OnePort API 키가 없거나 올바르지 않습니다((정보)). config/local-connection.json의 ONEPORT_API_KEY를 확인하고 npm.cmd run gas:init(macOS: npm run gas:init)을 다시 실행하세요."
+- 402: "OnePort 크레딧이 부족해 판독하지 못했습니다((정보)). OnePort 대시보드에서 남은 크레딧을 확인하세요."
+- 403: "OnePort 키로 이 모델을 쓸 수 없습니다((정보)). OnePort 대시보드에서 이 키의 요금제와 스페이스에 모델이 켜져 있는지 확인하세요."
+- 404: "OnePort에서 판독 모델을 찾지 못했습니다((정보)). 스크립트 속성 GEMINI_MODEL을 지우거나 gemini-3.8-flash로 두세요."
+- 413: "사진 합계가 OnePort 요청 크기 한도를 넘어 판독하지 못했습니다((정보)). 한 사건의 사진은 합계 3MB 이하여야 합니다. 사진을 줄여 새 사건으로 등록한 뒤 판독을 요청하세요."
+- 422이고 오류 코드가 upstream_execution_unconfirmed: "OnePort가 Gemini에서 판독이 실행됐는지 확인하지 못했습니다((정보)). 같은 판독이 두 번 실행되지 않도록 자동으로 다시 보내지 않았습니다. OnePort 대시보드의 사용 기록을 확인한 뒤 필요하면 판독을 다시 요청하세요." 오류 코드가 다른 422는 아래 "그 밖의 HTTP 오류" 문장을 씁니다.
+- 그 밖의 HTTP 오류: "OnePort(Gemini) 판독 요청 중 오류가 발생했습니다((정보)). 잠시 뒤 다시 판독을 요청하세요."
 
 ### 모델 설정 알려 주기
 
-gemini_settings는 요청 항목이 없고 `{"success": true, "model": "(판독 모델)", "fallback_model": "(대체 모델)"}`을 돌려줍니다. 대체 모델을 쓰지 않으면 fallback_model은 빈 글자입니다.
+gemini_settings는 요청 항목이 없고 `{"success": true, "model": "(판독 모델)"}`을 돌려줍니다.
 
 ## 서버가 Google 쪽을 부르는 법
 
@@ -314,7 +323,7 @@ status가 "interrupted"인 답에는 interrupted를 true로 둡니다.
 
 앞의 "저장소 동작 이름"을 부르는 자리에서 고릅니다. STORAGE_MODE=live이면 사건 등록, 정보 수정, 목록, 상세, 판단·조치 저장, 사진 판독, 기준 확인 결과 저장, 작업 맞춰 보기를 내 컴퓨터 저장소 대신 Google 쪽에 같은 action 이름으로 보냅니다. live 전용 처리를 따로 만들지 않습니다. mock이면 GAS_WEBAPP_URL에 값이 있어도 Google 쪽을 부르지 않습니다. 어느 쪽을 쓸지는 서버 한 곳에서 고릅니다.
 
-서버를 켤 때는 연동 상태 줄을 먼저 보여 줍니다. Gemini가 live이면 이어서 gemini_settings로 판독 모델을 물어 "연동 상태: 저장소 Google 시트 · Gemini live(gemini-3.8-flash, 대체 gemini-3.5-flash-lite) · NotebookLM live"처럼 모델을 붙인 줄을 한 번 더 보여 주고 /api/health의 integration_status에도 같은 줄을 씁니다. 대체 모델이 없으면 ", 대체 …"를 뺍니다. 묻지 못하면 "Gemini 판독 모델을 GAS에서 확인하지 못했습니다: (이유)"를 보여 주고 서버는 그대로 켜 둡니다.
+서버를 켤 때는 연동 상태 줄을 먼저 보여 줍니다. Gemini가 live이면 이어서 gemini_settings로 판독 모델을 물어 "연동 상태: 저장소 Google 시트 · Gemini live(gemini-3.8-flash) · NotebookLM live"처럼 모델을 붙인 줄을 한 번 더 보여 주고 /api/health의 integration_status에도 같은 줄을 씁니다. 묻지 못하면 "Gemini 판독 모델을 GAS에서 확인하지 못했습니다: (이유)"를 보여 주고 서버는 그대로 켜 둡니다.
 
 ### 화면에 돌려줄 오류 번호
 
@@ -366,19 +375,19 @@ clasp create-deployment --description vision-risk로 새 웹앱 배포를 만들
 
 ### gas:init
 
-서버의 Google 쪽 요청 부품을 함께 씁니다. 설정 파일의 GAS_WEBAPP_URL로 Google 쪽에 setup을 보내고, GEMINI_API_KEY에 값이 있으면 set_gemini_key로 키를 보냅니다. 다시 실행해도 됩니다. 키는 설정 파일에서만 읽고 같은 이름의 환경 변수는 읽지 않습니다. 아래 순서로 진행합니다.
+서버의 Google 쪽 요청 부품을 함께 씁니다. 설정 파일의 GAS_WEBAPP_URL로 Google 쪽에 setup을 보내고, ONEPORT_API_KEY에 값이 있으면 set_oneport_key로 키를 보냅니다. 다시 실행해도 됩니다. 키는 설정 파일에서만 읽고 같은 이름의 환경 변수는 읽지 않습니다. 아래 순서로 진행합니다.
 
 1. GAS_WEBAPP_URL이 비어 있으면 "GAS_WEBAPP_URL이 비어 있습니다. npm.cmd run gas:deploy로 배포하면 자동으로 적힙니다. 편집기에서 배포했다면 웹 앱 URL을 config/local-connection.json의 GAS_WEBAPP_URL에 넣으세요."를 보여 주고 끝납니다.
-2. setup을 보내기 전에 키 형식을 검사합니다. 키가 있는데 형식이 틀리면 "GEMINI_API_KEY 값이 Gemini API 키 형식이 아닙니다(영문·숫자·-·_ 20자 이상). AI Studio에서 복사한 키를 따옴표 안에 그대로 넣었는지 확인하세요. 아무것도 보내지 않았습니다."를 보여 주고 아무것도 보내지 않습니다.
+2. setup을 보내기 전에 키 형식을 검사합니다. 키가 있는데 형식이 틀리면 "ONEPORT_API_KEY 값이 OnePort API 키 형식이 아닙니다(sk-로 시작하고 영문·숫자·-·_ 20자 이상이 이어짐). sk-로 시작하는 OnePort 키를 따옴표 안에 그대로 넣었는지 확인하세요. 아무것도 보내지 않았습니다."를 보여 주고 아무것도 보내지 않습니다.
 3. setup을 보냅니다.
-4. 키가 비어 있으면 "GEMINI_API_KEY가 비어 있어 키는 보내지 않았습니다. AI 판독을 쓰려면 config/local-connection.json의 GEMINI_API_KEY에 키를 넣고 npm.cmd run gas:init을 다시 실행하세요. 기록 저장은 키 없이도 됩니다."를 보여 주고 끝냅니다. 키가 있으면 set_gemini_key를 보냅니다.
+4. 키가 비어 있으면 "ONEPORT_API_KEY가 비어 있어 키는 보내지 않았습니다. AI 판독을 쓰려면 config/local-connection.json의 ONEPORT_API_KEY에 OnePort 키를 넣고 npm.cmd run gas:init을 다시 실행하세요. 기록 저장은 키 없이도 됩니다."를 보여 주고 끝냅니다. 키가 있으면 set_oneport_key를 보냅니다.
 
 상황별로 아래 문장을 보여 줍니다.
 
 - Google 쪽이 승인·로그인 화면을 돌려주면 "GAS 웹앱이 아직 권한 승인 전입니다. npm.cmd run gas:open으로 웹앱 주소를 한 번 열어 허용하세요. 안 되면 npm.cmd run gas:editor로 편집기를 열고 initialSetup을 한 번 실행하세요."를 보여 줍니다.
-- 모르는 action이라는 답이면 "GAS 웹앱이 (setup 또는 set_gemini_key) 동작을 모릅니다(BAD_REQUEST). 웹앱 코드가 예전 것입니다. npm.cmd run gas:push와 npm.cmd run gas:redeploy로 최신 코드를 배포한 뒤 다시 실행하세요."를 보여 줍니다.
-- 그 밖의 실패는 "GAS (setup 또는 set_gemini_key) 요청에 실패했습니다((오류 코드)). (이유)"를 보여 줍니다. (이유)에서 키와 주소, 25글자가 넘는 영문·숫자 덩어리는 가립니다.
-- 성공하면 "Google 시트와 비공개 Drive 폴더를 준비했습니다."와 "Gemini API 키를 GAS 스크립트 속성 GEMINI_API_KEY에 저장했습니다."를 보여 줍니다.
+- 모르는 action이라는 답이면 "GAS 웹앱이 (setup 또는 set_oneport_key) 동작을 모릅니다(BAD_REQUEST). 웹앱 코드가 예전 것입니다. npm.cmd run gas:push와 npm.cmd run gas:redeploy로 최신 코드를 배포한 뒤 다시 실행하세요."를 보여 줍니다.
+- 그 밖의 실패는 "GAS (setup 또는 set_oneport_key) 요청에 실패했습니다((오류 코드)). (이유)"를 보여 줍니다. (이유)에서 키와 주소, 25글자가 넘는 영문·숫자 덩어리는 가립니다.
+- 성공하면 "Google 시트와 비공개 Drive 폴더를 준비했습니다."와 "OnePort API 키를 GAS 스크립트 속성 ONEPORT_API_KEY에 저장했습니다."를 보여 줍니다.
 - 웹앱 주소, 키, 긴 ID는 어느 경우에도 출력하지 않습니다.
 
 ### AI가 명령을 실행할 때

@@ -17,9 +17,9 @@
 
 | 연결 | 하는 일 | 준비하는 곳 |
 | --- | --- | --- |
-| GAS 웹앱 | 사건·판단 기록을 Google Sheets와 Drive에 저장하고 Gemini를 호출한다 | Google Apps Script |
+| GAS 웹앱 | 사건·판단 기록을 Google Sheets와 Drive에 저장하고 OnePort를 거쳐 Gemini를 호출한다 | Google Apps Script |
 | NotebookLM MCP | 검사 기준 원문과 사진 판독 결과를 대조한다 | 내 PC |
-| 로컬 설정 파일 | 위 두 곳의 주소·ID를 서버에 알려 주고, Gemini API 키를 GAS로 보낼 때 읽는다 | `config/local-connection.json` |
+| 로컬 설정 파일 | 위 두 곳의 주소·ID를 서버에 알려 주고, OnePort API 키를 GAS로 보낼 때 읽는다 | `config/local-connection.json` |
 
 1절부터 6절까지가 연결 준비다. 7절은 연동을 하나씩 켜고 끄는 스위치, 8절은 연결 확인, 9절은 NotebookLM 결과를 읽는 법, 10절은 서버를 끄는 법, 11절은 알려진 제한, 12절은 사진 저장소(이미지 레포)를 받는 법이다.
 API 키와 웹 앱 주소는 GAS 스크립트 속성과 6절의 설정 파일에만 둔다. 문서·메신저·커밋에는 붙여 넣지 않는다. 설정 파일에 넣을 때는 Antigravity 채팅에 붙여 넣어 맡겨도 된다(1절 단계 8).
@@ -48,14 +48,14 @@ API 키와 웹 앱 주소는 GAS 스크립트 속성과 6절의 설정 파일에
 
 | 단계 | 할 일 | 할 곳 | 명령·화면 |
 | --- | --- | --- | --- |
-| 1 | Gemini API 키 만들기 | 웹(클릭) | 3절 |
+| 1 | OnePort API 키 준비 | 강사 안내 | 3절 |
 | 2 | Apps Script API 켜기 | 웹(클릭) | `script.google.com/home/usersettings` |
 | 3 | clasp 로그인 | Antigravity(터미널), 이어서 웹(클릭) | `npm.cmd run gas:login` |
 | 4 | GAS 프로젝트 만들기 | Antigravity(터미널) | `npm.cmd run gas:create` |
 | 5 | 코드 올리기 | Antigravity(터미널) | `npm.cmd run gas:push` |
 | 6 | 웹앱 배포와 주소 기록 | Antigravity(터미널) | `npm.cmd run gas:deploy` |
 | 7 | 배포 접근 설정 확인 | Antigravity(터미널), 이어서 웹(클릭) | `npm.cmd run gas:editor`, 편집기의 배포 관리 |
-| 8 | Gemini API 키 넣기 | 설정 파일 | `config/local-connection.json`의 `GEMINI_API_KEY` |
+| 8 | OnePort API 키 넣기 | 설정 파일 | `config/local-connection.json`의 `ONEPORT_API_KEY` |
 | 9 | 첫 권한 승인 | Antigravity(터미널), 이어서 웹(클릭) | `npm.cmd run gas:open` |
 | 10 | 초기화(시트·폴더 만들기, 키 저장) | Antigravity(터미널) | `npm.cmd run gas:init` |
 
@@ -128,24 +128,25 @@ npm.cmd run gas:deploy
 3. 6단계에서 만든 배포가 **웹 앱**이고, 실행 사용자가 **나**(Me), 액세스 권한이 있는 사용자가 **모든 사용자**(Anyone)인지 본다.
 4. 다르면 그 배포의 편집(연필) 버튼을 눌러 고치고 **배포**를 누른다. 같은 배포를 고치면 주소는 바뀌지 않는다.
 
-로컬 서버는 Google 로그인 없이 웹앱 주소로 요청을 보낸다. 그래서 "모든 사용자"가 아니면 연결되지 않는다. 웹 앱 주소를 아는 사람은 누구나 이 시트의 기록과 사진을 읽고 쓸 수 있고, 스크립트 속성의 API 키로 Gemini 판독을 실행하거나 키를 바꿀 수 있다. 그러니 주소는 6절의 설정 파일에만 두고(`config/` 아래 설정 파일은 Git이 추적하지 않는다) 화면 공유나 메시지로 남에게 보이지 않는다. `gas:deploy`·`gas:redeploy`의 clasp 출력에는 배포 ID가, `gas:open`의 출력에는 주소가 그대로 나오므로 화면을 공유하는 중에는 이 명령을 실행하지 않는다.
+로컬 서버는 Google 로그인 없이 웹앱 주소로 요청을 보낸다. 그래서 "모든 사용자"가 아니면 연결되지 않는다. 웹 앱 주소를 아는 사람은 누구나 이 시트의 기록과 사진을 읽고 쓸 수 있고, 스크립트 속성의 OnePort 키로 Gemini 판독을 실행하거나(OnePort 크레딧이 쓰인다) 키를 바꿀 수 있다. 그러니 주소는 6절의 설정 파일에만 두고(`config/` 아래 설정 파일은 Git이 추적하지 않는다) 화면 공유나 메시지로 남에게 보이지 않는다. `gas:deploy`·`gas:redeploy`의 clasp 출력에는 배포 ID가, `gas:open`의 출력에는 주소가 그대로 나오므로 화면을 공유하는 중에는 이 명령을 실행하지 않는다.
 
 확인: 배포 관리에 보이는 설정이 웹 앱, 나, 모든 사용자다.
 
-### 단계 8. Gemini API 키 넣기 — 설정 파일
+### 단계 8. OnePort API 키 넣기 — 설정 파일
 
-3절에서 만든 키를 Antigravity 채팅에 붙여 넣고 `config/local-connection.json`의 `GEMINI_API_KEY`에 넣어 달라고 한다. Antigravity는 그 파일의 `GEMINI_API_KEY` 한 줄만 바꾸고, 키 값을 화면이나 대화에 다시 출력하지 않는다(수업 규칙 `.agent/rules/class-rules.md` 7번).
+3절의 OnePort 키를 Antigravity 채팅에 붙여 넣고 `config/local-connection.json`의 `ONEPORT_API_KEY`에 넣어 달라고 한다. Antigravity는 그 파일의 `ONEPORT_API_KEY` 한 줄만 바꾸고, 키 값을 화면이나 대화에 다시 출력하지 않는다(수업 규칙 `.agent/rules/class-rules.md` 7번).
 
-직접 고쳐도 된다. 파일을 메모장(macOS: 텍스트 편집기)이나 Antigravity 편집기로 열고 키를 `GEMINI_API_KEY`의 따옴표 안에 붙여 넣고 저장한다.
+직접 고쳐도 된다. 파일을 메모장(macOS: 텍스트 편집기)이나 Antigravity 편집기로 열고 키를 `ONEPORT_API_KEY`의 따옴표 안에 붙여 넣고 저장한다.
 
 ```json
-"GEMINI_API_KEY": "여기에 키를 붙여 넣는다",
+"ONEPORT_API_KEY": "여기에 sk-로 시작하는 키를 붙여 넣는다",
 ```
 
-- 키는 10단계 `npm.cmd run gas:init`만 읽어 GAS 스크립트 속성 `GEMINI_API_KEY`로 보낸다. `npm start`로 띄운 로컬 서버는 이 값을 환경 변수로 옮기지 않는다.
+- 키는 10단계 `npm.cmd run gas:init`만 읽어 GAS 스크립트 속성 `ONEPORT_API_KEY`로 보낸다. `npm start`로 띄운 로컬 서버는 이 값을 환경 변수로 옮기지 않는다.
 - 같은 이름의 환경 변수는 읽지 않는다. 다른 도구용으로 넣어 둔 키가 GAS로 가지 않게 하려는 것이다.
 - 화면을 공유하는 중에는 키를 채팅이나 파일에 붙여 넣지 않는다.
 - 편집기의 **프로젝트 설정**, **스크립트 속성**에 직접 넣어도 된다(2절). 그때는 이 칸을 비워 둔다.
+- 예전에 쓰던 설정 파일에 `GEMINI_API_KEY` 줄이 남아 있으면 그 값은 읽지 않고 `설정 경고: 설정 키 GEMINI_API_KEY는 더 이상 쓰지 않는다.`로 시작하는 안내가 나온다. 그 줄을 지우고 `ONEPORT_API_KEY`에 OnePort 키를 넣는다.
 
 확인: 파일을 저장한 뒤 `npm start`를 실행했을 때 `설정 경고:`로 시작하는 줄이 없다.
 
@@ -179,7 +180,7 @@ npm.cmd run gas:init
 설정 파일의 `GAS_WEBAPP_URL`로 웹앱에 두 가지를 요청한다. 다시 실행해도 된다.
 
 1. 시트와 폴더 준비(`setup`): 내 Drive에 `Vision_Risk_Records_Master_날짜` 스프레드시트와 `Vision_Risk_Records_Private_…` 폴더를 만든다. 이미 있으면 그대로 쓰고, 빠진 탭과 열만 더한다. 두 ID는 스크립트 속성 `SPREADSHEET_ID`·`DRIVE_FOLDER_ID`에 저장되고, 폴더와 스프레드시트는 비공개로 설정된다.
-2. 키 저장(`set_gemini_key`): 설정 파일의 `GEMINI_API_KEY`를 스크립트 속성 `GEMINI_API_KEY`에 저장한다. 값이 비어 있으면 보내지 않고 다음 할 일을 알린다. 키 없이도 기록 저장은 된다.
+2. 키 저장(`set_oneport_key`): 설정 파일의 `ONEPORT_API_KEY`를 스크립트 속성 `ONEPORT_API_KEY`에 저장한다. 값이 비어 있으면 보내지 않고 다음 할 일을 알린다. 키 없이도 기록 저장은 된다.
 
 웹앱 주소와 키는 터미널에 출력하지 않는다. 실패하면 오류 코드와 한 줄 안내가 나오고 종료 코드 1로 끝난다.
 
@@ -187,11 +188,11 @@ npm.cmd run gas:init
 | --- | --- |
 | GAS 웹앱이 아직 권한 승인 전입니다. npm.cmd run gas:open으로 … | 9단계를 한다. 승인 화면 대신 로그인 화면이 나오면 7단계의 접근 설정도 본다 |
 | GAS_WEBAPP_URL이 비어 있습니다 | 6단계 `npm.cmd run gas:deploy`를 하거나, 편집기에서 배포한 웹 앱 URL을 설정 파일에 넣는다 |
-| GEMINI_API_KEY 값이 Gemini API 키 형식이 아닙니다 | 키를 따옴표 안에 그대로 붙여 넣었는지 본다. 이때는 아무것도 보내지 않는다 |
-| GAS 웹앱이 … 동작을 모릅니다 | 웹앱 코드가 예전 것이다. `npm.cmd run gas:push`와 `npm.cmd run gas:redeploy`를 한 뒤 다시 실행한다 |
+| ONEPORT_API_KEY 값이 OnePort API 키 형식이 아닙니다 | `sk-`로 시작하는 키를 따옴표 안에 그대로 붙여 넣었는지 본다. 이때는 아무것도 보내지 않는다 |
+| GAS 웹앱이 … 동작을 모릅니다 | 웹앱 코드가 예전 것이다(`set_oneport_key`를 모르면 OnePort로 바꾸기 전 코드다). `npm.cmd run gas:push`와 `npm.cmd run gas:redeploy`를 한 뒤 다시 실행한다 |
 | GAS … 요청에 실패했습니다(오류 코드) | 8절의 오류 코드 표를 본다 |
 
-확인: `Google 시트와 비공개 Drive 폴더를 준비했습니다.`와 `Gemini API 키를 GAS 스크립트 속성 GEMINI_API_KEY에 저장했습니다.`가 나온다. `npm.cmd run gas:open`으로 연 화면에 `"status":"ok"`와 승인 완료 안내가 보인다.
+확인: `Google 시트와 비공개 Drive 폴더를 준비했습니다.`와 `OnePort API 키를 GAS 스크립트 속성 ONEPORT_API_KEY에 저장했습니다.`가 나온다. `npm.cmd run gas:open`으로 연 화면에 `"status":"ok"`와 승인 완료 안내가 보인다.
 
 ### 편집기 붙여넣기 경로(대안)
 
@@ -210,7 +211,7 @@ clasp를 쓸 수 없을 때(Apps Script API를 켤 수 없는 계정 등) 편집
 2. 상단 함수 목록에서 `initialSetup`을 고르고 **실행**을 누른다. 권한 확인 창은 9단계의 2번처럼 허용한다. 실행이 끝나면 10단계 1번의 시트와 폴더가 생긴다.
 3. **배포** 메뉴에서 **새 배포**를 누르고 유형을 **웹 앱**으로 고른다. 실행 사용자는 **나**(Me), 액세스 권한이 있는 사용자는 **모든 사용자**(Anyone)로 한다(7단계의 주의 사항을 읽는다).
 4. 배포가 끝나면 나오는 **웹 앱 URL**(`https://`로 시작하고 `/exec`로 끝난다)을 `config/local-connection.json`의 `GAS_WEBAPP_URL`에 넣는다.
-5. 8단계대로 설정 파일에 키를 넣고 `npm.cmd run gas:init`을 실행한다. 편집기의 스크립트 속성 `GEMINI_API_KEY`에 직접 넣어도 된다(2절). 속성은 배포한 뒤에 넣거나 바꿔도 다시 배포하지 않고 바로 반영된다.
+5. 8단계대로 설정 파일에 키를 넣고 `npm.cmd run gas:init`을 실행한다. 편집기의 스크립트 속성 `ONEPORT_API_KEY`에 직접 넣어도 된다(2절). 속성은 배포한 뒤에 넣거나 바꿔도 다시 배포하지 않고 바로 반영된다.
 
 확인: 시크릿 창에서 웹 앱 URL을 열면 `"status":"ok"`가 보인다.
 
@@ -260,30 +261,61 @@ npm.cmd run gas:init
 | --- | --- | --- |
 | `SPREADSHEET_ID` | `npm.cmd run gas:init`(또는 편집기에서 `initialSetup` 실행)이 자동으로 넣는다 | 직접 고치지 않는다 |
 | `DRIVE_FOLDER_ID` | `npm.cmd run gas:init`(또는 편집기에서 `initialSetup` 실행)이 자동으로 넣는다 | 직접 고치지 않는다 |
-| `GEMINI_API_KEY` | 설정 파일의 `GEMINI_API_KEY`를 `npm.cmd run gas:init`이 넣는다. 편집기에서 직접 넣어도 된다 | 3절 참고 |
-| `GEMINI_MODEL` | 선택. 비워 두면 `gemini-3.8-flash`를 쓴다 | 모델을 바꿀 때만 편집기에서 넣는다 |
-| `GEMINI_FALLBACK_MODEL` | 선택. 비워 두면 `gemini-3.5-flash-lite`를 쓴다 | `off`를 넣으면 다시 보내지 않는다 |
+| `ONEPORT_API_KEY` | 설정 파일의 `ONEPORT_API_KEY`를 `npm.cmd run gas:init`이 넣는다. 편집기에서 직접 넣어도 된다 | 3절 참고 |
+| `GEMINI_MODEL` | 선택. 비워 두면 `gemini-3.8-flash`를 쓴다 | 지금 쓸 수 있는 값은 `gemini-3.8-flash` 하나다 |
 
 같은 판독 요청이 두 번 저장되지 않는지는 `ai_drafts` 탭의 `request_id`로 확인한다. 예전 코드가 만든 `RESERVE_REQ_`로 시작하는 속성은 더 쓰지 않으니 지워도 된다.
 
-`GEMINI_MODEL`·`GEMINI_FALLBACK_MODEL`을 넣을 때는 아래를 지킨다.
+OnePort로 바꾸기 전 코드가 쓰던 속성은 이렇게 정리한다.
 
-- 값은 `gemini-3.8-flash`, `gemini-3.5-flash-lite` 둘 중 하나다. 대체 모델은 `off`도 된다. `models/` 접두사는 붙이지 않는다.
-- 2.5 모델은 쓰지 않는다. Google이 2.5 모델을 예전에 쓰던 사용자에게만 열어 두어, 새로 만든 키에서는 막힐 수 있다(Gemini API 변경 기록 2026-09-18).
-- 판독 모델이 붐비거나(HTTP 503) 한도에 걸리면(HTTP 429) 같은 판독 안에서 대체 모델로 한 번만 다시 보낸다. 그 밖의 오류는 다시 보내지 않는다. 대체 모델이 `off`이거나 판독 모델과 같으면 다시 보내지 않는다.
-- 실제로 답한 모델은 사건 상세의 Gemini 결과에 "판독 모델"로 보이고, 이력에도 남는다. `npm start`가 GAS에 물어 `연동 상태:` 줄에 `Gemini live(gemini-3.8-flash, 대체 gemini-3.5-flash-lite)`처럼 적는다.
+- `GEMINI_API_KEY`: 더 읽지 않는다. 지워도 된다. 키는 `ONEPORT_API_KEY`에 새로 넣는다.
+- `GEMINI_FALLBACK_MODEL`: 더 읽지 않는다. 지워도 된다. 대체 모델로 다시 보내는 기능은 없앴다.
+- `GEMINI_MODEL`에 `gemini-3.5-flash-lite`가 들어 있으면 AI 판독이 `SETUP_REQUIRED`로 끝난다. 값을 지운다.
+
+`GEMINI_MODEL`을 넣을 때는 아래를 지킨다.
+
+- 값은 `gemini-3.8-flash`만 받는다. `models/` 접두사는 붙이지 않는다.
+- 판독은 이 모델로 한 번만 보낸다. 붐비거나(HTTP 503) 한도에 걸려도(HTTP 429) 다른 모델로 다시 보내지 않는다.
+- 판독한 모델은 사건 상세의 Gemini 결과에 "판독 모델"로 보이고, 이력에도 남는다. `npm start`가 GAS에 물어 `연동 상태:` 줄에 `Gemini live(gemini-3.8-flash)`처럼 적는다.
 - 값이 틀리면 AI 판독만 `SETUP_REQUIRED`로 끝난다. 기록 저장에는 영향이 없다.
-- 속성은 다시 배포하지 않아도 바로 반영된다. 이 두 속성을 읽는 `Code.gs`를 배포한 뒤부터 적용된다.
+- 속성은 다시 배포하지 않아도 바로 반영된다. 이 속성을 읽는 `Code.gs`를 배포한 뒤부터 적용된다.
 
-## 3. Gemini API 키
+## 3. OnePort API 키
 
-- 키는 [Google AI Studio](https://aistudio.google.com)에서 만든다(웹(클릭)). 만든 키는 1절 8단계대로 설정 파일에 넣고 `npm.cmd run gas:init`으로 GAS에 저장한다.
-- 처음에는 개인 AI Studio 무료 키로 시작한다.
-- 무료 한도에 닿으면 대체 모델로 한 번 다시 보낸다(2절). 대체 모델도 한도에 걸리면 AI 판독이 `RATE_LIMIT_EXCEEDED`로 끝나고, 다시 시도할 시간이 함께 나온다. 그 시간이 지난 뒤 다시 판독을 요청한다.
-- 키가 틀리면 HTTP 400, 권한이 없으면 HTTP 403, 모델이 없으면 HTTP 404 안내가 나온다. 안내대로 키를 다시 넣거나 `GEMINI_MODEL`을 지운다.
-- 한도 오류가 계속 나오면 회사가 준 키로 바꾼다. 설정 파일의 `GEMINI_API_KEY`를 바꾸고 `npm.cmd run gas:init`을 다시 실행한다(편집기의 스크립트 속성을 직접 바꿔도 된다). 다시 배포하거나 로컬 서버를 다시 시작할 필요는 없다.
-- 무료 등급에서는 보낸 내용(사진 포함)이 Google 제품 개선에 쓰일 수 있다([가격표](https://ai.google.dev/gemini-api/docs/pricing)의 "Used to improve our products" 항목). 실제 고객 자료나 개인정보가 든 사진은 올리지 않는다.
+사진 판독은 GAS가 OnePort(OpenAI 호환 게이트웨이, `https://oneport.kr/v1/chat/completions`)로 보낸다. 모델은 그대로 Gemini(`gemini-3.8-flash`)다.
+
+- OnePort API 키(`sk-`로 시작)를 준비한다. 키를 받는 방법은 강사 안내를 따른다.
+- 키는 1절 8단계대로 설정 파일의 `ONEPORT_API_KEY`에 넣고 `npm.cmd run gas:init`으로 GAS에 저장한다. 키를 바꿀 때도 설정 파일을 고치고 `npm.cmd run gas:init`을 다시 실행한다(편집기의 스크립트 속성을 직접 바꿔도 된다). 다시 배포하거나 로컬 서버를 다시 시작할 필요는 없다.
+- 판독 한 번에 OnePort 크레딧이 쓰인다.
 - 키가 없으면 AI 판독 요청이 `SETUP_REQUIRED`로 끝난다. 기록 저장은 키 없이도 된다.
+
+### 사진 크기
+
+사건 하나의 사진은 1~5장, 장당 2MB 이하, **합계 3MB 이하**여야 한다.
+판독할 때 사진을 base64로 바꿔 한 요청에 모두 싣는데, OnePort는 요청 본문이 4.5MB를 넘으면 받지 않는다(HTTP 413).
+그래서 사건 등록 때 로컬 서버(직접 올린 사진, 저장소에서 고른 사진)와 GAS가 모두 합계 3MB를 넘으면 등록을 거절한다.
+
+- 직접 올린 사진: `사진 합계가 3MB보다 큽니다. 사진 수를 줄이거나 작은 사진으로 바꿔 합계 3MB 이하로 올려 주세요.`
+- 저장소에서 고른 사진: `고른 저장소 사진의 합계가 3MB보다 큽니다. 사진 수를 줄여 합계 3MB 이하로 골라 주세요.`
+- 이 규칙 전에 등록한 사건은 사진 합계가 커서 판독 때 413이 날 수 있다. 그때는 `사진 합계가 OnePort 요청 크기 한도를 넘어 판독하지 못했습니다(HTTP 413, …)` 안내가 나온다. 사진을 줄여 새 사건으로 등록한다.
+
+### 판독 오류
+
+OnePort가 돌려준 오류는 아래처럼 안내한다. 안내 문구의 괄호 안에 HTTP 상태, OnePort 오류 코드, 모델이 함께 나온다.
+
+| HTTP 상태 | 뜻 | 할 일 |
+| --- | --- | --- |
+| 401 | 키가 없거나 올바르지 않다 | 설정 파일의 `ONEPORT_API_KEY`를 확인하고 `npm.cmd run gas:init`을 다시 실행한다 |
+| 402 | 크레딧이 부족하다 | OnePort 대시보드에서 남은 크레딧을 확인한다. 강사가 준 키면 강사에게 알린다 |
+| 403 | 이 키로 모델을 쓸 수 없다 | OnePort 대시보드에서 이 키의 요금제와 스페이스에 모델이 켜져 있는지 본다. 강사가 준 키면 강사에게 알린다 |
+| 404 | 모델을 찾지 못했다 | 스크립트 속성 `GEMINI_MODEL`을 지운다(2절) |
+| 413 | 요청 본문이 4.5MB를 넘었다 | 위 "사진 크기"를 본다 |
+| 422 | OnePort가 Gemini에서 실행됐는지 확인하지 못했다 | 같은 판독이 두 번 실행되지 않도록 자동으로 다시 보내지 않는다. OnePort 대시보드의 사용 기록을 본 뒤(강사가 준 키면 강사에게 묻는다) 필요하면 다시 판독을 요청한다 |
+| 429 | 호출 한도를 넘었다 | `RATE_LIMIT_EXCEEDED`로 끝나고, 다시 시도할 시간을 받으면 함께 나온다. 그 시간이 지난 뒤 다시 요청한다 |
+| 503 | OnePort나 Gemini가 붐빈다 | 잠시 뒤 다시 판독을 요청한다 |
+| 그 밖의 5xx | Gemini 쪽 오류다 | 잠시 뒤 다시 판독을 요청한다 |
+
+- 어느 오류도 다른 모델로 다시 보내지 않고, 초안을 남기지 않는다. 같은 요청 번호로 다시 요청하면 다시 판독한다.
 
 ## 4. NotebookLM MCP
 
@@ -401,7 +433,7 @@ clasp 경로에서는 `npm.cmd run gas:deploy`가 이 파일이 없으면 만들
 | 키 | 값 | 얻는 곳 |
 | --- | --- | --- |
 | `GAS_WEBAPP_URL` | 웹 앱 URL(`https://…/exec`) | 1절 단계 6의 `npm.cmd run gas:deploy`가 적는다. 편집기에서 배포했으면 직접 넣는다 |
-| `GEMINI_API_KEY` | Gemini API 키. `npm.cmd run gas:init`만 읽어 GAS 스크립트 속성으로 보낸다. 로컬 서버는 쓰지 않는다 | 3절, 1절 단계 8 |
+| `ONEPORT_API_KEY` | OnePort API 키(`sk-`로 시작). `npm.cmd run gas:init`만 읽어 GAS 스크립트 속성으로 보낸다. 로컬 서버는 쓰지 않는다 | 3절, 1절 단계 8 |
 | `NOTEBOOKLM_NOTEBOOK_ID` | 노트북 ID | 4절 |
 | `NOTEBOOKLM_SOURCE_IDS` | 소스 ID. 여러 개면 쉼표로 구분한 문자열 하나(`"ID1,ID2"`) | 4절 |
 | `NOTEBOOKLM_MCP_COMMAND` | MCP 실행 파일 경로나 명령 이름. Antigravity 설정을 쓰면 비워 둔다 | 5절 |
@@ -468,7 +500,7 @@ clasp 경로에서는 `npm.cmd run gas:deploy`가 이 파일이 없으면 만들
 - 로컬 저장소의 사진은 `preview/_synthetic_store_images/`에 한 장씩 저장되어 서버를 다시 시작해도 남는다. 기록 파일과 함께 git에서 제외된다.
 - `NOTEBOOKLM_MODE=live`에는 `nlm login`, `NOTEBOOKLM_NOTEBOOK_ID`, `NOTEBOOKLM_SOURCE_IDS`가 필요하다(4절).
 - 환경 변수 `SYNTHETIC_MODE=true`는 `STORAGE_MODE=mock`과 같은 뜻이다. 이때 두 스위치의 기본값도 `mock`이 된다.
-- 수업에서는 `STORAGE_MODE=mock`, `GEMINI_MODE=mock`, `NOTEBOOKLM_MODE=live`로 시작한다. Gemini 키와 GAS 없이 NotebookLM만 실제로 시험하는 조합이다. 실제 연결은 셋 다 `live`다.
+- 수업에서는 `STORAGE_MODE=mock`, `GEMINI_MODE=mock`, `NOTEBOOKLM_MODE=live`로 시작한다. OnePort 키와 GAS 없이 NotebookLM만 실제로 시험하는 조합이다. 실제 연결은 셋 다 `live`다.
 
 막는 조합이나 알 수 없는 값이 있으면 서버는 시작하지 않고 종료 코드 1로 끝난다. 터미널에 이유와 고칠 방법이 한 줄로 나온다. `off`는 어느 저장소 모드와도 함께 쓸 수 있다.
 
@@ -520,7 +552,7 @@ API로 요청하면 HTTP 409와 `error_code` `INTEGRATION_OFF`를 돌려준다.
 
 | `error_code` | HTTP 상태 | 뜻과 할 일 |
 | --- | --- | --- |
-| `SETUP_REQUIRED` | 503 | 설정 파일의 `GAS_WEBAPP_URL`이 비어 있거나, GAS 스크립트 속성(`npm.cmd run gas:init`이나 `initialSetup`이 만드는 ID)이 없다. AI 판독에서는 `GEMINI_API_KEY`가 없거나(1절 단계 8·10) `GEMINI_MODEL`·`GEMINI_FALLBACK_MODEL`이 허용 값이 아닌 경우다(2절) |
+| `SETUP_REQUIRED` | 503 | 설정 파일의 `GAS_WEBAPP_URL`이 비어 있거나, GAS 스크립트 속성(`npm.cmd run gas:init`이나 `initialSetup`이 만드는 ID)이 없다. AI 판독에서는 `ONEPORT_API_KEY`가 없거나(1절 단계 8·10) `GEMINI_MODEL`이 허용 값이 아닌 경우다(2절) |
 | `GAS_AUTH_REQUIRED` | 503 | 첫 권한 승인 전이다(1절 9단계). 승인했는데도 나오면 액세스 권한이 "모든 사용자"가 아니거나 `/exec`로 끝나는 주소가 아니다(1절 7단계) |
 | `GAS_URL_INVALID` | 503 | 주소 형식이 틀렸거나(오타, `https://`가 아님) 웹 앱이 없다(HTTP 404, 배포 삭제·보관). `http://`는 `127.0.0.1`·`localhost` 시험 서버에만 쓸 수 있다 |
 | `GAS_UNREACHABLE` | 502 | 인터넷·DNS·프록시 문제나 인증서 오류로 접속하지 못했다. 교육장 네트워크의 보안 장비가 인증서를 바꾸는 경우에도 나온다. 요청은 실행되지 않았으니 다시 시도해도 된다 |
@@ -528,7 +560,7 @@ API로 요청하면 HTTP 409와 `error_code` `INTEGRATION_OFF`를 돌려준다.
 | `GAS_NON_JSON_RESPONSE` | 502 | GAS가 HTML 오류 페이지를 돌려줬다. Apps Script의 실행 로그를 본다 |
 | `GAS_HTTP_ERROR` | 502 | 그 밖의 HTTP 오류다. 메시지의 HTTP 상태를 보고 다시 시도한다 |
 | `EXECUTION_UNKNOWN` | 500 | 요청이 실행됐는지 알 수 없는 오류다. 기록을 확인한 뒤 다시 시도한다 |
-| `RATE_LIMIT_EXCEEDED` | 429 | 한도를 넘었다. 안내된 시간 뒤에 다시 시도한다 |
+| `RATE_LIMIT_EXCEEDED` | 429 | 한도를 넘었다(AI 판독이면 OnePort 호출 한도, 3절). 안내된 시간 뒤에 다시 시도한다 |
 | `LOCK_TIMEOUT` | 429 | 다른 저장이 스크립트 잠금을 잡고 있어 10초 동안 기다리다 시간이 지났다. 이 요청의 시트 저장은 하지 않았다. 잠시 뒤 다시 요청한다. 같은 요청 번호(`request_id`)로 다시 보내면 GAS가 같은 번호의 기록을 먼저 찾으므로 사건 등록·정보 수정·AI 판독·기준 확인·판단·조치 기록이 겹치지 않는다 |
 
 ## 9. NotebookLM 기준 확인 결과 읽기
