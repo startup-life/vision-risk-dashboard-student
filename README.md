@@ -2,6 +2,7 @@
 
 현장 사진으로 위험을 확인하고 판단·조치를 기록하는 대시보드를 6회차 수업에서 함께 만듭니다.
 이 브랜치(`milestone-0`)는 출발점이라 코드가 없습니다. 이 안내 파일, 강사가 준 자료(`materials`), AI가 읽는 규칙(`AGENTS.md`)과 보충 문서(`docs/guide`)만 있습니다.
+수강생은 이 저장소를 받지(clone) 않습니다. 빈 폴더에서 시작하고, 1회차 1-2에서 AI가 이 저장소를 `class`라는 이름으로 더해 필요한 파일만 가져옵니다.
 
 ## 브랜치
 
@@ -14,13 +15,6 @@
 | `milestone-4` | 상세에서 관련 기준 확인을 요청하면 NotebookLM 인용이 나온다 |
 | `milestone-5` | 사건이 Google 시트에 저장되고, Gemini 사진 판독 초안이 나온다 |
 | `main` | Teachable Machine으로 학습한 모델의 예측이 상세와 홈에 나온다 (완성본) |
-
-## 받기
-
-```bash
-git clone https://github.com/startup-life/vision-risk-dashboard-student.git
-cd vision-risk-dashboard-student
-```
 
 ## 따라하기 자료
 
