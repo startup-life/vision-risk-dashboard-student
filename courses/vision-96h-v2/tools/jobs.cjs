@@ -106,6 +106,8 @@ function deepRedact(obj, seen = new WeakSet()) {
     let s = obj.replace(/Bearer\s+[A-Za-z0-9\-._~+/]+=*/gi, 'Bearer [REDACTED]');
     // 2. Google AIza API 키 패턴
     s = s.replace(/AIza[0-9A-Za-z\-_]{35}/g, '[REDACTED_API_KEY]');
+    // 2-1. OnePort 등 sk- 로 시작하는 API 키 패턴
+    s = s.replace(/\bsk-[A-Za-z0-9_-]{20,200}/g, '[REDACTED_API_KEY]');
     // 3. URL 쿼리 파라미터 key/token/secret 마스킹
     s = s.replace(/([?&](?:key|api_key|token|secret|password)=)[^&\s]+/gi, '$1[REDACTED]');
     // 4. 일반 key=value / token=value 마스킹

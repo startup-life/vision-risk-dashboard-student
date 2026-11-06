@@ -2,43 +2,47 @@
  * 비전 리스크 대시보드 - Google Apps Script (GAS) Web App
  *
  * 정본 저장소: Google Drive (비공개 이미지 보존) & Google Sheets (6개 탭 정본)
- * 모델 판독: Gemini API (GAS ScriptProperties 실행, 모델은 GEMINI_MODEL 또는 DEFAULT_GEMINI_MODEL)
+ * 모델 판독: Gemini 모델을 OnePort(OpenAI 호환 게이트웨이)로 부른다 (키는 ScriptProperties의 ONEPORT_API_KEY, 모델은 GEMINI_MODEL 또는 DEFAULT_GEMINI_MODEL)
  * 보안: Formula Injection 방지, 비공개 권한 고정
  * 동시성/멱등성: LockService(try-catch), request_id 기반 결정적 record_id 및 부분 저장 재개
  */
 
-// 판독에 쓸 수 있는 모델. 2.5 모델은 새로 만든 키에서 막힐 수 있어 쓰지 않는다(Gemini API 변경 기록 2026-09-18).
-const GEMINI_MODELS = ['gemini-3.8-flash', 'gemini-3.5-flash-lite'];
+// 판독에 쓸 수 있는 모델. OnePort 키의 모델 목록에 있는 Gemini 글 모델은 이것 하나다(2026-11-06 확인).
+const GEMINI_MODELS = ['gemini-3.8-flash'];
 // Script Property GEMINI_MODEL이 없을 때 쓰는 모델. tools/server.cjs의 모의 응답도 같은 값을 쓴다.
 const DEFAULT_GEMINI_MODEL = 'gemini-3.8-flash';
-// 기본 모델이 붐비거나(503) 한도에 걸리면(429) 한 번만 다시 보내는 모델. GEMINI_FALLBACK_MODEL에 off를 넣으면 다시 보내지 않는다.
-const DEFAULT_GEMINI_FALLBACK_MODEL = 'gemini-3.5-flash-lite';
+// OnePort 채팅 완성 주소. 사진 판독 요청은 이 주소로만 보낸다.
+const ONEPORT_CHAT_URL = 'https://oneport.kr/v1/chat/completions';
+// Gemini는 생각 토큰도 max_tokens에 넣어 센다. 너무 작으면 답이 비거나 finish_reason이 length가 된다.
+const ONEPORT_MAX_TOKENS = 4000;
 
 /**
- * Script Property GEMINI_MODEL·GEMINI_FALLBACK_MODEL을 읽는다. 허용 목록에 없는 값이면 null을 돌려준다.
- * fallback_model은 off이거나 판독 모델과 같으면 ''이다.
+ * Script Property GEMINI_MODEL을 읽는다. 허용 목록에 없는 값이면 null을 돌려준다.
+ * 예전 설정의 GEMINI_FALLBACK_MODEL은 읽지 않는다. 다른 모델로 다시 보내지 않는다.
  */
-function getGeminiModels(props) {
+function getGeminiModel(props) {
   const model = String(props.getProperty('GEMINI_MODEL') || '').trim() || DEFAULT_GEMINI_MODEL;
-  const fallback = String(props.getProperty('GEMINI_FALLBACK_MODEL') || '').trim() || DEFAULT_GEMINI_FALLBACK_MODEL;
-  if (!GEMINI_MODELS.includes(model) || (fallback !== 'off' && !GEMINI_MODELS.includes(fallback))) return null;
-  return { model: model, fallback_model: fallback === 'off' || fallback === model ? '' : fallback };
+  return GEMINI_MODELS.includes(model) ? model : null;
 }
 
-const GEMINI_MODEL_SETTING_ERROR = 'GAS 스크립트 속성의 GEMINI_MODEL·GEMINI_FALLBACK_MODEL은 ' + GEMINI_MODELS.join(', ') + ' 중 하나여야 합니다(대체 모델은 off도 됩니다). 값을 고치거나 지우면 기본 모델을 씁니다.';
+const GEMINI_MODEL_SETTING_ERROR = 'GAS 스크립트 속성의 GEMINI_MODEL은 ' + GEMINI_MODELS.join(', ') + '만 쓸 수 있습니다. 값을 지우면 기본 모델을 씁니다.';
 
 // 로컬 서버가 기동할 때 판독 모델을 한 줄로 보여 주려고 묻는다.
 function handleGeminiSettings() {
-  const models = getGeminiModels(PropertiesService.getScriptProperties());
-  if (!models) return { success: false, status: 'setup_required', error_code: 'SETUP_REQUIRED', error: GEMINI_MODEL_SETTING_ERROR };
-  return { success: true, model: models.model, fallback_model: models.fallback_model };
+  const model = getGeminiModel(PropertiesService.getScriptProperties());
+  if (!model) return { success: false, status: 'setup_required', error_code: 'SETUP_REQUIRED', error: GEMINI_MODEL_SETTING_ERROR };
+  return { success: true, model: model };
 }
 
-// 429·503 밖의 Gemini 오류 안내. {model}에는 실제로 부른 모델(대체 모델일 수 있다)이 들어간다. 화면이 그대로 보여 주도록 LOCAL-SETUP.md를 가리킨다.
-const GEMINI_HTTP_MESSAGES = {
-  400: 'Gemini API 키가 올바르지 않거나 요청을 받아 주지 않았습니다(HTTP 400, {model}). config/local-connection.json의 GEMINI_API_KEY를 확인하고 npm.cmd run gas:init(macOS: npm run gas:init)을 다시 실행하세요(docs/LOCAL-SETUP.md 3절).',
-  403: 'Gemini API 키에 이 요청을 할 권한이 없습니다(HTTP 403, {model}). AI Studio에서 새 키를 만들어 npm.cmd run gas:init(macOS: npm run gas:init)으로 다시 넣으세요(docs/LOCAL-SETUP.md 3절).',
-  404: 'Gemini 판독 모델을 찾지 못했습니다(HTTP 404, {model}). 스크립트 속성 GEMINI_MODEL·GEMINI_FALLBACK_MODEL을 지우거나 ' + GEMINI_MODELS.join(', ') + ' 중 하나로 두세요(docs/LOCAL-SETUP.md 2절).'
+// 429·503 밖의 OnePort 오류 안내. {info}에는 HTTP 상태, OnePort 오류 코드, 부른 모델이 들어간다.
+// 화면이 그대로 보여 주도록 LOCAL-SETUP.md를 가리킨다.
+const ONEPORT_HTTP_MESSAGES = {
+  401: 'OnePort API 키가 없거나 올바르지 않습니다({info}). config/local-connection.json의 ONEPORT_API_KEY를 확인하고 npm.cmd run gas:init(macOS: npm run gas:init)을 다시 실행하세요(docs/LOCAL-SETUP.md 3절).',
+  402: 'OnePort 크레딧이 부족해 판독하지 못했습니다({info}). OnePort 대시보드에서 남은 크레딧을 확인하세요(docs/LOCAL-SETUP.md 3절).',
+  403: 'OnePort 키로 이 모델을 쓸 수 없습니다({info}). OnePort 대시보드에서 이 키의 요금제와 스페이스에 모델이 켜져 있는지 확인하세요(docs/LOCAL-SETUP.md 3절).',
+  404: 'OnePort에서 판독 모델을 찾지 못했습니다({info}). 스크립트 속성 GEMINI_MODEL을 지우거나 ' + GEMINI_MODELS.join(', ') + '로 두세요(docs/LOCAL-SETUP.md 2절).',
+  413: '사진 합계가 OnePort 요청 크기 한도를 넘어 판독하지 못했습니다({info}). 한 사건의 사진은 합계 3MB 이하여야 합니다. 사진을 줄여 새 사건으로 등록한 뒤 판독을 요청하세요(docs/LOCAL-SETUP.md 3절).',
+  422: 'OnePort가 Gemini에서 판독이 실행됐는지 확인하지 못했습니다({info}). 같은 판독이 두 번 실행되지 않도록 자동으로 다시 보내지 않았습니다. OnePort 대시보드의 사용 기록을 확인한 뒤 필요하면 판독을 다시 요청하세요(docs/LOCAL-SETUP.md 3절).'
 };
 
 const SHEET_TABS = {
@@ -225,8 +229,8 @@ function doPost(e) {
       case 'setup':
         // 동시에 두 번 불려도 스프레드시트와 폴더가 하나만 생기게 락 안에서 만든다.
         return jsonResponse(withShortLock(() => initialSetup()));
-      case 'set_gemini_key':
-        return jsonResponse(withShortLock(() => handleSetGeminiKey(payload)));
+      case 'set_oneport_key':
+        return jsonResponse(withShortLock(() => handleSetOnePortKey(payload)));
       case 'gemini_settings':
         return jsonResponse(handleGeminiSettings());
       case 'create_record':
@@ -287,25 +291,36 @@ function jsonResponse(data) {
 
 // ======================== 핸들러 구현 ======================== //
 
-// Gemini API 키 형식. 영문·숫자·'-'·'_'만 쓴다.
-const GEMINI_API_KEY_PATTERN = /^[A-Za-z0-9_-]{20,200}$/;
+// OnePort API 키 형식. sk-로 시작하고 그 뒤는 영문·숫자·'-'·'_'만 쓴다.
+const ONEPORT_API_KEY_PATTERN = /^sk-[A-Za-z0-9_-]{20,200}$/;
 
 /**
- * 로컬 설정 파일의 Gemini API 키를 스크립트 속성 GEMINI_API_KEY에 저장한다(npm run gas:init).
+ * 로컬 설정 파일의 OnePort API 키를 스크립트 속성 ONEPORT_API_KEY에 저장한다(npm run gas:init).
  * 편집기 프로젝트 설정에서 직접 넣어도 된다. 키 값은 응답과 오류 문구에 넣지 않고, 저장된 키를 돌려주는 동작도 없다.
  */
-function handleSetGeminiKey(p) {
+function handleSetOnePortKey(p) {
   const key = typeof p.api_key === 'string' ? p.api_key.trim() : '';
-  if (!GEMINI_API_KEY_PATTERN.test(key)) {
+  if (!ONEPORT_API_KEY_PATTERN.test(key)) {
     return {
       success: false,
       status: 'error',
       error_code: 'BAD_REQUEST',
-      error: 'api_key is not a Gemini API key (20-200 letters, digits, "-" or "_")'
+      error: 'api_key is not a OnePort API key ("sk-" followed by 20-200 letters, digits, "-" or "_")'
     };
   }
-  PropertiesService.getScriptProperties().setProperty('GEMINI_API_KEY', key);
-  return { success: true, gemini_key_saved: true };
+  PropertiesService.getScriptProperties().setProperty('ONEPORT_API_KEY', key);
+  return { success: true, oneport_key_saved: true };
+}
+
+// 한 사건의 사진 합계 한도. 판독 때 사진을 base64로 요청 본문에 싣는데, OnePort는 본문이 4.5MB를 넘으면 413으로 거절한다.
+// tools/server.cjs의 MAX_TOTAL_IMAGE_SIZE와 같은 값이다.
+const MAX_TOTAL_IMAGE_BYTES = 3 * 1024 * 1024;
+
+// base64 문자열이 담은 원래 바이트 수.
+function base64ByteLength(b64) {
+  const text = String(b64 || '');
+  const padding = text.endsWith('==') ? 2 : (text.endsWith('=') ? 1 : 0);
+  return Math.floor(text.length * 3 / 4) - padding;
 }
 
 /**
@@ -385,6 +400,15 @@ function handleCreateRecord(p) {
         error: `${idx + 1}번째 사진이 2MB보다 큽니다. 2MB 이하 사진을 올려 주세요.`
       };
     }
+  }
+  const totalBytes = images.reduce((sum, img) => sum + base64ByteLength(img.base64), 0);
+  if (totalBytes > MAX_TOTAL_IMAGE_BYTES) {
+    return {
+      success: false,
+      status: 'error',
+      error_code: 'BAD_REQUEST',
+      error: '사진 합계가 3MB보다 큽니다. 사진 수를 줄이거나 작은 사진으로 바꿔 합계 3MB 이하로 올려 주세요.'
+    };
   }
 
   const fileIds = [];
@@ -681,36 +705,22 @@ function findRecord(recordId) {
 }
 
 /**
- * Gemini 429 응답 본문에서 할당량 종류와 재시도 지연을 꺼낸다.
- * 본문 형식: { error: { message, status, details: [QuotaFailure{violations[]}, RetryInfo{retryDelay:'39s'}] } }
+ * OnePort 오류 응답 본문에서 오류 종류와 재시도 지연을 꺼낸다.
+ * 본문 형식: { error: { type, code?, reason?, message } }. 413은 JSON이 아닌 글자로 오므로 비어 있는 값을 돌려준다.
+ * 재시도 지연은 Retry-After 헤더(초)에서 읽는다.
  */
-function parseGeminiRateLimit(text, headers) {
-  const info = { message: '', quota_violations: [], retry_after_seconds: null };
+function parseOnePortError(text, headers) {
+  const info = { type: '', code: '', message: '', retry_after_seconds: null };
   try {
     const body = JSON.parse(text);
-    const err = body && body.error ? body.error : {};
+    const err = body && body.error && typeof body.error === 'object' ? body.error : {};
+    info.type = String(err.type || '');
+    info.code = String(err.code || err.reason || '');
     info.message = String(err.message || '').slice(0, 300);
-    const details = Array.isArray(err.details) ? err.details : [];
-    details.forEach(d => {
-      const type = String(d['@type'] || '');
-      if (type.indexOf('QuotaFailure') !== -1 && Array.isArray(d.violations)) {
-        d.violations.forEach(v => {
-          info.quota_violations.push({
-            quota_metric: v.quotaMetric || '',
-            quota_id: v.quotaId || '',
-            quota_value: v.quotaValue !== undefined ? String(v.quotaValue) : ''
-          });
-        });
-      }
-      if (type.indexOf('RetryInfo') !== -1 && d.retryDelay) {
-        const seconds = parseFloat(String(d.retryDelay));
-        if (isFinite(seconds)) info.retry_after_seconds = Math.ceil(seconds);
-      }
-    });
   } catch (e) {
     info.message = String(text || '').slice(0, 300);
   }
-  if (info.retry_after_seconds === null && headers) {
+  if (headers) {
     const retryAfter = headers['Retry-After'] || headers['retry-after'];
     const seconds = parseFloat(String(retryAfter || ''));
     if (isFinite(seconds)) info.retry_after_seconds = Math.ceil(seconds);
@@ -718,8 +728,30 @@ function parseGeminiRateLimit(text, headers) {
   return info;
 }
 
+// OpenAI 호환 응답의 message.content를 글자로 읽는다. 문자열이 보통이고, 조각 배열이면 text를 잇는다.
+function readMessageText(message) {
+  const content = message && message.content;
+  if (typeof content === 'string') return content;
+  if (Array.isArray(content)) return content.map(part => (part && typeof part.text === 'string') ? part.text : '').join('');
+  return '';
+}
+
+// 판독 초안의 JSON 스키마. 저장하는 ai_drafts 열과 같은 다섯 필드다.
+const DRAFT_JSON_SCHEMA = {
+  type: 'object',
+  properties: {
+    facts: { type: 'string' },
+    suspected_risk: { type: 'string' },
+    locations: { type: 'string' },
+    uncertainty: { type: 'string' },
+    additional_checks: { type: 'string' }
+  },
+  required: ['facts', 'suspected_risk', 'locations', 'uncertainty', 'additional_checks'],
+  additionalProperties: false
+};
+
 /**
- * Gemini API 모델 판독 (GAS 실행)
+ * Gemini 모델 판독 (GAS 실행, OnePort 경유)
  */
 function handleAnalyzeGemini(p) {
   const recordId = p.record_id;
@@ -747,17 +779,17 @@ function handleAnalyzeGemini(p) {
   }
 
   const props = PropertiesService.getScriptProperties();
-  const apiKey = props.getProperty('GEMINI_API_KEY');
+  const apiKey = props.getProperty('ONEPORT_API_KEY');
   if (!apiKey) {
     return {
       success: false,
       status: 'setup_required',
       error_code: 'SETUP_REQUIRED',
-      error: 'GAS 스크립트 속성에 GEMINI_API_KEY가 없습니다. npm.cmd run gas:init(macOS: npm run gas:init)으로 Gemini API 키를 넣어 주세요.'
+      error: 'GAS 스크립트 속성에 ONEPORT_API_KEY가 없습니다. npm.cmd run gas:init(macOS: npm run gas:init)으로 OnePort API 키를 넣어 주세요.'
     };
   }
-  const geminiModels = getGeminiModels(props);
-  if (!geminiModels) {
+  const geminiModel = getGeminiModel(props);
+  if (!geminiModel) {
     return {
       success: false,
       status: 'setup_required',
@@ -789,12 +821,10 @@ function handleAnalyzeGemini(p) {
     try {
       const file = DriveApp.getFileById(fid);
       const blob = file.getBlob();
-      imageParts.push({ text: `[사진 프레임 ${idx + 1}/${fileIds.length}]` });
+      imageParts.push({ type: 'text', text: `[사진 프레임 ${idx + 1}/${fileIds.length}]` });
       imageParts.push({
-        inline_data: {
-          mime_type: blob.getContentType(),
-          data: Utilities.base64Encode(blob.getBytes())
-        }
+        type: 'image_url',
+        image_url: { url: 'data:' + blob.getContentType() + ';base64,' + Utilities.base64Encode(blob.getBytes()) }
       });
     } catch (readErr) {
       return {
@@ -824,109 +854,109 @@ function handleAnalyzeGemini(p) {
 `;
 
   const requestBody = {
-    contents: [
+    model: geminiModel,
+    messages: [
       {
-        parts: [
+        role: 'user',
+        content: [
           ...imageParts,
-          { text: promptText }
+          { type: 'text', text: promptText }
         ]
       }
     ],
-    generationConfig: {
-      temperature: 0.1,
-      responseMimeType: 'application/json'
+    temperature: 0.1,
+    max_tokens: ONEPORT_MAX_TOKENS,
+    response_format: {
+      type: 'json_schema',
+      json_schema: { name: 'risk_draft', strict: true, schema: DRAFT_JSON_SCHEMA }
     }
   };
 
-  // 3. API 키는 URL query 대신 x-goog-api-key 헤더로 전달하여 예외 메시지 노출 방지
-  const fetchGemini = (model) => UrlFetchApp.fetch('https://generativelanguage.googleapis.com/v1beta/models/' + model + ':generateContent', {
-    method: 'post',
-    contentType: 'application/json',
-    headers: {
-      'x-goog-api-key': apiKey
-    },
-    payload: JSON.stringify(requestBody),
-    muteHttpExceptions: true
-  });
-
-  // 판독 모델이 붐비거나(503) 한도에 걸리면(429) 대체 모델로 한 번만 다시 보낸다. 실제로 답한 모델을 기록한다.
-  let geminiModel = geminiModels.model;
+  // 3. API 키는 Authorization 헤더로만 보낸다. 한 번만 보내고 다른 모델로 다시 보내지 않는다.
   let response = null;
   let code = 0;
   let text = '';
   try {
-    response = fetchGemini(geminiModel);
+    response = UrlFetchApp.fetch(ONEPORT_CHAT_URL, {
+      method: 'post',
+      contentType: 'application/json',
+      headers: {
+        Authorization: 'Bearer ' + apiKey
+      },
+      payload: JSON.stringify(requestBody),
+      muteHttpExceptions: true
+    });
     code = response.getResponseCode();
-    if ((code === 503 || code === 429) && geminiModels.fallback_model) {
-      geminiModel = geminiModels.fallback_model;
-      response = fetchGemini(geminiModel);
-      code = response.getResponseCode();
-    }
     text = response.getContentText();
   } catch (netErr) {
     return {
       success: false,
       status: 'interrupted',
       error_code: 'NETWORK_TIMEOUT',
-      error: 'Gemini API 호출 중 네트워크 오류가 발생했습니다.',
+      error: 'OnePort(Gemini) 호출 중 네트워크 오류가 발생했습니다.',
       interrupted: true
     };
   }
 
   if (code === 429) {
-    // 429는 Gemini가 요청을 처리하지 않은 것이라 초안을 남기지 않는다. 같은 request_id로 다시 보내면 다시 판독한다.
+    // 429는 OnePort가 요청을 처리하지 않은 것이라 초안을 남기지 않는다. 같은 request_id로 다시 보내면 다시 판독한다.
     const headers = response && typeof response.getHeaders === 'function' ? response.getHeaders() : null;
-    const limit = parseGeminiRateLimit(text, headers);
-    const quotaIds = limit.quota_violations.map(v => v.quota_id).filter(Boolean);
-    const quotaLabel = quotaIds.length > 0 ? `, 할당량: ${quotaIds.join(', ')}` : '';
+    const limit = parseOnePortError(text, headers);
+    const kind = limit.code || limit.type;
     const retryLabel = limit.retry_after_seconds !== null ? `${limit.retry_after_seconds}초 뒤` : '잠시 후';
-    const errorMessage = `Gemini API 호출 한도를 초과했습니다 (HTTP 429${quotaLabel}). ${retryLabel} 다시 시도해주세요.`;
+    const keyHint = kind === 'key_limit_exceeded' ? ' 계속 같으면 OnePort 대시보드에서 이 키의 사용 한도를 확인하세요.' : '';
     return {
       success: false,
       status: 'error',
       error_code: 'RATE_LIMIT_EXCEEDED',
-      error: errorMessage,
+      error: `OnePort 호출 한도를 초과했습니다 (HTTP 429${kind ? ', ' + kind : ''}). ${retryLabel} 다시 시도해주세요.${keyHint}`,
       retryable: true,
-      quota_violations: limit.quota_violations,
       retry_after_seconds: limit.retry_after_seconds,
       details: limit.message
     };
   }
 
   if (code !== 200) {
+    // 413은 JSON이 아닌 글자로 오므로 상태 코드로만 가린다.
+    const oneportError = parseOnePortError(text, null);
+    const oneportCode = code === 413 ? '' : (oneportError.code || oneportError.type);
+    const info = ['HTTP ' + code, oneportCode, geminiModel].filter(Boolean).join(', ');
+    // 422는 upstream_execution_unconfirmed일 때만 실행 여부를 모르는 경우다. 다른 422는 일반 오류 안내를 쓴다.
+    const template = (code === 422 && oneportCode !== 'upstream_execution_unconfirmed') ? null : ONEPORT_HTTP_MESSAGES[code];
     return {
       success: false,
       status: 'error',
       error_code: 'GEMINI_API_ERROR',
       error: code === 503
-        ? `Gemini 서버가 붐벼 판독하지 못했습니다(HTTP 503, ${geminiModel}). 잠시 뒤 다시 판독을 요청하세요.`
-        : (GEMINI_HTTP_MESSAGES[code] || `Gemini API 분석 요청 중 오류가 발생했습니다 (HTTP ${code}, {model}).`).replace('{model}', geminiModel),
+        ? `OnePort(Gemini) 서버가 붐벼 판독하지 못했습니다(${info}). 잠시 뒤 다시 판독을 요청하세요.`
+        : (template || 'OnePort(Gemini) 판독 요청 중 오류가 발생했습니다({info}). 잠시 뒤 다시 판독을 요청하세요.').replace('{info}', info),
       details: text.slice(0, 300)
     };
   }
 
-  // 4. Gemini JSON 파싱 검증 (차단/빈 응답/잘못된 필드 타입 오류 처리)
+  // 4. OnePort 응답(choices[0].message.content)의 JSON 파싱 검증 (차단/빈 응답/잘못된 필드 타입 오류 처리)
   let parsedContent = null;
   try {
     const resJson = JSON.parse(text);
-    if (resJson.promptFeedback && resJson.promptFeedback.blockReason) {
+    const choice = resJson.choices && resJson.choices[0];
+    const finishReason = choice && choice.finish_reason;
+    if (finishReason === 'content_filter') {
       return {
         success: false,
         status: 'error',
         error_code: 'CONTENT_BLOCKED',
-        error: `Gemini 콘텐츠 차단됨: ${resJson.promptFeedback.blockReason}`
+        error: `Gemini 콘텐츠 차단됨: ${finishReason}`
       };
     }
-    const cand = resJson.candidates && resJson.candidates[0];
-    if (!cand || !cand.content || !cand.content.parts || cand.content.parts.length === 0) {
+    const rawOut = readMessageText(choice && choice.message);
+    if (!rawOut.trim()) {
       return {
         success: false,
         status: 'error',
         error_code: 'EMPTY_RESPONSE',
-        error: `Gemini 응답에 내용이 없습니다 (finishReason: ${cand?.finishReason || 'unknown'})`
+        error: `Gemini 응답에 내용이 없습니다 (finish_reason: ${finishReason || 'unknown'})`
       };
     }
-    const rawOut = cand.content.parts[0].text;
     const jsonMatch = rawOut.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       return {
@@ -1654,7 +1684,7 @@ if (typeof module !== 'undefined' && module.exports) {
     handleSaveEvidenceCheck,
     handleSaveReview,
     handleSaveAction,
-    handleSetGeminiKey,
+    handleSetOnePortKey,
     sanitizeSheetValue,
     buildReviewSummary,
     computeQueueCounts,

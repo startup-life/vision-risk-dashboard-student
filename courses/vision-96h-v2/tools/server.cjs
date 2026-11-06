@@ -27,8 +27,8 @@ const GAS_REQUEST_TIMEOUT_MS = 120 * 1000;
 const GAS_LONG_REQUEST_TIMEOUT_MS = 300 * 1000;
 // 동작별 시간 제한. 표에 없는 동작(조회·저장)은 GAS_REQUEST_TIMEOUT_MS를 쓴다.
 const GAS_ACTION_TIMEOUT_MS = Object.freeze({
-  create_record: GAS_LONG_REQUEST_TIMEOUT_MS,  // 사진 1~5장 업로드(본문 최대 약 13MB)
-  analyze_gemini: GAS_LONG_REQUEST_TIMEOUT_MS  // GAS 안에서 Drive 사진 읽기와 Gemini 호출
+  create_record: GAS_LONG_REQUEST_TIMEOUT_MS,  // 사진 1~5장 업로드(합계 3MB, 본문 최대 약 4MB)
+  analyze_gemini: GAS_LONG_REQUEST_TIMEOUT_MS  // GAS 안에서 Drive 사진 읽기와 OnePort(Gemini) 호출
 });
 
 function gasTimeoutFor(action) {
@@ -45,6 +45,9 @@ const CONNECT_FAILURE_CODES = new Set([
 ]);
 const LOOPBACK_HOSTS = new Set(['127.0.0.1', 'localhost', '[::1]']);
 const MAX_IMAGE_SIZE = 2 * 1024 * 1024; // 2 MiB
+// 한 사건의 사진 합계 한도. 판독 때 GAS가 사진을 base64로 OnePort 요청 본문에 싣는데, 본문이 4.5MB를 넘으면 413으로 거절된다.
+// gas/Code.gs의 MAX_TOTAL_IMAGE_BYTES와 같은 값이다.
+const MAX_TOTAL_IMAGE_SIZE = 3 * 1024 * 1024; // 3 MiB
 // 화면의 분류 이름. 오류 문구에 분류 코드 대신 쓴다.
 const CATEGORY_LABELS = { safety: '산업안전', quality: '택배 발송 확인' };
 // gas/Code.gs의 DEFAULT_GEMINI_MODEL과 같은 값. 모의 응답에는 -synthetic을 붙인다.
@@ -424,7 +427,7 @@ function createServer(options = {}) {
       };
     }
 
-    // 동작 이름은 서버가 정한다. 브라우저가 보낸 본문의 action이 덮어쓰지 못하게 뒤에 둔다(예: set_gemini_key).
+    // 동작 이름은 서버가 정한다. 브라우저가 보낸 본문의 action이 덮어쓰지 못하게 뒤에 둔다(예: set_oneport_key).
     return requestGas(gasUrl, { ...safePayload, action });
   }
 
@@ -789,7 +792,7 @@ function createServer(options = {}) {
   async function loadGeminiModels() {
     const res = await callGas('gemini_settings', {});
     if (!res || !res.success) return `Gemini 판독 모델을 GAS에서 확인하지 못했습니다: ${(res && res.error) || '응답 없음'}`;
-    geminiModels = { model: res.model, fallback_model: res.fallback_model || '' };
+    geminiModels = { model: res.model };
     return startupModesLine(modes, geminiModels, () => findMcpExecutable(options.mcpOptions || {}));
   }
 
@@ -1034,6 +1037,9 @@ function createServer(options = {}) {
               }
               selectedFiles.push(fileData);
             }
+            if (selectedFiles.reduce((sum, f) => sum + f.buffer.length, 0) > MAX_TOTAL_IMAGE_SIZE) {
+              return sendJson({ error: '고른 저장소 사진의 합계가 3MB보다 큽니다. 사진 수를 줄여 합계 3MB 이하로 골라 주세요.' }, 400);
+            }
 
             // 서버가 검증된 images 배열 구성
             payload.images = selectedFiles.map(f => ({
@@ -1052,8 +1058,9 @@ function createServer(options = {}) {
             payload.memo = payload.memo ? `${String(payload.memo).trim()}\n\n${provenanceBlock}` : provenanceBlock;
             delete payload.repository_image_ids;
           } else {
-            // 직접 업로드 유효성 검사 (1~5장, 2MiB, 매직 바이트)
+            // 직접 업로드 유효성 검사 (1~5장, 장당 2MiB, 합계 3MiB, 매직 바이트)
             const images = payload.images || [];
+            let totalBytes = 0;
             if (images.length < 1 || images.length > 5) {
               return sendJson({ error: '사진은 1장 이상 5장 이하로 올려 주세요.' }, 400);
             }
@@ -1070,6 +1077,10 @@ function createServer(options = {}) {
               if (!validateImageMagicBytes(buf, img.mimeType)) {
                 return sendJson({ error: `${i + 1}번째 파일은 사진 파일이 아닙니다. JPG나 PNG 사진을 올려 주세요.` }, 400);
               }
+              totalBytes += buf.length;
+            }
+            if (totalBytes > MAX_TOTAL_IMAGE_SIZE) {
+              return sendJson({ error: '사진 합계가 3MB보다 큽니다. 사진 수를 줄이거나 작은 사진으로 바꿔 합계 3MB 이하로 올려 주세요.' }, 400);
             }
           }
 

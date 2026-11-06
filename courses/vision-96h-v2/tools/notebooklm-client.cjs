@@ -137,7 +137,7 @@ function isInheritedEnvName(key, platform) {
 }
 
 /**
- * 비공식 MCP 서버에는 필요한 변수만 넘긴다. GAS_WEBAPP_URL·GEMINI_API_KEY 같은 서버 설정값은 넘기지 않는다.
+ * 비공식 MCP 서버에는 필요한 변수만 넘긴다. GAS_WEBAPP_URL·ONEPORT_API_KEY 같은 서버 설정값은 넘기지 않는다.
  * 넘기는 것: SDK getDefaultEnvironment(), NOTEBOOKLM_로 시작하는 변수, Antigravity 설정 항목의 env, 고정값, 생성자 옵션 env.
  */
 function buildMcpEnv(launchEnv = {}, overrides = {}, env = process.env, platform = process.platform) {
