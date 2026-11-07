@@ -52,7 +52,7 @@
 - created_at은 등록 시각(예: 2026-11-01T06:30:00.000Z)이고 화면에는 한국 시각 YYYY-MM-DD HH:mm으로 보입니다.
 - location은 장소, category는 분류(safety 또는 quality), memo는 현장 메모, image_count는 사진 수입니다.
 - status(상태)는 등록하면 REGISTERED이고 화면에는 "검토 대기"로 보입니다. 뒤 회차 문서가 상태를 더합니다.
-- 사건 목록을 돌려줄 때 사건마다 queue를 붙입니다. status가 REGISTERED이면 queue는 awaiting_review(검토 대기)이고 그 밖의 status이면 null입니다.
+- 사건 목록을 돌려줄 때 사건마다 queue를 붙입니다. status가 REGISTERED이면 queue는 awaiting_review(검토 대기)이고 그 밖의 status이면 null입니다. queue는 기록 파일에 저장하지 않고 목록을 돌려줄 때만 계산해 붙입니다.
 
 ## 데이터 주소
 
