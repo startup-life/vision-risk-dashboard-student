@@ -710,7 +710,7 @@
               <label class="field">
                 <span><b>분류 *</b></span>
                 <select id="new-category" required>
-                  <option value="safety" ${draft.category === 'safety' ? 'selected' : ''}>산업안전 (safety)</option>
+                  <option value="safety" ${draft.category === 'safety' ? 'selected' : ''}>산업안전</option>
                   <option value="quality" ${draft.category === 'quality' ? 'selected' : ''}>택배 발송 확인</option>
                 </select>
               </label>
