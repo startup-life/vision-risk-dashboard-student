@@ -155,7 +155,7 @@ runtime 폴더는 git에 올리지 않고 브라우저 주소로도 열리지 �
 이력(history)에도 한 줄 남깁니다.
 
 - history_id: HIST-(시각 숫자)-3. 꼬리 3은 기준 확인 줄의 값입니다(3회차 문서의 꼬리 표에 더합니다)
-- phase: EVIDENCE_CHECK(화면 이름 "NotebookLM 대조")
+- phase: EVIDENCE_CHECK(화면 이름 "NotebookLM 대조"). 3회차 문서 "이력 한 줄"의 단계 이름 목록에도 이 줄을 더해, 상세 감사 이력의 단계 칸에 EVIDENCE_CHECK가 아니라 "NotebookLM 대조"가 보이게 합니다
 - action_name: "기준 근거 대조"
 - summary: "기준 C-01 대조 (충족여부: true)" 모양. true나 false 자리에는 그 결과의 sufficient 값을 씁니다
 - operator: "NotebookLM MCP", mock이면 "NotebookLM MCP (mock)"
@@ -188,6 +188,8 @@ review_summary에는 evidence(가장 최근 결과의 standard_id, source_id, qu
 - 완료: "완료되었습니다."
 - 실패: 실패 이유
 - 중단: "처리가 중단됐습니다. 저장된 결과를 확인해 주세요."
+
+요청이 실패하거나 중단돼도 결과 칸은 그 기준의 지난 결과(예: mock 때 만든 결과)를 그대로 보여 줍니다. 실패한 요청은 결과를 남기지 않으므로, 상태 줄의 실패 이유 아래에 지난 결과가 보이는 것이 맞습니다.
 
 요청 상태 줄은 끝난 작업이면 지금 고른 기준과 지금 사건 버전의 것만 보여 주고, 기다리는 작업은 기준과 상관없이 보여 줍니다. 같은 사건의 작업이 여럿이면 가장 나중에 요청한 것을 보여 줍니다. 끝난 작업의 줄은 알림을 닫기 전까지 새로고침해도 보이고, 알림을 닫으면 사라집니다.
 
@@ -321,7 +323,8 @@ GET /api/health에 mcp_status를 더합니다. 모양은 {"connected": true, "au
 - 연결하지 못하면 connected는 false, authStatus는 "unreachable"이고 error에 확인한 곳마다 무엇이 없었는지와 할 일(notebooklm-mcp 설치나 NOTEBOOKLM_MCP_COMMAND 지정)을 적습니다.
 - 스위치가 off면 실행 파일을 띄우지 않고 authStatus를 "off"로 둡니다. mock과 live는 GET /api/health를 받을 때 같은 방법으로 연결해 상태를 봅니다. 그래서 실행 파일을 설치한 PC에서는 mock이어도 화면을 열 때 서버가 그 프로그램을 띄웁니다. 이때 부르는 것은 도구 목록과 server_info뿐이고 질문은 보내지 않습니다. mock에서 연결하지 못해도 예시 결과는 그대로 동작합니다.
 - GET /api/health는 연결 확인이 끝난 뒤에 답합니다. 화면은 이 답을 받은 뒤에 연동 상태 줄을 보여 주므로 그동안 화면 알림 줄의 연동 상태가 비어 있을 수 있습니다.
-- server_info 응답에 든 메일 주소는 빼고 보냅니다.
+- 연결되면 mcp_status에 availableTools(MCP 도구 이름 목록)와 serverInfo(server_info 응답 JSON)도 함께 담습니다. 완료 브랜치 코드도 그렇게 답해서 도구 이름이 수십 개 보이는 것이 맞습니다.
+- server_info 응답에 든 메일 주소는 빼고 보냅니다. 이름이 email인 항목과 값 전체가 메일 주소 꼴인 항목을 뺍니다.
 
 ### 질문
 
