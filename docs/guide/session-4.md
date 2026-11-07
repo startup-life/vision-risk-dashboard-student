@@ -158,7 +158,7 @@ runtime 폴더는 git에 올리지 않고 브라우저 주소로도 열리지 �
 - phase: EVIDENCE_CHECK(화면 이름 "NotebookLM 대조"). 3회차 문서 "이력 한 줄"의 단계 이름 목록에도 이 줄을 더해, 상세 감사 이력의 단계 칸에 EVIDENCE_CHECK가 아니라 "NotebookLM 대조"가 보이게 합니다
 - action_name: "기준 근거 대조"
 - summary: "기준 C-01 대조 (충족여부: true)" 모양. true나 false 자리에는 그 결과의 sufficient 값을 씁니다
-- operator: "NotebookLM MCP", mock이면 "NotebookLM MCP (mock)"
+- operator: "NotebookLM MCP", mock이면 "NotebookLM MCP (Synthetic)"으로 저장합니다. 상세 감사 이력의 작업자 칸은 끝의 "(Synthetic)"을 "(mock)"으로 바꿔 보여 줍니다
 
 ### 돌려주는 데이터
 
@@ -372,4 +372,5 @@ live에서 match와 sufficient는 같은 값입니다. 근거 충분이면 둘 �
 ## 만들지 않는 것
 
 - 답변 글 꾸밈(제목 줄 굵게, 목록 줄을 "• "로, 굵은 글씨, 인용 줄 모양): 혼자 쓰는 연습용 앱이라 만들지 않습니다. 답변은 받은 글자 그대로 보여 주고 `**` 같은 기호가 보여도 됩니다.
+- 요청을 보내다 응답을 받지 못했을 때 작업 목록에서 같은 요청을 찾아 상태를 정하는 처리("전송 상태 확인 필요", "기준 근거 대조 요청을 다시 보내 주세요"): 혼자 쓰는 연습용 앱이라 만들지 않습니다. 완료 브랜치 코드의 화면에 이 처리(unknown_dispatch)가 있어도 따라 만들지 않습니다.
 - README의 4회차 절(NotebookLM 연결 안내): 혼자 쓰는 연습용 앱이라 만들지 않습니다. 실제 연결 준비 명령은 사용자가 직접 칩니다.
