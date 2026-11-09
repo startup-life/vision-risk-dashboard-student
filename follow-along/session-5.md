@@ -8,9 +8,9 @@
 
 4회차를 끝낸 프로젝트 폴더(`C:\vision-ai\vision-risk-dashboard`)에서 이어 합니다.
 
-준비물: 개인 Google 계정 하나, OnePort API 키(`sk-`로 시작, 받는 방법은 강사 안내를 따릅니다), 4회차까지 쓴 설정 파일(`config/local-connection.json`)과 사진 저장소 폴더, 켜 둔 서버 창, ego 브라우저.
+준비물: 개인 Google 계정 하나, OnePort API 키(`sk-`로 시작, 받는 방법은 강사 안내를 따릅니다), 4회차까지 쓴 설정 파일(`config/local-connection.json`)과 사진 저장소 폴더, 서버 창(AI가 열어 서버를 켠 창이며, 없으면 아래 1번에서 엽니다), ego 브라우저.
 
-1. 서버 켜고 지난 회차 확인: 서버 창(서버 창을 닫았으면 PowerShell 창을 새로 열어 `cd C:\vision-ai\vision-risk-dashboard`로 이동한 창)에서 `npm.cmd start`를 치고 ego 브라우저에서 http://127.0.0.1:8765 를 엽니다. 사건이 없으면 홈의 "사진 등록"으로 사진 1장짜리 사건을 하나 등록합니다. 사건 상세에서 "관련 기준 찾기"를 누르면 결과가 나오는지 봅니다.
+1. 서버 켜고 지난 회차 확인: 서버 창(서버가 켜진 창)이 있으면 ego 브라우저에서 http://127.0.0.1:8765 를 엽니다. 서버 창이 없으면 아래 5-1을 먼저 보내고, 답이 오면 AI에게 "서버를 켜 주세요."라고 보낸 뒤 같은 주소를 엽니다. 이때는 5-2부터 이어 갑니다. 사건이 없으면 홈의 "사진 등록"으로 사진 1장짜리 사건을 하나 등록합니다. 사건 상세에서 "관련 기준 찾기"를 누르면 결과가 나오는지 봅니다.
 2. Google 계정 준비: 개인 Google 계정 하나를 준비하고 ego 브라우저에서 로그인해 둡니다. 4회차 NotebookLM에 쓴 계정이어도 됩니다. 학교·회사 계정은 웹앱을 "모든 사용자"로 여는 설정이 막힐 수 있습니다.
 
 이번 회차에 알아 둘 것은 아래와 같습니다.
@@ -389,9 +389,9 @@ Google 쪽 코드가 OnePort를 거쳐 Gemini를 부를 수 있도록, OnePort �
 ```
 
 - 하는 일: 설정 파일의 저장소·Gemini 스위치가 `live`가 되고, NotebookLM 스위치는 노트북 ID가 있으면 `live`, 없으면 `off`가 됩니다.
-- 목표: 서버를 다시 켜면 사건 저장은 Google 시트와 Drive로, 판독은 실제 Gemini로 갑니다. 5-30에서 이 연결로 처음부터 끝까지 해 봅니다.
-- 완료 기준: 서버를 다시 켜면 서버 창에 "연동 상태: 저장소 Google 시트 · Gemini live · NotebookLM live"(NotebookLM을 off로 했으면 "NotebookLM 꺼짐")가 나오고, 이어서 "Gemini live" 뒤에 판독 모델 이름이 붙은 줄이 한 번 더 나옵니다. http://127.0.0.1:8765/api/records 에 `"success":true`와 `"records":[]`가, http://127.0.0.1:8765/api/health 에 `"gas_configured":true`가 보입니다.
-- 막히면: 머리말 연결 표시가 "설정 필요"이거나 아래 `/api/records`에 `GAS_AUTH_REQUIRED`가 보이면 5-26과 5-27을 다시 확인합니다.
+- 목표: AI가 서버를 다시 켜면 사건 저장은 Google 시트와 Drive로, 판독은 실제 Gemini로 갑니다. 5-30에서 이 연결로 처음부터 끝까지 해 봅니다.
+- 완료 기준: AI가 연 새 서버 창에 "연동 상태: 저장소 Google 시트 · Gemini live · NotebookLM live"(NotebookLM을 off로 했으면 "NotebookLM 꺼짐")가 나오고, 이어서 "Gemini live" 뒤에 판독 모델 이름이 붙은 줄이 한 번 더 나옵니다. http://127.0.0.1:8765/api/records 에 `"success":true`와 `"records":[]`가, http://127.0.0.1:8765/api/health 에 `"gas_configured":true`가 보입니다.
+- 막히면: 머리말 연결 표시가 "설정 필요"이거나 아래 `/api/records`에 `GAS_AUTH_REQUIRED`가 보이면 5-26과 5-27을 다시 확인합니다. 새 서버 창이 열리지 않았으면 "서버를 다시 켜 주세요."라고 보냅니다.
 
 ## 5-30. 실제 연결로 끝까지 (직접 하기)
 
@@ -409,9 +409,10 @@ Google 쪽 코드가 OnePort를 거쳐 Gemini를 부를 수 있도록, OnePort �
 
 ## 5-31. 내 코드 남겨 두기 (직접 하기)
 
-1. 서버를 끄고 서버 창에서 아래를 한 줄씩 칩니다.
+1. 서버 창이 아닌 PowerShell 창(5-23에서 연 창이 있으면 그 창, 없으면 시작 메뉴에서 새로 연 창)에서 아래를 한 줄씩 칩니다. 서버 창은 그대로 둡니다.
 
 ```powershell
+cd C:\vision-ai\vision-risk-dashboard
 git add -A
 git commit -m "5회차 사진 판독과 시트 저장"
 ```
@@ -464,7 +465,7 @@ gas:deploy는 실행하지 마세요.
 
 - 완료 기준: `Pushed 2 files`, "같은 배포를 새 버전으로 갱신했습니다. 주소는 그대로입니다.", "Google 시트와 비공개 Drive 폴더를 준비했습니다."가 차례로 나옵니다. OnePort 키를 넣었으면 "OnePort API 키를 GAS 스크립트 속성 ONEPORT_API_KEY에 저장했습니다."도 나옵니다.
 - 막히면: `invalid_grant`가 나오면 5-23으로 다시 로그인한 뒤 이 프롬프트를 다시 보냅니다. "권한 승인 전입니다"가 나오면 5-27의 첫 권한 승인을 한 뒤 `npm.cmd run gas:init`만 다시 실행해 달라고 보냅니다. OnePort 키를 아직 넣지 않았으면 5-28을 합니다.
-- 서버를 켜서 서버 창의 연동 상태를 봅니다. 저장소가 "로컬 저장"이면 5-29의 프롬프트를 보냅니다.
+- AI에게 "서버를 켜 주세요."라고 보내고, 서버 창의 연동 상태를 봅니다. AI가 "이미 켜져 있습니다"라고 답하면 지금 서버 창에서 봅니다. 저장소가 "로컬 저장"이면 5-29의 프롬프트를 보냅니다.
 
 #### 나. 이어서 배포하기
 
@@ -480,4 +481,4 @@ Google 연결 없이 6회차를 이어 하기 위해, 설정 파일의 저장소
 자세한 내용은 docs/guide/session-5.md의 "설정 스위치"를 참고해 주세요.
 ```
 
-- 완료 기준: 서버를 다시 켜면 서버 창에 "연동 상태: 저장소 로컬 저장 · Gemini mock · NotebookLM mock"이 나옵니다.
+- 완료 기준: AI가 연 새 서버 창에 "연동 상태: 저장소 로컬 저장 · Gemini mock · NotebookLM mock"이 나옵니다. AI가 서버를 다시 켜지 않았으면 "서버를 다시 켜 주세요."라고 보냅니다.
