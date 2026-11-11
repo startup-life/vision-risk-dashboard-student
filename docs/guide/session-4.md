@@ -27,13 +27,13 @@ NOTEBOOKLM_MODE 값은 off(꺼짐), mock(예시 결과), live(실제 NotebookLM)
 
 3회차 문서의 GET /api/health modes에는 notebooklm을 더해 {"storage": "mock", "notebooklm": "mock"} 모양으로 답합니다.
 
-live인데 MCP 실행 파일을 찾지 못하면 서버 창의 줄만 "연동 상태: 저장소 로컬 저장 · NotebookLM live(실행 파일을 찾지 못함: notebooklm-mcp를 설치하거나 NOTEBOOKLM_MCP_COMMAND를 지정)"으로 씁니다.
+스위치가 live인데 MCP 실행 파일을 찾지 못하면 서버 창의 줄만 "연동 상태: 저장소 로컬 저장 · NotebookLM live(실행 파일을 찾지 못함: notebooklm-mcp를 설치하거나 NOTEBOOKLM_MCP_COMMAND를 지정)"으로 씁니다.
 
 ## 사건 상세의 세 단계
 
 확인 순서는 "1. 사진", "2. 관련 기준 확인 (NotebookLM)", "3. 내 판단 남기기"입니다. 3회차 문서의 "2. 내 판단 남기기" 칸은 "3. 내 판단 남기기" 칸으로 바꿉니다. 그 칸의 판단·조치 표시와 단추는 3회차 그대로입니다.
 
-진행 표시와 그 아래 안내 문구는 상세를 열 때 아래 목록에서 위에서부터 처음으로 맞는 항목으로 정합니다.
+진행 표시와 그 아래 안내 문구는 상세를 열 때 아래 목록을 위부터 살펴 처음으로 맞는 항목으로 정합니다.
 
 1. review_summary.queue가 confirmed_risk(대응 필요): 강조하는 단계 없음, "어떤 조치를 했는지 기록해 주세요."
 2. 판단이 있고 queue가 additional_check가 아님: 강조하는 단계 없음, "판단이 저장됐습니다. 기록을 다시 확인할 수 있습니다."
@@ -124,7 +124,7 @@ live인데 MCP 실행 파일을 찾지 못하면 서버 창의 줄만 "연동 �
 
 처리는 질문 글과 고른 기준으로 결과를 만드는 일입니다. 스위치가 mock이면 "예시 결과(mock)" 절의 결과를 작업의 result에 넣습니다. 실제 연결을 아직 만들지 않았을 때 live로 요청하면 작업을 failed로 끝냅니다. 이유는 "실제 NotebookLM 연결이 아직 없습니다. NOTEBOOKLM_MODE를 mock으로 두세요."입니다.
 
-기준 번호가 확인 기준 목록에 없으면 작업을 failed로 끝내고 이유는 "Unknown standard_id: (기준 번호)"입니다. 실패한 작업의 error.code는 "PROVIDER_ERROR"로 쓰고 completed_at에 끝난 시각을 넣습니다.
+기준 번호가 확인 기준 목록에 없으면 작업을 failed로 끝냅니다. 이유는 "Unknown standard_id: (기준 번호)"입니다. 실패한 작업의 error.code는 "PROVIDER_ERROR"로 쓰고 completed_at에 끝난 시각을 넣습니다.
 
 ### 작업을 보는 주소
 
@@ -223,7 +223,7 @@ review_summary에는 evidence(가장 최근 결과의 standard_id, source_id, qu
 
 화면은 인용문을 확인 기준 목록과 비교해 그 문장이 든 기준을 "인용한 기준: C-01 머리 보호구"처럼 적습니다. 비교할 때 공백 차이는 무시합니다(이어진 공백은 하나로 보고 앞뒤 공백은 뺍니다).
 
-1. 먼저 기준의 canonical_quote가 인용문 안에 통째로 들어 있는 기준을 찾습니다. 하나라도 있으면 그 기준들이 인용한 기준입니다. 이 경우를 "통째로 든 경우"라고 부릅니다.
+1. 먼저 canonical_quote가 인용문 안에 통째로 들어 있는 기준을 찾습니다. 하나라도 있으면 그 기준들이 인용한 기준입니다. 이 경우를 "통째로 든 경우"라고 부릅니다.
 2. 없으면 기준의 "(id) (name)", canonical_quote, notes를 공백으로 이어 붙인 글 안에 인용문이 들어 있는 기준을 찾습니다.
 
 여러 기준이면 쉼표로 이어 모두 적습니다. 없으면 "등록된 기준 문장에서 찾지 못했습니다", 인용문이 비었으면 "인용문 없음"입니다.

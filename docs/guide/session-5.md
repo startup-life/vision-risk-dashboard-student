@@ -50,7 +50,7 @@ STORAGE_MODE=live인데 GAS_WEBAPP_URL이 비어 있으면 사건 저장·조회
 
 ## 저장소 동작 이름
 
-서버는 데이터 주소로 받은 입력을 검사한 뒤 저장소 일을 아래 동작 이름으로 부릅니다. 지금은 모든 동작이 내 컴퓨터 저장소를 읽고 씁니다. 뒤에서 저장소 스위치가 live일 때 같은 이름을 Google 쪽 코드로 보내려면 이 층이 먼저 있어야 합니다. 화면과 기능은 바뀌지 않고 이미 이렇게 나뉘어 있으면 그대로 둡니다.
+서버는 데이터 주소로 받은 입력을 검사한 뒤 아래 동작 이름으로 저장소를 부릅니다. 지금은 모든 동작이 내 컴퓨터 저장소를 읽고 씁니다. 뒤에서 저장소 스위치가 live일 때 같은 이름을 Google 쪽 코드로 보내려면 이 층이 먼저 있어야 합니다. 화면과 기능은 바뀌지 않고 이미 이렇게 나뉘어 있으면 그대로 둡니다.
 
 - create_record: 받는 항목은 request_id, location, category, memo, images(사진마다 base64, mimeType, filename)입니다. 답은 `{"success": true, "idempotent": false, "record_id": "...", "request_id": "...", "status": "REGISTERED", "created_at": "...", "image_count": 1, "drive_file_ids": [...], "version": 1, "updated_at": "...", "record": {...}}`입니다. 같은 request_id로 다시 오면 idempotent를 true로 두고 저장된 사건을 돌려줍니다.
 - update_record: 받는 항목은 record_id, request_id, operator와 바꾸는 값(location, category, memo)입니다. 답은 `{"success": true, "idempotent": false, "status": "updated", "record_id": "...", "version": 2, "updated_at": "...", "record": {...}}`입니다.
@@ -224,7 +224,7 @@ update_record의 요청 항목은 record_id, request_id, operator와 바꾸는 �
 ### 기준 확인·판단·조치 저장과 작업 맞춰 보기
 
 - 요청 항목은 셋 다 record_id, request_id에 더해 save_evidence_check가 input_version, standard_id, notebook_id, source_id, source_name, answer, references, quote, match, sufficient, notes, save_review가 decision, basis, followup_note, reviewer, save_action이 action_type(REQUEST 또는 COMPLETE), description, evidence_note, actor입니다.
-- save_evidence_check, save_review, save_action은 해당 탭에 한 줄씩 더합니다. 판정이 네 가지 밖이거나 근거가 비었을 때, 조치 유형·내용이 없거나 조치 완료인데 완료 증빙 메모가 없을 때는 거절합니다. 같은 request_id로 다시 오면 새 줄을 더하지 않고 저장된 것을 돌려줍니다. 답 모양은 위 "저장소 동작 이름"과 같습니다.
+- save_evidence_check, save_review, save_action은 해당 탭에 한 줄씩 더합니다. 판정이 네 가지에 속하지 않거나 근거가 비었을 때, 조치 유형·내용이 없거나 조치 완료인데 완료 증빙 메모가 없을 때는 거절합니다. 같은 request_id로 다시 오면 새 줄을 더하지 않고 저장된 것을 돌려줍니다. 답 모양은 위 "저장소 동작 이름"과 같습니다.
 - 시트에 쓰다 실패하면 save_evidence_check는 INTERNAL_ERROR와 "근거 확인 저장 실패: (이유)", save_review는 STORAGE_FAILED와 "판단 기록을 시트에 저장하지 못했습니다: (이유)", save_action은 STORAGE_FAILED와 "조치 기록을 시트에 저장하지 못했습니다: (이유)"입니다.
 - reconcile_job은 판독(analyze)과 기준 확인 작업(evidence_check)의 저장 결과를 request_id로 찾아 돌려줍니다. 요청 항목과 답은 위 "사진 판독 요청"의 저장소 동작 reconcile_job과 같고 job_type이 없으면 analyze로 봅니다.
 

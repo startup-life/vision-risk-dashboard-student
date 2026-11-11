@@ -203,7 +203,7 @@ Google 시트에서도 사건을 등록하고 볼 수 있도록, Google 쪽 코�
 ```
 
 - 하는 일: `Code.gs`에 사건 등록·정보 수정, 사건 목록·상세·사진 꺼내기, 사건 상태 계산이 더해집니다.
-- 목표: 저장소 스위치가 `live`이면 서버가 이 동작들을 Google 쪽에 맡겨, 사건은 시트에, 사진은 비공개 Drive 폴더에 저장됩니다. 답 모양이 이 PC 저장소와 같아 화면은 바꾸지 않습니다.
+- 목표: 저장소 스위치가 `live`이면 서버가 이 동작들을 Google 쪽에 맡기므로 사건은 시트에, 사진은 비공개 Drive 폴더에 저장됩니다. 답 모양이 이 PC 저장소와 같아 화면은 바꾸지 않습니다.
 - 완료 기준: `Code.gs`에서 Ctrl+F로 `create_record`, `update_record`, `get_records`, `get_image`, `사진 합계가 3MB보다`를 찾으면 나옵니다.
 
 ## 5-15. Google 쪽 코드: 기준 확인·판단·조치 저장
@@ -225,7 +225,7 @@ Google 시트에서도 사건을 등록하고 볼 수 있도록, Google 쪽 코�
 자세한 내용은 docs/guide/session-5.md의 "Google 쪽의 Gemini 판독(analyze_gemini)"을 참고해 주세요.
 ```
 
-- 하는 일: `Code.gs`에 사건 사진과 지시문을 OnePort로 보내 받은 사진 설명을 시트에 저장하는 판독 기능, 실패 안내 문장, 판독 모델 설정 알려 주기가 더해집니다.
+- 하는 일: `Code.gs`에 사건 사진과 지시문을 OnePort로 보내 받은 사진 설명을 시트에 저장하는 판독 기능, 실패 안내 문장, 판독 모델 설정을 알려 주는 기능이 더해집니다.
 - 목표: 5-29에서 Gemini 스위치를 `live`로 바꾸면 서버가 판독을 이 기능에 맡깁니다. 판독 모델 이름은 서버 창의 연동 상태 줄과 2번 구역에 보입니다.
 - 완료 기준: `Code.gs`에서 Ctrl+F로 `analyze_gemini`, `oneport.kr`, `산업안전 관찰을 보조하는 AI`, `크레딧이 부족해`, `gemini_settings`를 찾으면 나옵니다.
 
@@ -375,7 +375,7 @@ Google 쪽 코드가 OnePort를 거쳐 Gemini를 부를 수 있도록, OnePort �
 
 - 하는 일: 설정 파일의 OnePort 키 값이 내 키로 바뀌고, 내 Google Drive에 기록용 스프레드시트와 비공개 사진 폴더가 생기며, 키가 Google 쪽 설정에 저장됩니다.
 - 목표: 5-30에서 사건이 이 스프레드시트와 폴더에 저장되고, Google 쪽 코드가 여기 저장한 키로 OnePort를 거쳐 Gemini를 부릅니다.
-- 직접 하기: AI가 기다리겠다고 답하면, 5-22에서 준비한 키를 다음 메시지로 붙여 넣어 보냅니다. 키를 붙여 넣는 대화는 화면 공유하거나 캡처하지 않습니다.
+- 직접 하기: AI가 기다리겠다고 답하면, 5-22에서 준비한 키를 다음 메시지로 붙여 넣어 보냅니다. 키를 붙여 넣는 대화는 화면을 공유하거나 캡처하지 않습니다.
 - 완료 기준:
   - AI가 키 값을 쓰지 않고 설정 파일을 바꿨다고 알립니다. "Google 시트와 비공개 Drive 폴더를 준비했습니다."와 "OnePort API 키를 GAS 스크립트 속성 ONEPORT_API_KEY에 저장했습니다."가 나옵니다.
   - 내 Google Drive에 `Vision_Risk_Records_Master_날짜` 스프레드시트가 생기고, 열면 `records`, `ai_drafts`, `evidence_checks`, `final_reviews`, `actions`, `history` 탭이 있습니다. 처음부터 있던 빈 탭이 하나 더 있어도 됩니다.
