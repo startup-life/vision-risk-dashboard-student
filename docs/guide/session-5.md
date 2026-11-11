@@ -98,7 +98,7 @@ POST /api/records/(사건번호)/analyze: 4회차의 관련 기준 확인 요청
 
 확인 순서는 "1. 사진", "2. AI 사진 설명 (Gemini)", "3. 관련 기준 확인 (NotebookLM)", "4. 내 판단 남기기"입니다.
 
-"지금 버전"의 설명이나 결과는 판독하거나 확인한 사건 정보 버전이 지금 사건 버전과 같은 것입니다. 다르면 "수정 전" 것입니다.
+"지금 버전"의 설명이나 결과는 판독하거나 확인한 사건 정보 버전이 지금 사건 버전과 같은 것입니다. 다르면 "수정 전"인 것입니다.
 
 - 처음 열 때 단계: 사진이 없으면 1, 지금 버전의 사진 설명이 없으면 2, 지금 버전의 기준 확인 결과가 없으면 3, 아니면 4입니다. 꺼진 연동의 단계는 건너뜁니다. 연동 상태(GET /api/health)를 받기 전에 정한 처음 단계는 사용자가 "다음" 단추를 누르기 전이면 연동 상태를 받은 뒤 다시 정합니다. 판단을 이미 저장한 사건은 4회차처럼 완료·조치 상태를 따릅니다.
 - 안내 문구: 2단계 "Gemini 사진 설명을 확인해 주세요.", 3단계 "AI 결과를 확인했다면, NotebookLM으로 관련 기준을 찾아 사진과 비교해 주세요.", 4단계 "사진과 기준을 비교하고, 직접 확인한 판단을 남겨주세요."
@@ -185,7 +185,7 @@ action은 setup, set_oneport_key, create_record, update_record, get_records, get
 
 ### 시트와 비공개 폴더 준비
 
-setup(함수 이름 initialSetup): 내 Drive에 스프레드시트 "Vision_Risk_Records_Master_(오늘 날짜 yyyyMMdd)"와 폴더 "Vision_Risk_Records_Private_(스프레드시트 ID 앞 8글자)"를 만들고 두 ID를 스크립트 속성 SPREADSHEET_ID, DRIVE_FOLDER_ID에 저장합니다. 이미 만든 것이 있으면 그대로 쓰고 빠진 탭과 열만 끝에 더합니다. 시트와 폴더는 비공개로 둡니다. 잠금 안에서 해서 두 번 불려도 하나만 생깁니다.
+setup(함수 이름 initialSetup): 내 Drive에 스프레드시트 "Vision_Risk_Records_Master_(오늘 날짜 yyyyMMdd)"와 폴더 "Vision_Risk_Records_Private_(스프레드시트 ID 앞 8글자)"를 만들고 두 ID를 스크립트 속성 SPREADSHEET_ID, DRIVE_FOLDER_ID에 저장합니다. 이미 만든 것이 있으면 그대로 쓰고 빠진 탭과 열만 끝에 더합니다. 시트와 폴더는 비공개로 둡니다. 잠금 안에서 처리하므로 두 번 불려도 하나만 생깁니다.
 
 요청은 `{"action": "setup"}`이고 다른 항목은 없습니다. 답은 `{"success": true, "spreadsheet_id": "...", "drive_folder_id": "...", "tabs": [...]}`입니다.
 
@@ -243,7 +243,7 @@ update_record의 요청 항목은 record_id, request_id, operator와 바꾸는 �
 
 ### 답 읽기와 저장
 
-OnePort 답의 choices[0].message.content를 답 글로 읽어 JSON을 꺼내고 facts가 비어 있지 않을 때만 설명으로 받습니다. content는 보통 글자이고, 조각 목록이면 조각마다 text를 이어 붙입니다. HTTP 200을 받은 답의 오류는 아래와 같고 status는 모두 "error"입니다. 답 글 안에서 맨 앞 { 부터 맨 뒤 } 까지를 JSON으로 읽습니다.
+OnePort 답의 choices[0].message.content를 답 글로 읽어 JSON을 꺼내고 facts가 비어 있지 않을 때만 설명으로 받습니다. content는 보통 글자이고, 조각 목록이면 조각마다 text를 이어 붙입니다. HTTP 200으로 받은 답에서 생기는 오류는 아래와 같고 status는 모두 "error"입니다. 답 글 안에서 맨 앞 { 부터 맨 뒤 } 까지를 JSON으로 읽습니다.
 
 - 차단(choices[0].finish_reason이 content_filter): CONTENT_BLOCKED, "Gemini 콘텐츠 차단됨: content_filter"
 - 빈 답(답 글이 비었거나 띄어쓰기뿐): EMPTY_RESPONSE, "Gemini 응답에 내용이 없습니다 (finish_reason: (이유, 없으면 unknown))"
@@ -277,7 +277,7 @@ gemini_settings는 요청 항목이 없고 `{"success": true, "model": "(판독 
 
 ### 요청 보내기와 실패 이름
 
-이 기능은 서버 코드와 뒤의 gas:init 명령이 함께 씁니다. 서버 파일 안에 함수 하나(완료 브랜치 코드의 requestGas)로 만들고 module.exports로 내보내, 서버를 켜지 않고도 다른 파일이 require로 불러 쓸 수 있게 합니다. 새 파일로 따로 빼지 않아도 됩니다.
+이 기능은 서버 코드와 뒤의 gas:init 명령에서 함께 씁니다. 서버 파일 안에 함수 하나(완료 브랜치 코드의 requestGas)로 만들고 module.exports로 내보내, 서버를 켜지 않고도 다른 파일이 require로 불러 쓸 수 있게 합니다. 새 파일로 따로 빼지 않아도 됩니다.
 
 보낼 때는 JSON에 action을 넣어 POST로 보내고 301·302·303·307·308 이동이 오면 직접 따라가 결과 주소를 GET으로 받습니다. 주소는 https만 받습니다(127.0.0.1·localhost 시험 서버만 http 허용). 제한 시간은 create_record와 analyze_gemini가 300초, 나머지는 120초입니다.
 
