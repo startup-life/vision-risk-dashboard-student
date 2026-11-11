@@ -1,6 +1,6 @@
 # 5회차 보충 문서: 사진 판독(Gemini)과 Google 시트 저장
 
-이 회차는 사건 상세에 Gemini 사진 설명 단계를 넣고 사건 기록을 Google 시트와 Drive 비공개 폴더에 저장하는 길을 더합니다. 4회차까지 내 컴퓨터 저장소와 NotebookLM으로 만든 앱은 그대로 두고 설정 파일의 스위치로 연습용 결과와 실제 연결을 고릅니다.
+이 회차는 사건 상세에 Gemini 사진 설명 단계를 넣고 사건 기록을 Google 시트와 Drive 비공개 폴더에 저장하는 기능을 더합니다. 4회차까지 내 컴퓨터 저장소와 NotebookLM으로 만든 앱은 그대로 두고 설정 파일의 스위치로 연습용 결과와 실제 연결을 고릅니다.
 Google 쪽 코드는 내 컴퓨터 저장소와 같은 동작 이름, 같은 답 모양을 쓰므로 화면 코드는 어느 저장소를 쓰는지 몰라도 됩니다. 앞 회차 문서와 다른 내용은 이 문서에 "바꿉니다"라고 적었습니다.
 
 이 문서는 3회차 문서(이력, 사건 상태)와 4회차 문서(연동 상태 줄, 작업 대기열, 요청 알림 패널, 관련 기준 확인)를 이어 받습니다. 이 기능을 건드릴 때는 session-3.md와 session-4.md도 읽습니다.
@@ -9,7 +9,7 @@ Google 쪽 코드는 내 컴퓨터 저장소와 같은 동작 이름, 같은 답
 
 ### 설정 파일의 새 키와 스위치
 
-설정 파일에 GAS_WEBAPP_URL(Google 웹앱 주소), ONEPORT_API_KEY(OnePort 키), STORAGE_MODE(저장소 스위치), GEMINI_MODE(Gemini 스위치)를 더합니다. 사진 판독은 Google 쪽 코드가 OnePort를 거쳐 Gemini 모델에 보내므로 키는 OnePort 키(sk-로 시작)를 씁니다.
+설정 파일에 GAS_WEBAPP_URL(Google 웹앱 주소), ONEPORT_API_KEY(OnePort 키), STORAGE_MODE(저장소 스위치), GEMINI_MODE(Gemini 스위치)를 더합니다. 사진 판독은 Google 쪽 코드가 OnePort를 거쳐 Gemini 모델에 사진을 보내므로 키는 OnePort 키(sk-로 시작)를 씁니다.
 
 - STORAGE_MODE는 live(Google 쪽 코드를 거쳐 Google 시트와 Drive에 저장) 또는 mock(지금처럼 이 PC의 파일에 저장)입니다. 비워 두면 live입니다.
 - GEMINI_MODE는 off(쓰지 않음), mock(모의 사진 설명), live(실제 Gemini)입니다. 비워 두면 STORAGE_MODE와 같은 값입니다.
@@ -50,7 +50,7 @@ STORAGE_MODE=live인데 GAS_WEBAPP_URL이 비어 있으면 사건 저장·조회
 
 ## 저장소 동작 이름
 
-서버의 데이터 주소는 입력을 검사한 뒤 저장소 일을 아래 동작 이름으로 부릅니다. 지금은 모든 동작이 내 컴퓨터 저장소를 읽고 씁니다. 뒤에서 저장소 스위치가 live일 때 같은 이름을 Google 쪽 코드로 보내려면 이 층이 먼저 있어야 합니다. 화면과 기능은 바뀌지 않고 이미 이렇게 나뉘어 있으면 그대로 둡니다.
+서버는 데이터 주소로 받은 입력을 검사한 뒤 저장소 일을 아래 동작 이름으로 부릅니다. 지금은 모든 동작이 내 컴퓨터 저장소를 읽고 씁니다. 뒤에서 저장소 스위치가 live일 때 같은 이름을 Google 쪽 코드로 보내려면 이 층이 먼저 있어야 합니다. 화면과 기능은 바뀌지 않고 이미 이렇게 나뉘어 있으면 그대로 둡니다.
 
 - create_record: 받는 항목은 request_id, location, category, memo, images(사진마다 base64, mimeType, filename)입니다. 답은 `{"success": true, "idempotent": false, "record_id": "...", "request_id": "...", "status": "REGISTERED", "created_at": "...", "image_count": 1, "drive_file_ids": [...], "version": 1, "updated_at": "...", "record": {...}}`입니다. 같은 request_id로 다시 오면 idempotent를 true로 두고 저장된 사건을 돌려줍니다.
 - update_record: 받는 항목은 record_id, request_id, operator와 바꾸는 값(location, category, memo)입니다. 답은 `{"success": true, "idempotent": false, "status": "updated", "record_id": "...", "version": 2, "updated_at": "...", "record": {...}}`입니다.
@@ -175,7 +175,7 @@ doGet은 기록을 읽지 않고 `{"status": "ok", "message": "권한 승인이 
 
 action은 setup, set_oneport_key, create_record, update_record, get_records, get_record, get_image, save_evidence_check, save_review, save_action, reconcile_job, analyze_gemini, gemini_settings입니다. 이름은 서버의 내 컴퓨터 저장소 동작 이름과 같고 입력 검사·답 모양·이력도 내 컴퓨터 저장소와 같게 합니다. 저장만 시트와 Drive로 합니다. 요청 항목 이름은 서버가 내 컴퓨터 저장소 동작에 넘기는 이름을 그대로 쓰고 각 일의 항목은 아래 절에 적었습니다. 입력 검사의 오류 문장은 서버의 같은 검사 문장을 그대로 쓰고 error_code는 BAD_REQUEST입니다. 없는 사건은 NOT_FOUND와 "기록을 찾지 못했습니다. 목록에서 다시 골라 주세요."입니다. 이 문서에 없는 입력 규칙과 문장은 session-2.md, session-3.md, session-4.md와 서버 코드에서 찾습니다.
 
-시트 읽기·쓰기 공통 규칙을 아래에 적었습니다. 뒤의 일들이 함께 쓰므로 이 틀에 도우미로 만듭니다(시트 값 넣기와 읽기, 잠금 잡기, 탭 가져오기, 사건 번호로 탭의 줄을 항목 이름 객체로 읽기, 이력 한 줄 더하기, 사건 처리 상태 바꾸기).
+시트에서 읽고 시트에 쓰는 공통 규칙을 아래에 적었습니다. 뒤의 동작들에서 함께 쓰므로 이 틀에 도우미로 만듭니다(시트 값 넣기와 읽기, 잠금 잡기, 탭 가져오기, 사건 번호로 탭의 줄을 항목 이름 객체로 읽기, 이력 한 줄 더하기, 사건 처리 상태 바꾸기).
 
 - 시트에 글을 쓸 때 =, +, -, @, 탭, 줄바꿈(CR), 숫자로 시작하는 글은 앞에 '를 붙여 글자 그대로 저장하고 읽을 때는 그 '를 뗍니다. 수식이나 숫자로 바뀌지 않게 하려는 것입니다. 사진 파일 ID 목록은 JSON 글자로 저장합니다.
 - 쓰는 일은 스크립트 잠금으로 하나씩 처리합니다. 10초 기다려도 잠금을 못 잡으면 LOCK_TIMEOUT입니다.
@@ -189,7 +189,7 @@ setup(함수 이름 initialSetup): 내 Drive에 스프레드시트 "Vision_Risk_
 
 요청은 `{"action": "setup"}`이고 다른 항목은 없습니다. 답은 `{"success": true, "spreadsheet_id": "...", "drive_folder_id": "...", "tabs": [...]}`입니다.
 
-시트 탭은 records, ai_drafts, evidence_checks, final_reviews, actions, history입니다. 첫 줄에는 내 컴퓨터 저장소에서 그 목록이 저장하는 항목 이름을 열 제목으로 적습니다. 아래 순서로 둡니다.
+시트 탭은 records, ai_drafts, evidence_checks, final_reviews, actions, history입니다. 첫 줄에는 내 컴퓨터 저장소의 각 목록에 저장하는 항목 이름을 열 제목으로 적습니다. 아래 순서로 둡니다.
 
 - records: record_id, request_id, created_at, location, category, memo, image_count, status, drive_folder_id, drive_file_ids, version, updated_at
 - ai_drafts: draft_id, record_id, request_id, created_at, model, facts, suspected_risk, locations, uncertainty, additional_checks, raw_response, input_version
@@ -313,7 +313,7 @@ status가 "interrupted"인 답에는 interrupted를 true로 둡니다.
 
 ### 화면에 돌려줄 오류 번호
 
-화면에 돌려줄 HTTP 번호는 SETUP_REQUIRED·GAS_AUTH_REQUIRED·GAS_URL_INVALID는 503, RATE_LIMIT_EXCEEDED·LOCK_TIMEOUT은 429, GAS_UNREACHABLE·GAS_NON_JSON_RESPONSE·GAS_HTTP_ERROR는 502, NOT_FOUND는 404, BAD_REQUEST는 400, 그 밖은 500입니다. LOCK_TIMEOUT의 문장은 "다른 저장이 끝나기를 기다리다 시간이 지났습니다. 잠시 뒤 다시 요청하세요(LOCK_TIMEOUT)."로 바꿔 보여 줍니다.
+화면에 돌려줄 HTTP 번호는 다음과 같습니다. SETUP_REQUIRED·GAS_AUTH_REQUIRED·GAS_URL_INVALID는 503, RATE_LIMIT_EXCEEDED·LOCK_TIMEOUT은 429, GAS_UNREACHABLE·GAS_NON_JSON_RESPONSE·GAS_HTTP_ERROR는 502, NOT_FOUND는 404, BAD_REQUEST는 400, 그 밖은 500입니다. LOCK_TIMEOUT의 문장은 "다른 저장이 끝나기를 기다리다 시간이 지났습니다. 잠시 뒤 다시 요청하세요(LOCK_TIMEOUT)."로 바꿔 보여 줍니다.
 
 ### 작업 기록
 
@@ -339,7 +339,7 @@ gas:login은 clasp login, gas:push는 clasp push --force(--force를 빼지 않�
 
 ### gas:create (도우미 스크립트)
 
-빈 임시 폴더 runtime/gas-create를 만들고 clasp create-script --type standalone --title "비전 리스크 대시보드" --rootDir runtime/gas-create로 프로젝트를 만든 뒤 .clasp.json의 rootDir만 gas 폴더로 바꿉니다. clasp가 만들 때 지정한 폴더에 기본 appsscript.json을 받아 우리 파일을 덮어쓰기 때문입니다.
+빈 임시 폴더 runtime/gas-create를 만들고 clasp create-script --type standalone --title "비전 리스크 대시보드" --rootDir runtime/gas-create로 프로젝트를 만든 뒤 .clasp.json의 rootDir만 gas 폴더로 바꿉니다. clasp가 프로젝트를 만들 때 지정한 폴더에 기본 appsscript.json을 받아 우리 파일을 덮어쓰기 때문입니다.
 
 출력에 "Created new script"가 없으면 "clasp가 프로젝트를 만들지 못했습니다. 위 출력을 확인하고, 로그인이 만료됐으면 npm.cmd run gas:login을 다시 실행하세요."로 실패합니다. 성공하면 ".clasp.json이 gas 폴더를 가리키게 했습니다."를 보여 줍니다.
 
