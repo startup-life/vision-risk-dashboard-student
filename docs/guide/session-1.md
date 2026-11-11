@@ -37,7 +37,7 @@ Get-NetTCPConnection -LocalPort 8765 -State Listen -ErrorAction SilentlyContinue
 Get-CimInstance Win32_Process -Filter "ProcessId=(프로세스 번호)" | Select-Object -ExpandProperty CommandLine
 ```
 
-**새 창에서 켜기.** 아래 명령으로 새 PowerShell 창을 열고 그 창에서 서버를 켭니다. 프로젝트 폴더가 `C:\vision-ai\vision-risk-dashboard`가 아니면 그 경로로 바꿉니다.
+**새 창에서 켜기.** 아래 명령으로 새 PowerShell 창을 열고 그 창에서 서버를 켭니다. 프로젝트 폴더가 `C:\vision-ai\vision-risk-dashboard`가 아니면 아래 명령의 경로를 프로젝트 폴더 경로로 바꿉니다.
 
 ```powershell
 Start-Process powershell -ArgumentList '-NoExit','-Command','cd C:\vision-ai\vision-risk-dashboard; npm.cmd start'
@@ -87,13 +87,13 @@ Stop-Process -Id (프로세스 번호)
 ### 화면 바꾸기
 
 - 화면 글은 모두 한국어입니다. 브라우저 탭 제목은 "Vision QC"입니다.
-- 화면은 주소 끝 # 뒤 이름으로 바꿉니다. #dashboard와 # 없음은 홈, #models는 확인 기준 화면이고 모르는 이름은 홈을 보여 줍니다. 뒤 회차 문서가 화면을 더합니다.
+- 화면은 주소 끝 # 뒤 이름으로 바꿉니다. #dashboard와 # 없음은 홈, #models는 확인 기준 화면이고 모르는 이름이면 홈을 보여 줍니다. 뒤 회차 문서가 화면을 더합니다.
 - 주소 끝이 바뀌면 화면을 다시 그립니다. 화면이 바뀌면 맨 위로 올라갑니다. 같은 화면을 다시 그릴 때(예: 데이터를 받은 뒤)는 올라가지 않습니다. 브라우저 뒤로 가기를 누르면 앞 화면으로 돌아갑니다.
 
 ### 서버에 요청하기
 
 - 화면의 모든 요청은 공통 함수 하나를 거칩니다. 이 함수가 연결 표시와 알림 줄이 쓰는 상태(요청 중, 연결됨, 오류)를 바꿉니다.
-- 요청이 여러 개면 모두 끝나야 요청 중이 끝납니다.
+- 요청이 여러 개면 모두 끝나야 요청 중 상태가 끝납니다.
 - 요청을 시작할 때와 끝날 때마다 연결 표시와 알림 줄을 다시 그립니다. 알림 줄은 프롬프트가 요청할 때 만들고, 그 전에는 연결 표시만 다시 그립니다. 화면 전체를 다시 그리지 않아도 됩니다.
 - 요청이 성공하면 오류 상태를 지우고 연결됨으로 둡니다.
 - 서버에 연결하지 못했거나 500번대로 답하면 오류 상태에 이유를 넣습니다. 500번대면 연결됨도 풉니다.
