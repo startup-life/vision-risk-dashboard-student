@@ -391,7 +391,7 @@ Google 쪽 코드가 OnePort를 거쳐 Gemini를 부를 수 있도록, OnePort �
 - 하는 일: 설정 파일의 저장소·Gemini 스위치가 `live`가 되고, NotebookLM 스위치는 노트북 ID가 있으면 `live`, 없으면 `off`가 됩니다.
 - 목표: AI가 서버를 다시 켜면 사건 저장은 Google 시트와 Drive로, 판독은 실제 Gemini로 갑니다. 5-30에서 이 연결로 처음부터 끝까지 해 봅니다.
 - 완료 기준: AI가 연 새 서버 창에 "연동 상태: 저장소 Google 시트 · Gemini live · NotebookLM live"(NotebookLM을 off로 했으면 "NotebookLM 꺼짐")가 나오고, 이어서 "Gemini live" 뒤에 판독 모델 이름이 붙은 줄이 한 번 더 나옵니다. http://127.0.0.1:8765/api/records 에 `"success":true`와 `"records":[]`가, http://127.0.0.1:8765/api/health 에 `"gas_configured":true`가 보입니다.
-- 막히면: 머리말 연결 표시가 "설정 필요"이거나 아래 `/api/records`에 `GAS_AUTH_REQUIRED`가 보이면 5-26과 5-27을 다시 확인합니다. 새 서버 창이 열리지 않았으면 "서버를 다시 켜 주세요."라고 보냅니다.
+- 막히면: 머리말 연결 표시가 "설정 필요"이거나 위 `/api/records`에 `GAS_AUTH_REQUIRED`가 보이면 5-26과 5-27을 다시 확인합니다. 새 서버 창이 열리지 않았으면 "서버를 다시 켜 주세요."라고 보냅니다.
 
 ## 5-30. 실제 연결로 끝까지 (직접 하기)
 
@@ -404,7 +404,7 @@ Google 쪽 코드가 OnePort를 거쳐 Gemini를 부를 수 있도록, OnePort �
 - 완료 기준:
   - 1에서: 스프레드시트 `records` 탭에 한 줄이 생기고, Drive의 `Vision_Risk_Records_Private_`로 시작하는 폴더에 사진 파일이 생깁니다. 상세 화면에 그 사진이 보입니다.
   - 2에서: 알림 패널에 "AI 초안 분석 중"과 지난 시간이 보이고, 새로고침한 뒤에도 같은 요청이 이어 보입니다. 끝나면 "Gemini 관찰 초안"과 "판독 모델: gemini-3.8-flash"가 보이고 `ai_drafts` 탭에 한 줄이 생깁니다.
-  - 3에서: `evidence_checks` 탭과 `final_reviews` 탭에 줄이 생깁니다.
+  - 3에서: `final_reviews` 탭에 줄이 생깁니다. NotebookLM을 켠 경우에는 `evidence_checks` 탭에도 줄이 생깁니다.
 - 막히면: 판독이 "OnePort 호출 한도를 초과했습니다"로 끝나면 안내된 시간 뒤 다시 요청합니다. "AI 초안 요청이 중단됐습니다"가 나오면 안내대로 3분쯤 뒤 사건을 다시 엽니다. 한도 안내가 계속되거나 "OnePort 크레딧이 부족해"로 시작하는 안내가 나오면 강사에게 알립니다. Google 쪽 코드를 고쳤으면 맨 아래 참고의 "Google 쪽 코드 다시 올리기"에서 "가. 다시 올리기" 프롬프트를 보냅니다.
 
 ## 5-31. 내 코드 남겨 두기 (직접 하기)
