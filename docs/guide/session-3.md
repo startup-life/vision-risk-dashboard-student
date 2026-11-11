@@ -172,7 +172,7 @@ additional_check "추가 확인", awaiting_review "검토 대기", confirmed_ris
 
 ### 확인 이유
 
-상세의 상태 배지 옆 괄호 안과 홈 카드의 "확인 이유:" 줄에 같은 글을 씁니다. 화면은 서버가 준 review_summary(queue, context_changed, completion_recorded_after_review)와 마지막 판단으로 아래 표에서 정합니다. 같은 상태 안에서는 위에서부터 먼저 맞는 줄을 씁니다.
+상세의 상태 배지 옆 괄호 안과 홈 카드의 "확인 이유:" 줄에 같은 글을 씁니다. 화면은 서버가 준 review_summary(queue, context_changed, completion_recorded_after_review)와 마지막 판단을 보고 아래 표에서 그 글을 정합니다. 같은 상태 안에서는 위에서부터 먼저 맞는 줄을 씁니다.
 
 상태 계산의 규칙 묶음을 더할 때는 그 묶음의 줄도 함께 만듭니다. 마지막 칸이 그 묶음입니다. 상태 계산만 바꾸고 확인 이유를 그대로 두면 상세에 판단 근거처럼 상태와 맞지 않는 글이 남습니다.
 
