@@ -319,7 +319,7 @@ review_summary에는 evidence(가장 최근 결과의 standard_id, source_id, qu
 
 NotebookLM 도구는 notebooklm-mcp-cli 0.15.6입니다. uv 설치, uv tool install, nlm login, 노트북 만들기는 사용자가 직접 합니다. AI는 이 명령을 실행하지 않습니다.
 
-이 회차에 더해도 되는 패키지는 @modelcontextprotocol/sdk 하나입니다. 설치 명령은 npm.cmd install @modelcontextprotocol/sdk입니다. 설치하면 package-lock.json이 새로 생기거나 바뀝니다. 이 파일은 회차 끝 커밋에 함께 저장합니다.
+이 회차에 더해도 되는 패키지는 @modelcontextprotocol/sdk 하나입니다. 설치 명령은 npm.cmd install @modelcontextprotocol/sdk입니다. 설치하면 package-lock.json이 새로 생기거나 바뀝니다.
 
 ### 실행 파일과 연결
 
