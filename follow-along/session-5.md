@@ -390,8 +390,8 @@ Google 쪽 코드가 OnePort를 거쳐 Gemini를 부를 수 있도록, OnePort �
 
 - 하는 일: 설정 파일의 저장소·Gemini 스위치가 `live`가 되고, NotebookLM 스위치는 노트북 ID가 있으면 `live`, 없으면 `off`가 됩니다.
 - 목표: AI가 서버를 다시 켜면 사건 저장은 Google 시트와 Drive로, 판독은 실제 Gemini로 갑니다. 5-30에서 이 연결로 처음부터 끝까지 해 봅니다.
-- 완료 기준: AI가 연 새 서버 창에 "연동 상태: 저장소 Google 시트 · Gemini live · NotebookLM live"(NotebookLM을 off로 했으면 "NotebookLM 꺼짐")가 나오고, 이어서 "Gemini live" 뒤에 판독 모델 이름이 붙은 줄이 한 번 더 나옵니다. http://127.0.0.1:8765/api/records 에 `"success":true`와 `"records":[]`가, http://127.0.0.1:8765/api/health 에 `"gas_configured":true`가 보입니다.
-- 막히면: 머리말 연결 표시가 "설정 필요"이거나 위 `/api/records`에 `GAS_AUTH_REQUIRED`가 보이면 5-26과 5-27을 다시 확인합니다. 새 서버 창이 열리지 않았으면 "서버를 다시 켜 주세요."라고 보냅니다.
+- 완료 기준: AI가 연 서버 창에 "연동 상태: 저장소 Google 시트 · Gemini live · NotebookLM live"(NotebookLM을 off로 했으면 "NotebookLM 꺼짐")가 나오고, 이어서 "Gemini live" 뒤에 판독 모델 이름이 붙은 줄이 한 번 더 나옵니다. http://127.0.0.1:8765/api/records 에 `"success":true`와 `"records":[]`가, http://127.0.0.1:8765/api/health 에 `"gas_configured":true`가 보입니다.
+- 막히면: 머리말 연결 표시가 "설정 필요"이거나 위 `/api/records`에 `GAS_AUTH_REQUIRED`가 보이면 5-26과 5-27을 다시 확인합니다. 서버가 다시 켜지지 않았으면 "서버를 다시 켜 주세요."라고 보냅니다.
 
 ## 5-30. 실제 연결로 끝까지 (직접 하기)
 
@@ -466,4 +466,4 @@ Google 연결 없이 6회차를 이어서 하기 위해, 설정 파일의 저장
 자세한 내용은 docs/guide/session-5.md의 "설정 스위치"를 참고해 주세요.
 ```
 
-- 완료 기준: AI가 연 새 서버 창에 "연동 상태: 저장소 로컬 저장 · Gemini mock · NotebookLM mock"이 나옵니다. AI가 서버를 다시 켜지 않았으면 "서버를 다시 켜 주세요."라고 보냅니다.
+- 완료 기준: AI가 연 서버 창에 "연동 상태: 저장소 로컬 저장 · Gemini mock · NotebookLM mock"이 나옵니다. AI가 서버를 다시 켜지 않았으면 "서버를 다시 켜 주세요."라고 보냅니다.
