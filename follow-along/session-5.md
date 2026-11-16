@@ -280,10 +280,6 @@ Google 시트에서도 사건을 등록하고 볼 수 있도록, Google 쪽 코�
 - 목표: 저장소 스위치가 `live`이면 서버가 이 동작들을 Google 쪽에 맡기므로 사건은 시트에, 사진은 비공개 Drive 폴더에 저장됩니다. 답 모양이 이 PC 저장소와 같아 화면은 바꾸지 않습니다.
 - 완료 기준: `Code.gs`에서 Ctrl+F로 `create_record`, `update_record`, `get_records`, `get_image`, `사진 합계가 3MB보다`를 찾으면 나옵니다.
 
-![5-14 사건 등록·조회 동작이 추가된 [Code.gs](http://Code.gs) 파일](images/session-5/19-1a02744e-5-14-code-find.png)
-
-5-14 사건 등록·조회 동작이 추가된 [Code.gs](http://Code.gs) 파일
-
 ## 5-15. Google 쪽 코드: 기준 확인·판단·조치 저장
 
 ```text
@@ -294,10 +290,6 @@ Google 시트에서도 사건을 등록하고 볼 수 있도록, Google 쪽 코�
 - 하는 일: `Code.gs`에 기준 확인 결과·판단·조치 저장과, 끝나지 않은 작업을 맞춰 보는 기능이 더해집니다.
 - 목표: 5-30에서 실제 연결로 "관련 기준 찾기"와 "판단 기록하기"를 하면 그 결과가 시트의 `evidence_checks`, `final_reviews` 탭에 남습니다.
 - 완료 기준: `Code.gs`에서 Ctrl+F로 `save_evidence_check`, `save_review`, `save_action`, `reconcile_job`을 찾으면 나옵니다.
-
-![5-15 기준 확인·판단·조치 저장 동작을 추가한 코드 파일](images/session-5/20-693c42a0-5-15-code-actions.png)
-
-5-15 기준 확인·판단·조치 저장 동작을 추가한 코드 파일
 
 ## 5-16. Google 쪽 코드: Gemini 판독
 
@@ -310,10 +302,6 @@ Google 시트에서도 사건을 등록하고 볼 수 있도록, Google 쪽 코�
 - 하는 일: `Code.gs`에 사건 사진과 지시문을 OnePort로 보내 받은 사진 설명을 시트에 저장하는 판독 기능, 실패 안내 문장, 판독 모델 설정을 알려 주는 기능이 더해집니다.
 - 목표: 5-29에서 Gemini 스위치를 `live`로 바꾸면 서버가 판독을 이 기능에 맡깁니다. 판독 모델 이름은 서버 창의 연동 상태 줄과 2번 구역에 보입니다.
 - 완료 기준: `Code.gs`에서 Ctrl+F로 `analyze_gemini`, `oneport.kr`, `산업안전 관찰을 보조하는 AI`, `크레딧이 부족해`, `gemini_settings`를 찾으면 나옵니다.
-
-![5-16 OnePort를 통한 Gemini 판독 코드](images/session-5/21-aad884ee-5-16-gemini-code.png)
-
-5-16 OnePort를 통한 Gemini 판독 코드
 
 ## 5-17. Google 쪽 요청 부품
 
@@ -374,10 +362,6 @@ Google 쪽 코드를 내 Google 계정에 올리기 위해, package.json에 Goog
 - 목표: 5-23 로그인, 5-24 프로젝트 만들기와 코드 올리기, 5-26 편집기 열기에 이 명령을 씁니다. Google 연결 설정 파일은 내 프로젝트 정보라 git에 올리지 않습니다.
 - 완료 기준: `package.json`에 `gas:login`, `gas:push`, `gas:editor`, `gas:create`가 있습니다. `.gitignore`를 열면 `.clasp.json`과 `runtime`이 있습니다.
 
-![5-20 네 가지 Google 명령이 추가된 package.json](images/session-5/25-ebe3beef-5-20-package.png)
-
-5-20 네 가지 Google 명령이 추가된 package.json
-
 ![5-20 연결 설정 파일과 runtime 폴더가 제외된 .gitignore](images/session-5/26-dff4b43b-5-20-ignore.png)
 
 5-20 연결 설정 파일과 runtime 폴더가 제외된 .gitignore
@@ -393,10 +377,6 @@ Google 쪽 코드를 내 Google 계정에 올리기 위해, package.json에 Goog
 - 하는 일: `package.json`에 웹앱 배포, 같은 주소로 갱신, 웹앱 주소 열기, 초기화 명령이 생깁니다. 이번에는 실행하지 않습니다.
 - 목표: 5-25 웹앱 배포, 5-27 첫 권한 승인, 5-28 시트 준비와 OnePort 키 저장, 맨 아래 참고의 다시 올리기에서 이 명령을 씁니다.
 - 완료 기준: `package.json`에 `gas:deploy`, `gas:redeploy`, `gas:open`, `gas:init`이 있습니다.
-
-![5-21 배포, 갱신, 열기, 초기화 명령이 추가된 package.json](images/session-5/27-634c9011-5-21.png)
-
-5-21 배포, 갱신, 열기, 초기화 명령이 추가된 package.json
 
 ## 5-22. OnePort 키 준비와 Apps Script API 켜기 (직접 하기)
 

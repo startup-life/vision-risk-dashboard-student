@@ -61,10 +61,6 @@
 - 목표: 스위치는 4-4에서 mock으로, 4-22에서 off로, 4-28에서 live로 바꿔 가며 쓰고, 노트북 ID와 소스 ID는 4-24에서 채웁니다.
 - 완료 기준: `config` 폴더의 `local-connection.example.json`을 메모장으로 열면 `NOTEBOOKLM_`으로 시작하는 키 네 개가 빈 값("")으로 있습니다.
 
-![4-2 예시 설정 파일의 빈 NotebookLM 설정 키 네 개](images/session-4/05-b9189c98-4-2-example-config-formatted.png)
-
-4-2 예시 설정 파일의 빈 NotebookLM 설정 키 네 개
-
 ## 4-3. 연동 상태 줄
 
 ```text
@@ -545,9 +541,9 @@ NotebookLM이 내 노트북에 없는 문장을 근거로 내세우지 않도록
 
 4-28 실제 요청을 기다리는 동안 표시된 경과 시간
 
-![4-28 실제 요청 진행 중인 알림 패널](images/session-4/42-199358cd-4-28-live-notification.png)
+![4-28 실제 요청이 끝난 뒤의 알림 패널](images/session-4/42-199358cd-4-28-live-notification.png)
 
-4-28 실제 요청 진행 중인 알림 패널
+4-28 실제 요청이 끝난 뒤의 알림 패널
 
 ![4-28 실제 NotebookLM의 근거 확인 결과 (소스 ID가 보이지 않는 위치)](images/session-4/43-0a1fed98-4-28-live-result-no-id.png)
 
