@@ -9,8 +9,8 @@
 - 화면은 HTML·CSS·JavaScript로 public 폴더에 둡니다. public/index.html 한 페이지이고 화면을 그리는 코드는 js 파일(public/app.js)에, 모양은 css 파일(public/style.css)에 따로 둡니다.
 - public/index.html은 문서 언어를 한국어(lang="ko")로 하고 화면 내용은 본문의 빈 자리(id가 app인 div) 안에 코드로 그립니다.
 - 내 프로젝트에 코드가 이미 있으면 서버와 화면 파일의 위치는 그 코드의 폴더 구조를 따릅니다. 완료 브랜치 코드는 courses/vision-96h-v2 폴더 아래(서버는 tools, 화면은 preview)에 있어 이 구조와 다릅니다. 완료 브랜치 코드는 동작만 참고하고 그 폴더 구조로 옮기지 않습니다.
-- npm.cmd start를 치면 server/server.js가 켜집니다(package.json의 start). 서버 창의 시작 줄("현장 리스크 대시보드: …")은 이 시작 파일에서 찍습니다. 완료 브랜치 코드에서는 courses/vision-96h-v2/tools/run-local.cjs가 시작 파일입니다.
-- package.json에는 이름 vision-risk-dashboard, private true, type commonjs, scripts의 start "node server/server.js", engines의 node ">=22.9.0"을 적습니다. 더할 패키지가 없으므로 dependencies는 비워 둡니다.
+- npm.cmd start를 치면 server/server.js가 켜집니다(package.json의 start). node --watch로 켜서 server 폴더의 파일이 바뀌면 같은 창에서 서버가 알아서 다시 켜집니다. 서버 창의 시작 줄("현장 리스크 대시보드: …")은 이 시작 파일에서 찍습니다. 완료 브랜치 코드에서는 courses/vision-96h-v2/tools/run-local.cjs가 시작 파일입니다.
+- package.json에는 이름 vision-risk-dashboard, private true, type commonjs, scripts의 start "node --watch --watch-preserve-output server/server.js"(--watch-preserve-output은 다시 켤 때 서버 창의 앞 줄을 지우지 않게 합니다), engines의 node ">=22.9.0"을 적습니다. 더할 패키지가 없으므로 dependencies는 비워 둡니다.
 - git에 올리지 않는 파일은 node_modules 폴더, .env, config/local-connection.json입니다(.gitignore). 예시 파일 config/local-connection.example.json은 git에 올립니다.
 
 ## 서버 켜기
@@ -23,38 +23,49 @@
 
 서버는 프롬프트나 사용자가 켜 달라고 할 때 AI가 켭니다. AI의 터미널에서 켜지 않고, 새 PowerShell 창을 열어 그 창에서 켭니다. 이 새 창이 서버 창입니다. 사용자는 이 창에서 서버가 보여 주는 줄과 빨간 오류 줄을 봅니다. 2회차부터 회차를 시작할 때 사용자가 "서버를 켜 주세요."라고 보내면 같은 순서로 켭니다.
 
-**켜기 전 확인.** 8765번 포트를 듣는 프로세스가 있는지 봅니다.
+서버는 node --watch로 켭니다("앱과 폴더"의 package.json). server 폴더의 파일이 바뀌면 서버가 같은 창에서 알아서 다시 켜지므로, AI는 서버를 다시 켜려고 서버를 끄거나 새 창을 열지 않습니다. 서버 창은 하나만 둡니다.
+
+**켜기 전 확인.** 먼저 package.json의 start가 "앱과 폴더"의 값(`node --watch --watch-preserve-output server/server.js`)인지 봅니다. 다르면 그 값으로 고칩니다. 그다음 8765번 포트를 듣는 프로세스가 있는지 봅니다.
 
 ```powershell
 Get-NetTCPConnection -LocalPort 8765 -State Listen -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess -Unique
 ```
 
-- 아무것도 나오지 않으면 아래 "새 창에서 켜기"로 켭니다.
-- 프로세스 번호가 나오면 아래 명령으로 그 번호의 명령 줄을 봅니다. 명령 줄에 package.json의 start에 적힌 시작 파일(이 문서의 구조면 `server/server.js`)이 있으면 서버가 이미 켜져 있는 것입니다. 새로 켜지 않고 "이미 켜져 있습니다"라고 알립니다.
+- 프로세스 번호가 나오면 아래 명령으로 그 번호의 명령 줄을 봅니다. 명령 줄에 package.json의 start에 적힌 시작 파일(이 문서의 구조면 `server/server.js`)이 있으면 서버가 이미 켜져 있는 것입니다. 새로 켜지 않고 "이미 켜져 있습니다"라고 알립니다. 이때 "감시 확인"에 아무것도 나오지 않으면 `--watch` 없이 켠 예전 방식 서버이니 "다시 켤 때"의 마지막 항목대로 합니다.
 - 그 시작 파일이 없으면 다른 프로그램이 8765번 포트를 쓰고 있는 것입니다. 그 프로그램을 끄지 않고 서버도 켜지 않으며, 다른 프로그램이 8765번 포트를 쓰고 있으니 강사에게 알려 달라고 사용자에게 말합니다.
+- 아무것도 나오지 않으면 "감시 확인"을 합니다. 줄이 나오면 서버 창이 열려 있고, 서버가 오류로 멈춘 채 파일이 바뀌기를 기다리는 중입니다. 새 창을 열지 않습니다. 서버 창의 빨간 줄을 복사해 붙여 넣어 달라고 하고, 고친 뒤(고칠 것이 없으면 바로) "다시 켤 때"대로 같은 창에서 다시 켭니다. 감시 확인에도 아무것도 나오지 않을 때만 아래 "새 창에서 켜기"로 켭니다.
 
 ```powershell
 Get-CimInstance Win32_Process -Filter "ProcessId=(프로세스 번호)" | Select-Object -ExpandProperty CommandLine
 ```
 
-**새 창에서 켜기.** 아래 명령으로 새 PowerShell 창을 열고 그 창에서 서버를 켭니다. 프로젝트 폴더가 `C:\vision-ai\vision-risk-dashboard`가 아니면 아래 명령의 경로를 프로젝트 폴더 경로로 바꿉니다.
+**감시 확인.** 서버 창에서 `--watch`로 도는 Node 프로세스가 있는지 봅니다. 포트를 듣는 것은 이 프로세스가 띄운 서버이고, 이 프로세스는 서버가 오류로 멈춰도 창과 함께 남아 있습니다.
+
+```powershell
+Get-CimInstance Win32_Process -Filter "Name='node.exe'" | Where-Object { $_.CommandLine -like '* --watch *server/server.js*' } | Select-Object ProcessId, CommandLine
+```
+
+**새 창에서 켜기.** 아래 명령으로 새 PowerShell 창을 열고 그 창에서 서버를 켭니다. 프로젝트 폴더가 `C:\vision-ai\vision-risk-dashboard`가 아니면 아래 명령의 경로를 프로젝트 폴더 경로로 바꿉니다. 서버가 꺼진 예전 서버 창이 남아 있으면 닫아도 된다고 사용자에게 알립니다.
 
 ```powershell
 Start-Process powershell -ArgumentList '-NoExit','-Command','cd C:\vision-ai\vision-risk-dashboard; npm.cmd start'
 ```
 
-- 몇 초 뒤 "켜기 전 확인"의 첫 명령으로 8765번 포트를 듣는 프로세스가 생겼는지 봅니다.
+- 몇 초 뒤 "켜기 전 확인"의 포트 명령으로 8765번 포트를 듣는 프로세스가 생겼는지 봅니다.
 - 생겼으면 새 PowerShell 창에서 서버를 켰으니 ego 브라우저에서 http://127.0.0.1:8765 를 열어 보라고 알립니다. 사용자가 확인을 부탁할 때만 AI가 ego 브라우저로 화면을 엽니다.
-- 생기지 않았으면 다시 켜 보지 않고, 새 창에 나온 빨간 줄을 복사해 붙여 넣어 달라고 사용자에게 말합니다. 사용자가 그 줄을 붙여 넣고 고쳐 달라고 하면 고친 뒤 "새 창에서 켜기"로 다시 켭니다.
+- 생기지 않았으면 새 창을 더 열지 않고, 서버 창에 나온 빨간 줄을 복사해 붙여 넣어 달라고 사용자에게 말합니다. 사용자가 그 줄을 붙여 넣고 고쳐 달라고 하면 고친 뒤 "다시 켤 때"대로 같은 창에서 다시 켭니다.
 
-**다시 켤 때.** 서버 쪽 파일(server 폴더, package.json, 설정 파일)을 고친 번호는 마치기 전에 서버를 다시 켭니다. "켜기 전 확인"으로 찾은 프로세스(명령 줄에 시작 파일이 있는 것)만 끄고, "새 창에서 켜기"로 다시 켭니다. 화면 파일(public 폴더)만 고쳤으면 다시 켜지 않습니다. 서버가 캐시를 끄므로 ego 브라우저에서 새로고침(F5)만 하면 바뀐 화면이 보입니다.
+**다시 켤 때.** 서버를 끄거나 새 창을 열지 않습니다. 프롬프트나 사용자가 "끄고 새 창에서 켜 달라"고 해도 이 순서로 합니다.
+
+- server 폴더의 .js 파일을 고쳤으면 서버가 같은 창에서 알아서 다시 켜집니다. 서버 창에 `Restarting`으로 시작하는 줄과 시작 줄이 다시 나옵니다. 화면 파일(public 폴더)만 고쳤으면 서버는 그대로이고, 서버가 캐시를 끄므로 ego 브라우저에서 새로고침(F5)만 하면 바뀐 화면이 보입니다.
+- server 폴더 밖의 파일(package.json, .env, 설정 파일)을 고쳤거나 파일을 고치지 않고 다시 켜야 하면(사용자가 다시 켜 달라고 할 때 등) 시작 파일의 수정 시각만 바꿉니다. 서버가 파일이 바뀐 것으로 보고 같은 창에서 다시 켜집니다. 프로젝트 폴더가 다르면 경로를 바꿉니다.
 
 ```powershell
-Stop-Process -Id (프로세스 번호)
+(Get-Item -LiteralPath 'C:\vision-ai\vision-risk-dashboard\server\server.js').LastWriteTime = Get-Date
 ```
 
-- 포트로 찾은 프로세스만 끕니다. `node` 같은 프로세스 이름으로 찾아 끄지 않습니다. 같은 이름으로 도는 다른 프로그램까지 꺼질 수 있습니다.
-- 다시 켠 뒤 서버가 꺼진 예전 서버 창은 닫아도 된다고 사용자에게 알립니다.
+- 다시 켜기 전에 8765번 포트를 듣는 프로세스 번호를 봐 둡니다. 다시 켠 뒤 몇 초 기다렸다가 그 번호가 바뀌었는지 봅니다. 바뀌었으면 다시 켜진 것입니다. 포트가 비어 있으면 서버 창의 빨간 줄을 복사해 붙여 넣어 달라고 합니다.
+- 포트를 듣는 서버는 있는데 "감시 확인"에 아무것도 나오지 않으면 `--watch` 없이 켠 예전 방식 서버라 알아서 다시 켜지지 않습니다. 이때만 "켜기 전 확인"대로 package.json을 고치고, 사용자에게 지금 서버 창을 한 번 닫아 달라고 한 뒤 포트가 빈 것을 확인하고 "새 창에서 켜기"로 켭니다.
 
 **끄기.** 사용자가 서버 창을 닫거나 그 창에서 Ctrl+C를 누르면 꺼집니다. "일괄 작업을 끝내시겠습니까 (Y/N)?"가 나오면 `Y`를 칩니다.
 
