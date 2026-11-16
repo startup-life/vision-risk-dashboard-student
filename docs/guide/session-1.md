@@ -9,8 +9,8 @@
 - 화면은 HTML·CSS·JavaScript로 public 폴더에 둡니다. public/index.html 한 페이지이고 화면을 그리는 코드는 js 파일(public/app.js)에, 모양은 css 파일(public/style.css)에 따로 둡니다.
 - public/index.html은 문서 언어를 한국어(lang="ko")로 하고 화면 내용은 본문의 빈 자리(id가 app인 div) 안에 코드로 그립니다.
 - 내 프로젝트에 코드가 이미 있으면 서버와 화면 파일의 위치는 그 코드의 폴더 구조를 따릅니다. 완료 브랜치 코드는 courses/vision-96h-v2 폴더 아래(서버는 tools, 화면은 preview)에 있어 이 구조와 다릅니다. 완료 브랜치 코드는 동작만 참고하고 그 폴더 구조로 옮기지 않습니다.
-- npm.cmd start를 치면 server/server.js가 켜집니다(package.json의 start). node --watch로 켜서 server 폴더의 파일이 바뀌면 같은 창에서 서버가 알아서 다시 켜집니다. 서버 창의 시작 줄("현장 리스크 대시보드: …")은 이 시작 파일에서 찍습니다. 완료 브랜치 코드에서는 courses/vision-96h-v2/tools/run-local.cjs가 시작 파일입니다.
-- package.json에는 이름 vision-risk-dashboard, private true, type commonjs, scripts의 start "node --watch --watch-preserve-output server/server.js"(--watch-preserve-output은 다시 켤 때 서버 창의 앞 줄을 지우지 않게 합니다), engines의 node ">=22.9.0"을 적습니다. 더할 패키지가 없으므로 dependencies는 비워 둡니다.
+- npm.cmd start를 치면 server/server.js가 켜집니다(package.json의 start). node --watch로 켜서 server 폴더의 파일이 바뀌면 같은 창에서 서버가 알아서 다시 켜집니다. 다시 켤 때 서버 창의 앞 줄은 지워지고 새로 찍힙니다. 서버 창의 시작 줄("현장 리스크 대시보드: …")은 이 시작 파일에서 찍습니다. 완료 브랜치 코드에서는 courses/vision-96h-v2/tools/run-local.cjs가 시작 파일입니다.
+- package.json에는 이름 vision-risk-dashboard, private true, type commonjs, scripts의 start "node --watch server/server.js", engines의 node ">=22.9.0"을 적습니다. 더할 패키지가 없으므로 dependencies는 비워 둡니다.
 - git에 올리지 않는 파일은 node_modules 폴더, .env, config/local-connection.json입니다(.gitignore). 예시 파일 config/local-connection.example.json은 git에 올립니다.
 
 ## 서버 켜기
@@ -25,7 +25,7 @@
 
 서버는 node --watch로 켭니다("앱과 폴더"의 package.json). server 폴더의 파일이 바뀌면 서버가 같은 창에서 알아서 다시 켜지므로, AI는 서버를 다시 켜려고 서버를 끄거나 새 창을 열지 않습니다. 서버 창은 하나만 둡니다.
 
-**켜기 전 확인.** 먼저 package.json의 start가 "앱과 폴더"의 값(`node --watch --watch-preserve-output server/server.js`)인지 봅니다. 다르면 그 값으로 고칩니다. 그다음 8765번 포트를 듣는 프로세스가 있는지 봅니다.
+**켜기 전 확인.** 먼저 package.json의 start가 "앱과 폴더"의 값(`node --watch server/server.js`)인지 봅니다. 다르면 그 값으로 고칩니다. 그다음 8765번 포트를 듣는 프로세스가 있는지 봅니다.
 
 ```powershell
 Get-NetTCPConnection -LocalPort 8765 -State Listen -ErrorAction SilentlyContinue | Select-Object -ExpandProperty OwningProcess -Unique
