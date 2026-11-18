@@ -2,7 +2,7 @@
 
 이 회차는 사건 상세에 "2. 관련 기준 확인 (NotebookLM)" 단계를 더합니다. 사용자가 확인 기준을 고르고 "관련 기준 찾기"를 누르면 서버가 요청을 작업 대기열에 넣어 하나씩 처리하고 끝난 결과를 사건 상세, 홈 카드, 판단 화면에 보여 줍니다. 3회차의 사건 기록, 판단, 조치, 이력은 그대로 쓰고 그 위에 더합니다. 먼저 예시 결과(mock)로 화면 흐름을 끝낸 뒤 실제 NotebookLM(live)을 연결합니다.
 
-이 문서는 회차 전체를 한꺼번에 설명합니다. 각 프롬프트에서 요청한 부분만 만들고 나머지는 그 프롬프트가 올 때까지 두세요. 프롬프트가 절 이름을 말하면 그 절만 만듭니다.
+이 문서는 회차 전체를 한꺼번에 설명합니다. 프롬프트가 요청한 부분을 만들고, 나머지는 그 프롬프트가 오거나 사용자가 부탁할 때 만듭니다. 프롬프트가 절 이름을 말하면 그 절을 만듭니다.
 
 ## NotebookLM 설정 키와 스위치
 
@@ -182,7 +182,7 @@ review_summary에는 evidence(가장 최근 결과의 standard_id, source_id, qu
 
 화면은 GET /api/jobs/(작업번호)로 상태를 확인합니다. 요청하고 1.2초 뒤에 처음 확인하고 그 뒤로는 2초마다 확인합니다. 작업 상태는 응답의 job.status로 봅니다. succeeded, failed, interrupted면 그 사건의 기다리는 상태를 풀고 단추 글을 "관련 기준 찾기"로 되돌려 다시 켭니다. 단추는 바꿀 때마다 화면에서 다시 찾습니다. 2·3번 칸을 다시 그리면 전에 잡아 둔 단추는 화면에 없기 때문입니다. 2초마다 하는 상태 확인과 결과를 다시 받는 요청은 알림 줄의 "처리 중..."을 띄우지 않고 화면도 움직이지 않습니다.
 
-화면 코드를 참고할 때는 git show class/milestone-4:courses/vision-96h-v2/preview/app.js의 startJobPolling(상태 확인), updateDetailJobPaneDom(단추와 상태 줄), syncDetailJobButtons(다시 그린 뒤 단추 맞추기), refreshDetailReviewPane(2·3번 칸 다시 그리기), buildLiveDetail(2·3번 칸 계산)과 같은 폴더 workflow-live.js의 RiskLiveDetail, workflow.js의 evidenceFor를 봅니다. 동작만 참고하고, 이 코드의 unknown_dispatch 처리와 답변 글 꾸밈(answerPreview, answerHtml), 지금 번호보다 뒤의 기능은 만들지 않습니다.
+화면 코드를 참고할 때는 git show class/milestone-4:courses/vision-96h-v2/preview/app.js의 startJobPolling(상태 확인), updateDetailJobPaneDom(단추와 상태 줄), syncDetailJobButtons(다시 그린 뒤 단추 맞추기), refreshDetailReviewPane(2·3번 칸 다시 그리기), buildLiveDetail(2·3번 칸 계산)과 같은 폴더 workflow-live.js의 RiskLiveDetail, workflow.js의 evidenceFor를 봅니다. 이 코드의 unknown_dispatch 처리와 답변 글 꾸밈(answerPreview, answerHtml)은 "만들지 않는 것" 절에 적었고, 지금 번호보다 뒤의 기능은 그 프롬프트가 오거나 사용자가 부탁할 때 만듭니다.
 
 ### 요청 상태 줄
 
@@ -284,7 +284,7 @@ review_summary에는 evidence(가장 최근 결과의 standard_id, source_id, qu
 
 ### 새로고침 뒤 이어 받기
 
-화면은 기다리는 요청(작업 번호, 사건 번호, 기준 번호, 요청 번호, 요청 시각)을 브라우저 탭 저장 공간(sessionStorage)의 vision_active_jobs라는 이름으로 저장합니다. 비밀 값은 넣지 않습니다.
+화면은 기다리는 요청(작업 번호, 사건 번호, 기준 번호, 요청 번호, 요청 시각)을 브라우저 탭 저장 공간(sessionStorage)의 vision_active_jobs라는 이름으로 저장합니다.
 
 페이지를 열 때 받은 작업 목록에 대기·진행 중인 작업이 있으면 2초마다 상태 확인을 다시 시작합니다.
 
@@ -317,7 +317,7 @@ review_summary에는 evidence(가장 최근 결과의 standard_id, source_id, qu
 
 ## 실제 NotebookLM(live) 연결
 
-NotebookLM 도구는 notebooklm-mcp-cli 0.15.6입니다.
+NotebookLM 도구는 notebooklm-mcp-cli 0.15.6입니다. 준비는 uv 설치, uv tool install notebooklm-mcp-cli==0.15.6, nlm login --storage protected(뜨는 Chrome 창에서 Google 계정으로 로그인), nlm notebook create "현장 리스크 기준" --json으로 노트북 만들기, nlm source add (노트북 ID) --file materials/factory-criteria-v1.txt --wait로 기준 원문 올리기 순서입니다. 나온 노트북 ID와 소스 ID는 설정 파일의 NOTEBOOKLM_NOTEBOOK_ID와 NOTEBOOKLM_SOURCE_IDS에 넣습니다.
 
 이 회차에 더하는 패키지는 @modelcontextprotocol/sdk입니다. 설치 명령은 npm.cmd install @modelcontextprotocol/sdk입니다. 설치하면 package-lock.json이 새로 생기거나 바뀝니다.
 

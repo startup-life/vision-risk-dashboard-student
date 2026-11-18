@@ -25,14 +25,14 @@
 준비물: AI 도구에서 연 프로젝트 폴더, 서버 창(AI가 열어 서버를 켠 PowerShell 창), ego 브라우저, 프로젝트 폴더 옆에 받은 사진 저장소(`C:\vision-ai\vision-risk-student-images`, 아래 2에서 받습니다).
 
 1. 서버 켜 보기: 서버 창(서버가 켜진 창)이 있으면 ego 브라우저에서 http://127.0.0.1:8765 를 엽니다. 서버 창이 없으면 아래 2-1을 먼저 보내고, 답이 오면 AI에게 "서버를 켜 주세요."라고 보낸 뒤 같은 주소를 엽니다. 이때는 아래 2~3을 마친 뒤 2-2부터 이어 갑니다. 1회차 홈과 "확인 기준 보기" 단추가 보이면 됩니다.
-2. 사진 저장소 받기: 사진 저장소는 강사가 공개한 연습용 현장 사진 모음이고, 프로젝트 폴더 옆 `vision-risk-student-images` 폴더에 받아 두고 읽기만 합니다. `C:\vision-ai` 안에 `vision-risk-student-images` 폴더가 이미 있으면 건너뜁니다. 없으면 서버 창이 아닌 PowerShell 창에서 아래 두 줄을 한 줄씩 칩니다. ZIP으로 받으면 쓰지 못하니 꼭 이 명령으로 받고, 폴더 이름은 바꾸지 않습니다.
+2. 사진 저장소 받기: 사진 저장소는 강사가 공개한 연습용 현장 사진 모음입니다. 앱은 프로젝트 폴더 옆에 git으로 받은 `vision-risk-student-images` 폴더에서 사진을 읽으므로, ZIP으로 받거나 폴더 이름을 바꾸면 사진을 읽지 못합니다. `C:\vision-ai` 안에 이 폴더가 이미 있으면 건너뜁니다. 없으면 시작 메뉴에서 PowerShell 창을 새로 열고 아래 두 줄을 한 줄씩 칩니다.
 
 ```powershell
 cd C:\vision-ai
 git clone https://github.com/startup-life/vision-risk-student-images.git
 ```
 
-3. 사진 수 확인: 서버 창이 아닌 PowerShell 창에서 아래 한 줄을 칩니다. `210`이 나와야 합니다.
+3. 사진 수 확인: 시작 메뉴에서 연 PowerShell 창(2에서 연 창이 있으면 그 창)에서 아래 한 줄을 칩니다. `210`이 나와야 합니다.
 
 ```powershell
 (Get-ChildItem C:\vision-ai\vision-risk-student-images\assets\dataset\images -Filter *.png).Count
@@ -48,12 +48,12 @@ git clone https://github.com/startup-life/vision-risk-student-images.git
 ## 2-1. 지침 세팅
 
 ```text
-이번 회차 문서를 이 프로젝트로 가져오기 위해, 수업 저장소(class)를 다시 받아 class/milestone-1의 docs/guide와 AGENTS.md를 이 프로젝트로 가져와 주세요(브랜치는 옮기지 않습니다).
-그다음 AGENTS.md를 작업 지침으로 삼아 주세요. 프롬프트에 없는 상세 구현(주소, 화면 문구, 파일 이름, 거절 규칙)은 docs/guide의 회차 문서와 그 회차 완료 브랜치 코드(class/milestone-2)에서 확인합니다.
+이번 회차 문서를 이 프로젝트로 가져오기 위해, 수업 저장소(class)를 다시 받아 class/milestone-1의 docs/guide와 AGENTS.md를 이 프로젝트의 지금 브랜치로 가져와 주세요.
+그다음 AGENTS.md를 작업 지침으로 삼아 주세요. 프롬프트에 없는 상세 구현(주소, 화면 문구, 파일 이름, 입력 검사)은 docs/guide의 회차 문서와 그 회차 완료 브랜치 코드(class/milestone-2)에서 확인합니다.
 지금은 AGENTS.md, docs/guide/session-1.md, docs/guide/session-2.md를 읽기만 하고, 읽은 파일 이름만 한 줄로 알려 주세요.
 ```
 - 하는 일: 수업 저장소 `milestone-1`에서 규칙 파일과 보충 문서를 프로젝트 폴더로 가져오고, AI가 1~2회차 문서를 읽어 둡니다. `docs\guide`에 2회차 보충 문서가 새로 생깁니다.
-- 목표: 2회차의 자세한 약속(주소, 화면 문구, 파일 이름, 거절 규칙)은 2회차 보충 문서와 완료 브랜치 `milestone-2` 코드에 있으므로, 이 프롬프트를 다른 번호보다 먼저 보냅니다.
+- 목표: 2회차의 자세한 약속(주소, 화면 문구, 파일 이름, 입력 검사)은 2회차 보충 문서와 완료 브랜치 `milestone-2` 코드에 있으므로, 이 프롬프트를 다른 번호보다 먼저 보냅니다.
 - 완료 기준: 탐색기에서 `docs\guide` 폴더에 `session-2.md`가 있고, AI 답에 `AGENTS.md`, `session-1.md`, `session-2.md`가 나옵니다. 새 대화를 열 때마다 이 프롬프트를 먼저 보냅니다.
 
 ![2-1 1회차와 2회차 보충 문서가 있는 폴더](images/session-2/04-6846840b-2-1-guides.png)
