@@ -1,22 +1,22 @@
 # 6회차 보충 문서: Teachable Machine 모델 학습과 모델 예측
 
-이 회차에서는 앱에 모델 학습 화면을 더하고 학습한 모델의 예측을 사건 상세에 넣습니다. 사용자가 제공 사진을 직접 분류해 브라우저 안에서 모델을 학습하고 검증과 비교, 적용까지 이 화면에서 합니다. 5회차까지 네 단계였던 사건 상세는 다섯 단계가 되고 새 3단계의 모델 예측이 관련 기준 확인과 판단 화면의 참고 칸에도 들어갑니다. 앞 회차 문서와 다른 부분은 이 문서를 따릅니다.
+이 회차에서는 앱에 모델 학습 화면을 더하고 학습한 모델의 예측을 사건 상세에 넣습니다. 사용자가 제공 사진을 분류해 브라우저 안에서 모델을 학습하고 검증과 비교, 적용까지 이 화면에서 합니다. 5회차까지 네 단계였던 사건 상세는 다섯 단계가 되고 새 3단계의 모델 예측이 관련 기준 확인과 판단 화면의 참고 칸에도 들어갑니다. 앞 회차 문서와 다른 부분은 이 문서를 따릅니다.
 
 ## 학습 준비: 패키지와 준비 명령
 
 학습에는 패키지 세 개와 준비 명령 하나가 필요합니다. 이 문서에서 "화면 폴더"는 1회차 문서의 public 폴더입니다. 이미 있는 코드가 화면 파일을 다른 폴더에 두면 index.html이 있는 그 폴더를 화면 폴더로 읽고 새 public 폴더를 만들지 않습니다.
 
 - 학습용 패키지는 @teachablemachine/image 0.8.5, @tensorflow/tfjs 1.3.1, esbuild 0.25.10 세 개입니다. package.json에 버전 앞 ^ 없이 이 버전 그대로 적고 "overrides": { "node-fetch": "2.7.0" }도 넣습니다. 설치는 npm.cmd install로 하고 이미 있는 패키지는 바꾸지 않습니다.
-- 준비 명령은 npm.cmd run setup:tm입니다(package.json의 setup:tm). 사용자가 서버 창이 아닌 터미널에서 한 번 실행합니다. 인터넷이 필요합니다.
+- 준비 명령은 npm.cmd run setup:tm입니다(package.json의 setup:tm). 서버 창이 아닌 터미널에서 한 번 실행합니다. 인터넷이 필요합니다.
 - 준비 명령의 첫째 일: esbuild로 @tensorflow/tfjs와 @teachablemachine/image를 한 파일로 묶어 화면 폴더의 vendor/tm/runtime.js로 저장합니다. 브라우저에서 이 파일을 불러오면 window.tf와 window.tmImage로 쓸 수 있어야 합니다. 묶는 입구 파일은 import * as tf from '@tensorflow/tfjs', import * as tmImage from '@teachablemachine/image'로 불러와 window.tf와 window.tmImage에 넣는 네 줄이고 esbuild 설정은 bundle: true, minify: true, platform: 'browser'입니다.
 - 준비 명령의 둘째 일: 기초 모델 MobileNet v2(0.35)를 https://storage.googleapis.com/teachable-machine-models/mobilenet_v2_weights_tf_dim_ordering_tf_kernels_0.35_224_no_top/ 에서 받아 화면 폴더의 vendor/tm-v2/에 같은 이름으로 저장합니다. 그 주소의 model.json을 읽고 거기 적힌 가중치 파일(weightsManifest 안의 paths)을 모두 받은 뒤 model.json을 마지막에 저장합니다. 받다가 실패하면 어느 파일이 실패했는지 알리고 멈춥니다.
-- 화면 폴더의 vendor 폴더는 git에 올리지 않습니다(.gitignore). 브라우저는 이 파일들을 /vendor/tm/runtime.js, /vendor/tm-v2/model.json 주소로 불러옵니다.
+- 브라우저는 이 파일들을 /vendor/tm/runtime.js, /vendor/tm-v2/model.json 주소로 불러옵니다.
 
 ## 학습 자료 저장
 
 학습 사진과 모델은 이 PC에만 저장합니다.
 
-- 설정 키 VISION_TM_ROOT: 학습 자료를 저장할 폴더입니다. 비어 있으면 사건 기록 위치와 상관없이 프로젝트 맨 위 runtime 폴더 안의 teachable 폴더(runtime/teachable)를 씁니다. runtime 폴더는 2회차 문서대로 git에 올리지 않고 브라우저에도 보내지 않습니다. 이 키는 설정 파일에서 쓰는 키 목록과 예시 파일에 더합니다.
+- 설정 키 VISION_TM_ROOT: 학습 자료를 저장할 폴더입니다. 비어 있으면 사건 기록 위치와 상관없이 프로젝트 맨 위 runtime 폴더 안의 teachable 폴더(runtime/teachable)를 씁니다. runtime 폴더는 브라우저에 보내지 않습니다. 이 키는 설정 파일에서 쓰는 키 목록과 예시 파일에 더합니다.
 - 그 폴더 안에 프로젝트(projects), 사진 파일(images, 파일 이름은 사진 해시), 모델 버전(versions/버전 ID 폴더), 적용 모델(active.json), 사건별 모델 예측(predictions/사건 번호.json)을 둡니다.
 - 사진 해시는 사진 파일 내용의 SHA-256(소문자 16진수 64자)입니다.
 - 학습 데이터 주소(/api/tm/ 로 시작)는 요청 하나를 20MB까지 받습니다. 사진과 모델을 base64 글자로 보내기 때문입니다.
@@ -39,7 +39,7 @@
 제공 사진은 옆 폴더 사진 저장소의 학습용 사진입니다. 2회차에 저장소 사진 목록을 읽은 방식 그대로(같은 목록 파일, 같은 해시 대조) 읽습니다. 목록 파일은 사진 저장소 origin/main 커밋에 든 metadata/generation_manifest.csv입니다.
 
 - 쓰는 사진은 상태(status)가 accepted, 시퀀스 ID(sequence_id)가 빈칸, 용도(split)가 train 또는 val, 분류(track)가 quality 또는 safety인 것뿐입니다. image_id는 Q-IND-042, S-IND-042 모양입니다.
-- 제공 사진에는 정답 유형이 없습니다. 유형은 사용자가 사진을 보고 직접 고릅니다. 목록에 유형(subtype 등)을 넣지 않습니다.
+- 제공 사진에는 정답 유형이 없습니다. 유형은 사용자가 사진을 보고 고릅니다. 목록에 유형(subtype 등)을 넣지 않습니다.
 - GET /api/tm/catalog: {"images": [{"image_id", "track", "split", "sha256"}, …], "error": 오류 문구 또는 null}입니다. 사진은 해시 순서로 정렬합니다. 사진 저장소를 읽지 못하면 images는 빈 목록이고 error에 이유를 넣되 내 PC 경로는 넣지 않습니다.
 - 사진 목록 파일에서 용도가 test인 사진은 파일 없이 해시만 있습니다. 이 해시들을 기억해 두고 학습에 넣지 못하게 막습니다.
 - GET /api/tm/images/(사진 해시): 제공 사진이나 프로젝트에 넣은 사진(버전에 남긴 사진 기록 포함)의 파일을 보냅니다. 답의 Content-Type은 그 사진의 형식입니다. 1회차 문서의 캐시 끄기는 이 주소에서 Cache-Control: private, max-age=3600으로 바꿔 브라우저가 기억해도 되게 합니다. 없으면 404입니다.
