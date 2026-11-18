@@ -50,8 +50,8 @@ cd vision-risk-dashboard-student
 ```
 
 - 사진 저장소는 공개 저장소라 GitHub 계정 없이 받는다. 사진은 일반 파일이라 Git LFS는 필요 없다.
-- **ZIP으로 받지 않는다.** 대시보드는 git으로 사진 저장소의 원격 주소와 커밋을 확인한 뒤 사진을 읽는다. ZIP으로 받은 폴더에는 `.git`이 없어 쓰지 못한다.
-- 사진 저장소 주소는 위 https 주소를 그대로 쓴다. 다른 주소(fork 등)에서 받은 폴더는 쓰지 않는다.
+- 위 `git clone` 명령으로 받는다. 대시보드는 git으로 사진 저장소의 원격 주소와 커밋을 확인한 뒤 사진을 읽는데, ZIP으로 받은 폴더에는 `.git`이 없어 쓰지 못한다.
+- 사진 저장소 주소는 위 https 주소를 그대로 쓴다. 대시보드는 origin이 이 저장소인지 확인하므로 다른 주소(fork 등)에서 받은 폴더의 사진은 읽지 못한다.
 - 사진 저장소를 다른 위치에 두었으면 아래 설정 파일의 `REPOSITORY_IMAGES_ROOT`에 그 폴더의 절대 경로를 `C:/work/vision-risk-student-images`처럼 `/`로 적는다.
 - Git 설치, 사진 수 확인, 사진을 읽지 못할 때의 원인은 [로컬 실행 준비 12절](docs/LOCAL-SETUP.md#12-사진-저장소-받기)에 적었다.
 
@@ -69,7 +69,7 @@ npm run setup:tm
 
 ## 3. 연결 설정 파일 만들기
 
-`npm start`는 `config/local-connection.json`을 읽는다. 이 파일은 Git이 추적하지 않는다.
+`npm start`는 `config/local-connection.json`을 읽는다.
 처음에는 [예시 파일](config/local-connection.example.json)을 복사해서 만든다. 아래 명령은 파일이 이미 있으면 덮어쓰지 않는다.
 
 ```powershell
@@ -87,15 +87,14 @@ if not exist config\local-connection.json copy config\local-connection.example.j
 cp -n config/local-connection.example.json config/local-connection.json
 ```
 
-- 값은 복사한 `config/local-connection.json`에만 넣는다. 예시 파일은 고치지 않는다.
+- 값은 복사한 `config/local-connection.json`에 넣는다. 서버는 예시 파일의 값을 쓰지 않는다.
 - 쓰지 않는 항목은 빈 문자열(`""`)로 둔다.
-- API 키와 웹앱 주소는 이 파일에만 둔다. 이 파일을 커밋하거나 메신저에 붙여 넣지 않는다.
-- API 키는 Antigravity 채팅에 붙여 넣어 이 파일에 넣게 해도 된다. Antigravity는 이 파일의 해당 한 줄만 바꾸고 값을 화면이나 대화에 다시 출력하지 않는다. 직접 파일을 열어 고쳐도 된다.
+- API 키는 Antigravity 채팅에 붙여 넣어 이 파일에 넣게 해도 되고, 직접 파일을 열어 고쳐도 된다.
 - 각 키의 뜻과 터미널에 나오는 설정 메시지는 [로컬 실행 준비 6절](docs/LOCAL-SETUP.md#6-로컬-설정-파일)에 있다.
 
 ## 4. 실행
 
-처음에는 외부 연결 없이 로컬 저장으로 띄운다. `config/local-connection.json`에서 `STORAGE_MODE`만 `mock`(로컬 저장)으로 바꾼다.
+처음에는 외부 연결 없이 로컬 저장으로 띄운다. `config/local-connection.json`에서 `STORAGE_MODE`를 `mock`(로컬 저장)으로 바꾼다. `GEMINI_MODE`·`NOTEBOOKLM_MODE`가 비어 있으면 저장소 모드를 따라 `mock`이 된다.
 
 ```json
 "STORAGE_MODE": "mock",
@@ -135,7 +134,7 @@ Teachable Machine은 브라우저 안에서 돌아가므로 스위치가 없다.
 검사 기준 원문(`courses/vision-96h-v2/preview/factory-criteria-v1.txt`)을 NotebookLM 노트북에 올려 두고, 사진 판독 결과와 대조한다. 로컬 서버가 내 PC에 설치한 NotebookLM MCP를 직접 실행한다.
 
 1. `uv`를 설치하고 `uv tool install notebooklm-mcp-cli`로 `nlm`과 `notebooklm-mcp`를 설치한다.
-2. 터미널에 본인이 직접 `nlm login --storage protected`를 입력해 로그인한다.
+2. 터미널에서 `nlm login --storage protected`를 실행하고, 뜨는 Chrome 창에서 Google 계정으로 로그인한다.
 3. 노트북을 만들고 기준 문서를 소스로 올린 뒤, 노트북 ID와 소스 ID를 설정 파일의 `NOTEBOOKLM_NOTEBOOK_ID`·`NOTEBOOKLM_SOURCE_IDS`에 넣는다.
 4. `NOTEBOOKLM_MODE`를 `live`로 바꾸고 서버를 다시 시작한다.
 
@@ -162,7 +161,7 @@ GAS 없이 NotebookLM만 실제로 써 보려면 `STORAGE_MODE=mock`, `GEMINI_MO
 8. `STORAGE_MODE`·`GEMINI_MODE`·`NOTEBOOKLM_MODE`를 `live`로 바꾸고 서버를 다시 시작한다. NotebookLM을 아직 준비하지 않았으면 `NOTEBOOKLM_MODE`는 `off`로 둔다.
 
 `ONEPORT_API_KEY`는 `gas:init`만 읽어 GAS로 보낸다. `npm start`로 띄운 로컬 서버는 이 값을 쓰지 않는다.
-웹앱 주소를 아는 사람은 누구나 이 시트의 기록을 읽고 쓸 수 있다. 화면을 공유하는 중에는 `gas:deploy`·`gas:redeploy`·`gas:open`을 실행하지 않는다.
+웹앱 주소를 아는 사람은 누구나 이 시트의 기록을 읽고 쓸 수 있다.
 각 단계의 화면과 오류 안내는 [로컬 실행 준비 1~3절](docs/LOCAL-SETUP.md#1-gas-웹앱-배포)에 있다. `Code.gs`를 고친 뒤에는 `npm run gas:push`, `npm run gas:redeploy`, `npm run gas:init` 순서로 다시 배포한다(주소는 그대로다).
 
 ### Teachable Machine (모델 예측)
@@ -176,12 +175,12 @@ GAS 없이 NotebookLM만 실제로 써 보려면 `STORAGE_MODE=mock`, `GEMINI_MO
 
 - 학습하는 동안 대시보드 탭을 앞에 띄워 둔다. 다른 탭이나 창이 앞에 있으면 브라우저가 학습을 늦출 수 있다. 대시보드 안에서 다른 화면으로 옮겨도 학습은 이어지지만, 새로고침하거나 브라우저를 닫으면 중단된다.
 - 검증 정확도의 정답은 내가 고른 유형이다. 분류가 기준과 다르면 정확도도 그만큼 달라진다.
-- 예측은 사진 한 장의 대표 유형이다. 위치 탐지나 안전 인증이 아니므로 점수를 안전 판단 기준으로 쓰지 않는다.
+- 예측은 사진 한 장의 대표 유형이다. 위치 탐지나 안전 인증이 아니므로 점수는 안전 판단의 참고 자료로 본다.
 - 프로젝트는 **백업·가져오기**에서 JSON 파일로 백업하고 다른 PC에서 복원할 수 있다. 공식 Teachable Machine에서 내보낸 모델(`model.json`, `metadata.json`, `weights.bin`)도 가져올 수 있다.
 
 ## 이 PC에 생기는 파일
 
-아래 파일은 모두 Git이 추적하지 않는다. 지우면 그 기록이 없어진다.
+아래 파일을 지우면 그 기록이 없어진다.
 
 | 위치 | 내용 |
 | --- | --- |
