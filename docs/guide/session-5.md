@@ -329,6 +329,8 @@ live에서 사건 사진 주소를 열면 서버가 get_image로 Drive 사진을
 
 clasp는 npx --yes @google/clasp@3.4.1로 부르고 묻는 질문 없이 끝나게 합니다. 도우미 스크립트에서 부를 때 Windows에서는 셸로 실행하고, clasp 출력은 그대로 보여 줍니다. 셸로 실행하면 셸이 명령 줄을 띄어쓰기로 나누므로, 프로젝트 제목처럼 띄어쓰기가 있는 값은 큰따옴표까지 함께 넘겨 한 덩어리로 전달합니다.
 
+도우미 스크립트는 clasp의 실행 오류, 신호로 중단됨, 종료 코드가 0이 아닌 경우를 먼저 확인합니다. 하나라도 해당하면 "clasp 명령을 완료하지 못했습니다. 위 출력을 확인하세요."로 끝냅니다(종료 코드 1). 성공 문구가 함께 나와도 성공으로 처리하지 않습니다. 정상 종료해도 아래 각 명령의 성공 결과까지 맞아야 합니다. 성공 결과는 표준 출력(stdout)에서만 읽고, 오류 출력(stderr)은 보여 주기만 합니다. 오류 출력에 적힌 ID나 성공 문구를 쓰지 않습니다. npm의 일반 경고만으로 실패 처리하지는 않습니다.
+
 ### 로그인, 올리기, 편집기 열기
 
 gas:login은 clasp login, gas:push는 clasp push --force(--force를 빼지 않음), gas:editor는 clasp open-script입니다. 이 셋은 package.json에 npx 명령을 바로 적고 나머지 다섯은 도우미 스크립트로 만듭니다.
@@ -339,7 +341,9 @@ gas:login은 clasp login, gas:push는 clasp push --force(--force를 빼지 않�
 
 빈 임시 폴더 runtime/gas-create를 만들고 clasp create-script --type standalone --title "비전 리스크 대시보드" --rootDir runtime/gas-create로 프로젝트를 만든 뒤 .clasp.json의 rootDir만 gas 폴더로 바꿉니다. clasp가 프로젝트를 만들 때 지정한 폴더에 기본 appsscript.json을 받아 우리 파일을 덮어쓰기 때문입니다.
 
-출력에 "Created new script"가 없으면 "clasp가 프로젝트를 만들지 못했습니다. 위 출력을 확인하고, 로그인이 만료됐으면 npm.cmd run gas:login을 다시 실행하세요."로 실패합니다. 성공하면 ".clasp.json이 gas 폴더를 가리키게 했습니다."를 보여 줍니다.
+실행 전에 .clasp.json이 이미 있으면 덮어쓰지 않고 "Google 연결 설정 파일(.clasp.json)이 이미 있습니다. 새로 만들지 않았습니다. 기존 프로젝트를 쓰려면 npm.cmd run gas:push(macOS: npm run gas:push)를 실행하세요."로 실패합니다. 이때 clasp도 부르지 않습니다.
+
+정상 종료한 뒤 표준 출력에 "Created new script: https://script.google.com/d/(스크립트 ID)/edit"인 줄이 정확히 하나 있고, 새 .clasp.json을 JSON으로 읽을 수 있으며 그 안의 scriptId가 그 줄의 ID와 같은지 확인합니다. 파일 맨 앞의 BOM은 지우고 읽습니다. 하나라도 맞지 않으면 "clasp가 프로젝트를 만들지 못했습니다. 생성 결과와 .clasp.json의 scriptId를 확인하세요. 로그인이 만료됐으면 npm.cmd run gas:login(macOS: npm run gas:login)을 다시 실행하세요."로 실패합니다(종료 코드 1). 통과했을 때만 rootDir을 바꾸고 ".clasp.json이 gas 폴더를 가리키게 했습니다."를 보여 줍니다. 실패한 경우에는 원래 만든 gas/appsscript.json을 고치지 않습니다.
 
 ### gas:deploy
 
@@ -347,13 +351,21 @@ GAS_WEBAPP_URL에 이미 값이 있으면 배포하지 않고 "이미 배포 주
 
 clasp create-deployment --description vision-risk로 새 웹앱 배포를 만들고 clasp 출력에서 AKfyc로 시작하는 배포 ID를 정확히 하나 찾았을 때만 설정 파일의 GAS_WEBAPP_URL에 https://script.google.com/macros/s/(배포 ID)/exec를 적습니다. 이때 STORAGE_MODE가 비어 있으면 live로 같이 적고 다른 키는 그대로 둡니다. clasp가 0으로 끝나도 ID가 없으면 실패입니다(ID가 없거나 둘 이상이면 "clasp 출력에서 배포 ID를 찾지 못했습니다. 위 출력을 확인하고, 로그인이 만료됐으면 npm.cmd run gas:login을 다시 실행하세요."). 성공하면 "config/local-connection.json에 GAS_WEBAPP_URL을 적었습니다."를 보여 줍니다.
 
+ID만 찾지 말고 표준 출력의 한 줄 전체가 "Deployed (배포 ID) @(버전)"인지 확인합니다. 버전은 숫자 또는 HEAD이며 끝의 마침표는 있어도 됩니다. 이 성공 줄이 정확히 하나이고 표준 출력에 등장한 배포 ID도 그 ID 하나뿐이어야 합니다. 오류 문장 안의 ID, 오류 출력에만 있는 성공 문구, 중복 성공 줄은 실패입니다(종료 코드 1, 위 배포 ID 안내 문구). 실패하면 설정 파일은 바꾸지 않습니다.
+
 ### gas:redeploy
 
 설정 파일 주소의 배포 ID로 clasp update-deployment (배포 ID) --description vision-risk를 불러 같은 배포를 새 버전으로 갱신합니다(주소는 그대로). 주소가 없으면 "config/local-connection.json에 GAS_WEBAPP_URL이 없습니다. 먼저 npm.cmd run gas:deploy를 실행하세요."로 실패합니다. 출력에 "Redeployed (배포 ID) @"가 없으면 위 배포 ID 문장으로 실패합니다. 성공하면 "같은 배포를 새 버전으로 갱신했습니다. 주소는 그대로입니다."를 보여 줍니다.
 
+gas:deploy와 같은 방식으로 정상 종료와 표준 출력의 성공 줄 전체를 확인합니다. 성공 줄은 "Redeployed (배포 ID) @(버전)"이며 정확히 하나여야 하고, 그 ID가 설정 파일 주소의 ID와 같아야 합니다. 다른 ID, 오류 출력의 문구, 성공 문구와 같은 줄에 덧붙은 오류 글은 성공으로 처리하지 않습니다. 실패는 종료 코드 1로 알리고 설정 파일의 주소는 그대로 둡니다.
+
 ### gas:open
 
 "브라우저로 엽니다. 권한 승인 화면이 나오면 허용하세요."와 웹앱 주소 한 줄을 보여 주고 기본 브라우저로 엽니다. 주소가 없으면 gas:redeploy와 같은 문장으로 실패합니다.
+
+Windows에서는 `spawnSync('start "" "' + url + '"', { shell: true })`처럼 명령 전체를 문자열로 넘깁니다. 이 방식은 Node가 cmd.exe에 따옴표를 그대로 전달합니다. `cmd.exe`에 `start`와 따옴표를 각각 배열 인수로 넘기는 방식으로 바꾸면 주소 앞에 역슬래시가 붙을 수 있으므로 바꾸지 않습니다. macOS는 open, 그 밖은 xdg-open을 씁니다.
+
+실행 결과에 error 또는 signal이 있거나 status가 0이 아니면 "브라우저를 열지 못했습니다. 위 주소를 브라우저 주소창에 붙여 넣어 여세요."로 끝냅니다(종료 코드 1). 정상 종료는 브라우저 실행 요청이 전달됐다는 뜻이며, 실제 페이지 표시나 Google 권한 승인 완료를 뜻하지는 않습니다.
 
 ### gas:init
 
