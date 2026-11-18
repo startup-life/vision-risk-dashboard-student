@@ -17,7 +17,7 @@ NOTEBOOKLM_MODE 값은 off(꺼짐), mock(예시 결과), live(실제 NotebookLM)
 
 그 밖의 값이면 서버를 켜지 않고 "NOTEBOOKLM_MODE 값을 알아볼 수 없다. 허용 값은 off, mock, live이다. 설정 파일이나 환경 변수의 NOTEBOOKLM_MODE를 고친다." 한 줄을 보여 주고 끝냅니다. 적힌 값은 보여 주지 않습니다.
 
-노트북 ID와 소스 ID는 사용자가 설정 파일에 직접 넣습니다. 비밀 값이라 화면, 터미널, 대화 답, 작업 파일, README에 옮겨 적지 않습니다. 정해진 자리는 예외입니다. 기준 확인 결과의 notebook_id와 source_id 항목, 그 결과를 담는 작업의 result, 결과 칸의 "소스 ID:" 표시에는 이 값이 들어갑니다.
+노트북 ID와 소스 ID는 설정 파일에 넣습니다. 기준 확인 결과의 notebook_id와 source_id 항목, 그 결과를 담는 작업의 result, 결과 칸의 "소스 ID:" 표시에는 이 값이 들어갑니다.
 
 ## 연동 상태 줄
 
@@ -137,7 +137,7 @@ NOTEBOOKLM_MODE 값은 off(꺼짐), mock(예시 결과), live(실제 NotebookLM)
 
 작업을 사건 기록이 어디에 있든 상관없이 프로젝트 폴더 맨 위의 runtime 폴더 안 jobs 폴더(runtime/jobs)에 한 건씩 JSON 파일로 저장하고 상태가 바뀔 때마다 다시 씁니다. 서버를 껐다 켜도 남습니다.
 
-runtime 폴더는 git에 올리지 않고 브라우저 주소로도 열리지 않습니다. .gitignore에 runtime 폴더가 없으면 더합니다.
+runtime 폴더는 브라우저 주소로 열리지 않습니다.
 
 서버를 켤 때 작업 파일을 읽어 정리합니다. 사건 기록에 기준 확인 목록이 아직 없으면 결과가 없는 것으로 봅니다.
 
@@ -317,9 +317,9 @@ review_summary에는 evidence(가장 최근 결과의 standard_id, source_id, qu
 
 ## 실제 NotebookLM(live) 연결
 
-NotebookLM 도구는 notebooklm-mcp-cli 0.15.6입니다. uv 설치, uv tool install, nlm login, 노트북 만들기는 사용자가 직접 합니다. AI는 이 명령을 실행하지 않습니다.
+NotebookLM 도구는 notebooklm-mcp-cli 0.15.6입니다.
 
-이 회차에 더해도 되는 패키지는 @modelcontextprotocol/sdk 하나입니다. 설치 명령은 npm.cmd install @modelcontextprotocol/sdk입니다. 설치하면 package-lock.json이 새로 생기거나 바뀝니다.
+이 회차에 더하는 패키지는 @modelcontextprotocol/sdk입니다. 설치 명령은 npm.cmd install @modelcontextprotocol/sdk입니다. 설치하면 package-lock.json이 새로 생기거나 바뀝니다.
 
 ### 실행 파일과 연결
 
@@ -387,4 +387,4 @@ live에서 match와 sufficient는 같은 값입니다. 근거 충분이면 둘 �
 
 - 답변 글 꾸밈(제목 줄 굵게, 목록 줄을 "• "로, 굵은 글씨, 인용 줄 모양): 혼자 쓰는 연습용 앱이라 만들지 않습니다. 답변은 받은 글자 그대로 보여 주고 `**` 같은 기호가 보여도 됩니다.
 - 요청을 보내다 응답을 받지 못했을 때 작업 목록에서 같은 요청을 찾아 상태를 정하는 처리("전송 상태 확인 필요", "기준 근거 대조 요청을 다시 보내 주세요"): 혼자 쓰는 연습용 앱이라 만들지 않습니다. 완료 브랜치 코드의 화면에 이 처리(unknown_dispatch)가 있어도 따라 만들지 않습니다.
-- README의 4회차 절(NotebookLM 연결 안내): 혼자 쓰는 연습용 앱이라 만들지 않습니다. 실제 연결 준비 명령은 사용자가 직접 칩니다.
+- README의 4회차 절(NotebookLM 연결 안내): 혼자 쓰는 연습용 앱이라 만들지 않습니다.
