@@ -16,11 +16,9 @@ Google 쪽 코드는 내 컴퓨터 저장소와 같은 동작 이름, 같은 답
 - 4회차 문서에서 비어 있으면 live로 보던 NOTEBOOKLM_MODE("비워 두면 live")는 이제 비워 두면 STORAGE_MODE와 같은 값으로 바꿉니다.
 - 허용하지 않는 값이면 4회차 NOTEBOOKLM_MODE처럼 서버를 켜지 않고 허용 값을 알립니다.
 
-세 스위치(STORAGE_MODE, GEMINI_MODE, NOTEBOOKLM_MODE)의 값은 비밀이 아닙니다. 요청하면 바꾸고 바꾼 값을 답에 알려 줘도 됩니다. 설정 파일의 값을 옮겨 적지 않는다는 지침에서 이 세 값만 예외입니다. GAS_WEBAPP_URL과 ONEPORT_API_KEY의 값은 비밀입니다.
-
 ONEPORT_API_KEY는 npm.cmd run gas:init만 읽어 Google 쪽 설정으로 보냅니다. 서버(npm.cmd start)는 이 값을 읽어 쓰지 않고 환경 변수로도 옮기지 않습니다.
 
-사용자가 대화에 OnePort 키를 붙여 넣으면 설정 파일의 ONEPORT_API_KEY 값만 그 키로 바꿉니다. 다른 줄은 그대로 두고 키 값은 답, 화면, 터미널에 다시 쓰지 않습니다.
+사용자가 대화에 OnePort 키를 붙여 넣으면 설정 파일의 ONEPORT_API_KEY 값만 그 키로 바꿉니다. 다른 줄은 그대로 둡니다.
 
 예전 설정 파일에 GEMINI_API_KEY 줄이 있으면 그 값은 읽지 않고 "알 수 없는 설정 키" 대신 "설정 경고: 설정 키 GEMINI_API_KEY는 더 이상 쓰지 않는다. 사진 판독은 OnePort를 거치므로 OnePort 키를 ONEPORT_API_KEY에 넣고 npm run gas:init을 다시 실행한다. GEMINI_API_KEY 줄은 지운다." 한 줄로 알립니다.
 
@@ -327,7 +325,7 @@ live에서 사건 사진 주소를 열면 서버가 get_image로 Drive 사진을
 
 ## Google 쪽 명령(package.json의 npm.cmd run gas:…)
 
-프로젝트 맨 위의 .clasp.json을 "Google 연결 설정 파일"이라고 부릅니다. git에 올리지 않는 것(.gitignore)에 .clasp.json을 더합니다. runtime 폴더(2회차)가 없으면 runtime 폴더도 더합니다.
+프로젝트 맨 위의 .clasp.json을 "Google 연결 설정 파일"이라고 부릅니다.
 
 clasp는 npx --yes @google/clasp@3.4.1로 부르고 묻는 질문 없이 끝나게 합니다. 도우미 스크립트에서 부를 때 Windows에서는 셸로 실행하고, clasp 출력은 그대로 보여 줍니다. 셸로 실행하면 셸이 명령 줄을 띄어쓰기로 나누므로, 프로젝트 제목처럼 띄어쓰기가 있는 값은 큰따옴표까지 함께 넘겨 한 덩어리로 전달합니다.
 
@@ -355,7 +353,7 @@ clasp create-deployment --description vision-risk로 새 웹앱 배포를 만들
 
 ### gas:open
 
-"브라우저로 엽니다. 권한 승인 화면이 나오면 허용하세요."와 웹앱 주소 한 줄을 보여 주고 기본 브라우저로 엽니다. 시크릿 창에 붙여 넣을 때 쓰므로 이 명령만 웹앱 주소를 터미널에 보여 줍니다. 웹앱 주소를 터미널에 쓰지 않는다는 지침에서 이 명령만 예외입니다. 주소가 없으면 gas:redeploy와 같은 문장으로 실패합니다. 이 명령은 사용자가 직접 칩니다.
+"브라우저로 엽니다. 권한 승인 화면이 나오면 허용하세요."와 웹앱 주소 한 줄을 보여 주고 기본 브라우저로 엽니다. 주소가 없으면 gas:redeploy와 같은 문장으로 실패합니다.
 
 ### gas:init
 
@@ -376,7 +374,7 @@ clasp create-deployment --description vision-risk로 새 웹앱 배포를 만들
 
 ### AI가 명령을 실행할 때
 
-AI가 gas:create, gas:push, gas:deploy, gas:redeploy, gas:init을 실행하면 답에는 각 명령의 마지막 결과 줄만 쓰고 스크립트 ID, 배포 ID, 웹앱 주소는 쓰지 않습니다. gas:deploy는 한 번만 실행합니다. 다시 하면 새 주소가 생깁니다. gas:login과 gas:open은 사용자가 직접 칩니다.
+gas:deploy는 한 번만 실행합니다. 다시 하면 새 주소가 생깁니다.
 
 ## 만들지 않는 것
 
