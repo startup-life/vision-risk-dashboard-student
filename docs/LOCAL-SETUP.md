@@ -22,13 +22,13 @@
 | 로컬 설정 파일 | 위 두 곳의 주소·ID를 서버에 알려 주고, OnePort API 키를 GAS로 보낼 때 읽는다 | `config/local-connection.json` |
 
 1절부터 6절까지가 연결 준비다. 7절은 연동을 하나씩 켜고 끄는 스위치, 8절은 연결 확인, 9절은 NotebookLM 결과를 읽는 법, 10절은 서버를 끄는 법, 11절은 알려진 제한, 12절은 사진 저장소(이미지 레포)를 받는 법이다.
-API 키와 웹 앱 주소는 GAS 스크립트 속성과 6절의 설정 파일에만 둔다. 문서·메신저·커밋에는 붙여 넣지 않는다. 설정 파일에 넣을 때는 Antigravity 채팅에 붙여 넣어 맡겨도 된다(1절 단계 8).
+API 키와 웹 앱 주소는 GAS 스크립트 속성과 6절의 설정 파일에 넣는다. 설정 파일에 넣을 때는 Antigravity 채팅에 붙여 넣어 맡겨도 된다(1절 단계 8).
 
 단계마다 **할 곳**을 적었다.
 
 - **Antigravity(터미널)**: 저장소 폴더의 터미널에서 명령으로 끝난다. Antigravity 에이전트가 명령을 대신 실행해도 된다.
-- **웹(클릭)**: 브라우저의 Google 화면에서 본인이 직접 로그인하고 누른다. 에이전트가 대신하지 않는다.
-- **설정 파일**: `config/local-connection.json`의 값을 바꾼다. 값을 Antigravity 채팅에 붙여 넣으면 Antigravity가 그 파일의 해당 한 줄만 바꾸고, 값을 화면이나 대화에 다시 출력하지 않는다. 본인이 파일을 열어 고쳐도 된다.
+- **웹(클릭)**: 브라우저의 Google 화면에서 로그인 화면이 뜨면 계정을 골라 로그인하고, 안내한 버튼을 누른다.
+- **설정 파일**: `config/local-connection.json`의 값을 바꾼다. 값을 Antigravity 채팅에 붙여 넣으면 Antigravity가 그 파일의 해당 줄을 바꾼다. 파일을 열어 고쳐도 된다.
 
 단계 끝의 「확인:」 줄은 그 단계가 끝났을 때 보이는 것이다.
 
@@ -39,10 +39,10 @@ API 키와 웹 앱 주소는 GAS 스크립트 속성과 6절의 설정 파일에
 이 계정의 Drive에 스프레드시트와 비공개 폴더가 새로 생긴다.
 
 기본은 **clasp 경로**다. Antigravity 터미널에서 명령으로 GAS 프로젝트를 만들고, 코드를 올리고, 웹앱으로 배포한다.
-웹에서 직접 하는 일은 아래 표의 "웹(클릭)" 단계뿐이다.
+웹 화면에서 하는 일은 아래 표의 "웹(클릭)" 단계뿐이다.
 편집기에 코드를 붙여 넣는 방법은 [편집기 붙여넣기 경로(대안)](#편집기-붙여넣기-경로대안)로 남겨 두었다.
 
-- clasp는 `npm run gas:*` 명령이 `npx`로 `@google/clasp@3.4.1`을 받아 실행한다. 따로 설치하지 않는다. 버전이 고정되지 않도록 `npx clasp …`를 직접 치지 않고 npm 명령을 쓴다(편집기 열기도 `npm.cmd run gas:editor`).
+- clasp는 `npm run gas:*` 명령이 `npx`로 `@google/clasp@3.4.1`을 받아 실행하므로 따로 설치할 필요가 없다. `npx clasp …`를 바로 치면 3.4.1이 아닌 clasp가 실행될 수 있으므로 보통 npm 명령을 쓴다(편집기 열기도 `npm.cmd run gas:editor`).
 - GAS에 올리는 파일은 `courses/vision-96h-v2/gas/`의 `Code.gs`와 `appsscript.json`이다. `appsscript.json`에 시간대(Asia/Seoul), 권한 범위(Sheets·Drive·외부 요청), 웹앱 설정(실행 사용자: 나, 액세스: 모든 사용자)이 들어 있다.
 - 명령은 Windows PowerShell 기준(`npm.cmd`, `npx.cmd`)으로 적었다. 명령 프롬프트와 macOS 터미널에서는 `.cmd`를 빼고 친다(위 "Windows에서 명령 입력하기").
 
@@ -73,7 +73,7 @@ npm.cmd run gas:login
 ```
 
 - 브라우저가 열리면 본인 계정을 고르고, 요청한 권한을 모두 허용한다. 9단계에서도 같은 계정을 쓴다.
-- 로그인 정보는 홈 폴더의 `.clasprc.json`에 저장된다. 다른 사람과 나누지 않는다.
+- 로그인 정보는 홈 폴더의 `.clasprc.json`에 저장된다.
 
 확인: 명령이 오류 없이 끝나고 홈 폴더에 `.clasprc.json`이 생긴다.
 
@@ -83,9 +83,9 @@ npm.cmd run gas:login
 npm.cmd run gas:create
 ```
 
-- standalone 프로젝트 "비전 리스크 대시보드"를 만들고 저장소 폴더에 `.clasp.json`을 만든다. 프로젝트 ID는 사람마다 달라 `.clasp.json`은 Git에서 뺐다.
-- clasp는 새 프로젝트의 기본 파일을 `--rootDir` 폴더에 받아 온다. 그래서 Git이 무시하는 빈 폴더 `runtime/gas-create`에서 만든 뒤 `.clasp.json`의 `rootDir`만 `courses/vision-96h-v2/gas`로 바꾼다. 저장소의 `appsscript.json`은 건드리지 않는다.
-- 이미 `.clasp.json`이 있으면 clasp가 `Project file already exists.`를 내고 새 프로젝트를 만들지 않는다. 다른 사람의 `.clasp.json`을 이 저장소로 복사하지 않는다.
+- standalone 프로젝트 "비전 리스크 대시보드"를 만들고 저장소 폴더에 `.clasp.json`을 만든다. 이 파일에는 사람마다 다른 프로젝트 ID가 들어 있다.
+- clasp는 새 프로젝트의 기본 파일을 `--rootDir` 폴더에 받아 온다. 그래서 빈 폴더 `runtime/gas-create`에서 만든 뒤 `.clasp.json`의 `rootDir`만 `courses/vision-96h-v2/gas`로 바꾼다. 저장소의 `appsscript.json`은 건드리지 않는다.
+- 이미 `.clasp.json`이 있으면 clasp가 `Project file already exists.`를 내고 새 프로젝트를 만들지 않는다.
 
 확인: `Created new script:`와 `.clasp.json이 courses/vision-96h-v2/gas 폴더를 가리키게 했습니다.`가 나오고, `git status`에 `appsscript.json` 변경이 없다.
 
@@ -111,7 +111,7 @@ npm.cmd run gas:deploy
 - 설정 파일이 없으면 `config/local-connection.example.json`의 키로 새로 만든다. 예시 파일에 값이 들어 있어도 옮기지 않는다.
 - 주소를 적을 때 `STORAGE_MODE`가 비어 있으면 `live`로 같이 적는다. `npm start`가 이 웹앱(Google 시트)에 저장하게 하려는 것이다. `mock`이 적혀 있으면 바꾸지 않는다. 수업 조합(7절)으로 시작할 때는 이 값을 `mock`으로 바꾼다. 다른 키는 그대로 둔다.
 - `GAS_WEBAPP_URL`에 이미 값이 있으면 `이미 배포 주소가 있습니다. npm.cmd run gas:redeploy(macOS: npm run gas:redeploy)로 갱신하세요.`를 내고 배포를 만들지 않는다. 새 배포를 쓰려면 그 값을 `""`로 바꾸고 다시 실행한다.
-- 처음 한 번만 한다. 다시 하면 새 주소가 생긴다. 코드를 갱신할 때는 「코드를 고친 뒤 다시 배포하기」를 따른다.
+- 보통 처음 한 번 한다. 다시 하면 새 주소가 생긴다. 코드를 갱신할 때는 「코드를 고친 뒤 다시 배포하기」를 따른다.
 - 설정 파일이 JSON 형식 오류로 읽히지 않으면 `…의 JSON 형식이 올바르지 않습니다. 쉼표와 따옴표를 고친 뒤 다시 실행하세요.`를 내고 배포를 만들기 전에 멈춘다. 틀린 위치는 `npm.cmd start`가 알려 준다(6절 「설정 파일 메시지」).
 
 확인: `GAS_WEBAPP_URL을 적었습니다.`가 나오고, 설정 파일의 `STORAGE_MODE`가 `live`다(원래 `mock`이었으면 그대로다).
@@ -128,13 +128,13 @@ npm.cmd run gas:deploy
 3. 6단계에서 만든 배포가 **웹 앱**이고, 실행 사용자가 **나**(Me), 액세스 권한이 있는 사용자가 **모든 사용자**(Anyone)인지 본다.
 4. 다르면 그 배포의 편집(연필) 버튼을 눌러 고치고 **배포**를 누른다. 같은 배포를 고치면 주소는 바뀌지 않는다.
 
-로컬 서버는 Google 로그인 없이 웹앱 주소로 요청을 보낸다. 그래서 "모든 사용자"가 아니면 연결되지 않는다. 웹 앱 주소를 아는 사람은 누구나 이 시트의 기록과 사진을 읽고 쓸 수 있고, 스크립트 속성의 OnePort 키로 Gemini 판독을 실행하거나(OnePort 크레딧이 쓰인다) 키를 바꿀 수 있다. 그러니 주소는 6절의 설정 파일에만 두고(`config/` 아래 설정 파일은 Git이 추적하지 않는다) 화면 공유나 메시지로 남에게 보이지 않는다. `gas:deploy`·`gas:redeploy`의 clasp 출력에는 배포 ID가, `gas:open`의 출력에는 주소가 그대로 나오므로 화면을 공유하는 중에는 이 명령을 실행하지 않는다.
+로컬 서버는 Google 로그인 없이 웹앱 주소로 요청을 보낸다. 그래서 "모든 사용자"가 아니면 연결되지 않는다. 웹 앱 주소를 아는 사람은 누구나 이 시트의 기록과 사진을 읽고 쓸 수 있고, 스크립트 속성의 OnePort 키로 Gemini 판독을 실행하거나(OnePort 크레딧이 쓰인다) 키를 바꿀 수 있다.
 
 확인: 배포 관리에 보이는 설정이 웹 앱, 나, 모든 사용자다.
 
 ### 단계 8. OnePort API 키 넣기 — 설정 파일
 
-3절의 OnePort 키를 Antigravity 채팅에 붙여 넣고 `config/local-connection.json`의 `ONEPORT_API_KEY`에 넣어 달라고 한다. Antigravity는 그 파일의 `ONEPORT_API_KEY` 한 줄만 바꾸고, 키 값을 화면이나 대화에 다시 출력하지 않는다(수업 규칙 `.agent/rules/class-rules.md` 7번).
+3절의 OnePort 키를 Antigravity 채팅에 붙여 넣고 `config/local-connection.json`의 `ONEPORT_API_KEY`에 넣어 달라고 한다. Antigravity가 그 파일의 `ONEPORT_API_KEY` 줄을 바꾼다.
 
 직접 고쳐도 된다. 파일을 메모장(macOS: 텍스트 편집기)이나 Antigravity 편집기로 열고 키를 `ONEPORT_API_KEY`의 따옴표 안에 붙여 넣고 저장한다.
 
@@ -144,7 +144,6 @@ npm.cmd run gas:deploy
 
 - 키는 10단계 `npm.cmd run gas:init`만 읽어 GAS 스크립트 속성 `ONEPORT_API_KEY`로 보낸다. `npm start`로 띄운 로컬 서버는 이 값을 환경 변수로 옮기지 않는다.
 - 같은 이름의 환경 변수는 읽지 않는다. 다른 도구용으로 넣어 둔 키가 GAS로 가지 않게 하려는 것이다.
-- 화면을 공유하는 중에는 키를 채팅이나 파일에 붙여 넣지 않는다.
 - 편집기의 **프로젝트 설정**, **스크립트 속성**에 직접 넣어도 된다(2절). 그때는 이 칸을 비워 둔다.
 - 예전에 쓰던 설정 파일에 `GEMINI_API_KEY` 줄이 남아 있으면 그 값은 읽지 않고 `설정 경고: 설정 키 GEMINI_API_KEY는 더 이상 쓰지 않는다.`로 시작하는 안내가 나온다. 그 줄을 지우고 `ONEPORT_API_KEY`에 OnePort 키를 넣는다.
 
@@ -159,7 +158,7 @@ npm.cmd run gas:deploy
    npm.cmd run gas:open
    ```
 2. 기본 브라우저가 3단계와 같은 계정으로 로그인돼 있어야 한다. 권한 확인 화면이 나오면 계정을 고르고 허용한다.
-   브라우저에 Google 계정이 여러 개 로그인돼 있으면 웹앱 주소가 다른 계정(보통 처음 로그인한 계정)으로 열려 "액세스 거부됨"이나 파일을 열 수 없다는 화면이 나올 수 있다. 그때는 시크릿 창(Chrome: Windows `Ctrl+Shift+N`, macOS `Cmd+Shift+N`)을 열고 3단계 계정으로만 로그인한 뒤, 터미널에 나온 주소를 그 창의 주소창에 붙여 넣어 연다. 주소는 남에게 보이지 않게 한다(7단계).
+   브라우저에 Google 계정이 여러 개 로그인돼 있으면 웹앱 주소가 다른 계정(보통 처음 로그인한 계정)으로 열려 "액세스 거부됨"이나 파일을 열 수 없다는 화면이 나올 수 있다. 그때는 시크릿 창(Chrome: Windows `Ctrl+Shift+N`, macOS `Cmd+Shift+N`)을 열고 3단계 계정으로만 로그인한 뒤, 터미널에 나온 주소를 그 창의 주소창에 붙여 넣어 연다.
    개인 Google 계정이면 "Google에서 확인하지 않은 앱" 경고가 나온다. 내가 만든 스크립트이므로 **고급**을 눌러 프로젝트로 이동한 뒤 허용한다.
 3. 화면에 `권한 승인이 끝났습니다. 이 창을 닫고 터미널로 돌아가세요.`가 들어 있는 짧은 JSON이 보이면 창을 닫는다. 기록은 들어 있지 않다.
 
@@ -196,7 +195,7 @@ npm.cmd run gas:init
 
 ### 편집기 붙여넣기 경로(대안)
 
-clasp를 쓸 수 없을 때(Apps Script API를 켤 수 없는 계정 등) 편집기에서 직접 만든다.
+clasp를 쓸 수 없을 때(Apps Script API를 켤 수 없는 계정 등) 편집기에서 만든다.
 
 | 단계 | 할 일 | 할 곳 |
 | --- | --- | --- |
@@ -209,7 +208,7 @@ clasp를 쓸 수 없을 때(Apps Script API를 켤 수 없는 계정 등) 편집
 1. [Apps Script](https://script.google.com)에서 **새 프로젝트**를 만든다. 편집기의 `Code.gs` 내용을 모두 지우고 이 저장소의 `courses/vision-96h-v2/gas/Code.gs` 내용을 그대로 붙여 넣은 뒤 저장한다.
    매니페스트(`appsscript.json`)는 붙여 넣지 않아도 동작한다. 시간대까지 맞추려면 **프로젝트 설정**에서 "편집기에 'appsscript.json' 매니페스트 파일 표시"를 켜고 저장소의 `appsscript.json` 내용으로 바꾼다.
 2. 상단 함수 목록에서 `initialSetup`을 고르고 **실행**을 누른다. 권한 확인 창은 9단계의 2번처럼 허용한다. 실행이 끝나면 10단계 1번의 시트와 폴더가 생긴다.
-3. **배포** 메뉴에서 **새 배포**를 누르고 유형을 **웹 앱**으로 고른다. 실행 사용자는 **나**(Me), 액세스 권한이 있는 사용자는 **모든 사용자**(Anyone)로 한다(7단계의 주의 사항을 읽는다).
+3. **배포** 메뉴에서 **새 배포**를 누르고 유형을 **웹 앱**으로 고른다. 실행 사용자는 **나**(Me), 액세스 권한이 있는 사용자는 **모든 사용자**(Anyone)로 한다(7단계 설명을 본다).
 4. 배포가 끝나면 나오는 **웹 앱 URL**(`https://`로 시작하고 `/exec`로 끝난다)을 `config/local-connection.json`의 `GAS_WEBAPP_URL`에 넣는다.
 5. 8단계대로 설정 파일에 키를 넣고 `npm.cmd run gas:init`을 실행한다. 편집기의 스크립트 속성 `ONEPORT_API_KEY`에 직접 넣어도 된다(2절). 속성은 배포한 뒤에 넣거나 바꿔도 다시 배포하지 않고 바로 반영된다.
 
@@ -229,7 +228,7 @@ npm.cmd run gas:init
 
 - `gas:redeploy`는 설정 파일의 `GAS_WEBAPP_URL`에서 배포 ID를 꺼내 `clasp update-deployment <배포 ID>`로 같은 배포를 새 버전으로 갱신한다. 주소는 그대로이고, 배포 ID를 따로 적지 않는다.
 - `gas:init`은 새 코드에 더한 탭이나 열을 시트에 채운다. 있는 시트와 폴더는 그대로 쓴다. 설정 파일에 키가 있으면 그 키를 다시 저장하고, 비어 있으면 스크립트 속성의 키를 건드리지 않는다.
-- `npm.cmd run gas:deploy`는 새 주소를 만들기 때문에 갱신에는 쓰지 않는다.
+- `npm.cmd run gas:deploy`는 새 주소를 만들기 때문에 갱신에는 보통 `npm.cmd run gas:redeploy`를 쓴다.
 - 갱신한 뒤에도 7단계처럼 배포 관리의 접근 설정이 웹 앱, 나, 모든 사용자인지 본다.
 
 편집기 붙여넣기 경로는 웹(클릭)에서 이렇게 한다.
@@ -259,8 +258,8 @@ npm.cmd run gas:init
 
 | 속성 | 넣는 방법 | 비고 |
 | --- | --- | --- |
-| `SPREADSHEET_ID` | `npm.cmd run gas:init`(또는 편집기에서 `initialSetup` 실행)이 자동으로 넣는다 | 직접 고치지 않는다 |
-| `DRIVE_FOLDER_ID` | `npm.cmd run gas:init`(또는 편집기에서 `initialSetup` 실행)이 자동으로 넣는다 | 직접 고치지 않는다 |
+| `SPREADSHEET_ID` | `npm.cmd run gas:init`(또는 편집기에서 `initialSetup` 실행)이 자동으로 넣는다 | `Vision_Risk_Records_Master_날짜` 스프레드시트의 ID다 |
+| `DRIVE_FOLDER_ID` | `npm.cmd run gas:init`(또는 편집기에서 `initialSetup` 실행)이 자동으로 넣는다 | `Vision_Risk_Records_Private_…` 폴더의 ID다 |
 | `ONEPORT_API_KEY` | 설정 파일의 `ONEPORT_API_KEY`를 `npm.cmd run gas:init`이 넣는다. 편집기에서 직접 넣어도 된다 | 3절 참고 |
 | `GEMINI_MODEL` | 선택. 비워 두면 `gemini-3.8-flash`를 쓴다 | 지금 쓸 수 있는 값은 `gemini-3.8-flash` 하나다 |
 
@@ -272,9 +271,9 @@ OnePort로 바꾸기 전 코드가 쓰던 속성은 이렇게 정리한다.
 - `GEMINI_FALLBACK_MODEL`: 더 읽지 않는다. 지워도 된다. 대체 모델로 다시 보내는 기능은 없앴다.
 - `GEMINI_MODEL`에 `gemini-3.5-flash-lite`가 들어 있으면 AI 판독이 `SETUP_REQUIRED`로 끝난다. 값을 지운다.
 
-`GEMINI_MODEL`을 넣을 때는 아래를 지킨다.
+`GEMINI_MODEL`을 넣을 때 알아 둘 점이다.
 
-- 값은 `gemini-3.8-flash`만 받는다. `models/` 접두사는 붙이지 않는다.
+- 값은 `gemini-3.8-flash`만 받는다. `models/` 접두사 없이 적는다.
 - 판독은 이 모델로 한 번만 보낸다. 붐비거나(HTTP 503) 한도에 걸려도(HTTP 429) 다른 모델로 다시 보내지 않는다.
 - 판독한 모델은 사건 상세의 Gemini 결과에 "판독 모델"로 보이고, 이력에도 남는다. `npm start`가 GAS에 물어 `연동 상태:` 줄에 `Gemini live(gemini-3.8-flash)`처럼 적는다.
 - 값이 틀리면 AI 판독만 `SETUP_REQUIRED`로 끝난다. 기록 저장에는 영향이 없다.
@@ -334,14 +333,14 @@ NotebookLM 연결은 패키지 `notebooklm-mcp-cli`(저장소 [jacob-bd/gemini-n
    로컬 서버는 `notebooklm-mcp`를 PATH에서 찾으므로 따로 등록하지 않아도 된다(5절). 설치한 뒤 새로 연 터미널에서 서버를 시작한다.
    Windows에서 `nlm`을 찾지 못하면 uv의 설치 폴더(`%USERPROFILE%\.local\bin`)가 PATH에 들어 있는지 본다.
    `nlm setup add antigravity`는 Antigravity에서 NotebookLM을 MCP 도구로 쓰려고 Antigravity 설정 파일(`~/.gemini/antigravity/mcp_config.json`)에 등록하는 명령이다. 대시보드를 실행하는 데는 필요 없다. 등록해 두면 로컬 서버도 그 항목을 쓴다(5절 2번).
-3. 로그인한다. 이 명령은 Antigravity 터미널에 **본인이 직접** 입력한다. 로그인을 5분(300초)까지만 기다리므로 에이전트에게 시키지 않는다.
+3. 로그인한다. 명령을 실행하면 로그인 창이 뜨고, 로그인을 5분(300초)까지만 기다리므로 바로 이어서 로그인한다.
    ```sh
    nlm login --storage protected
    ```
    - `--storage protected`는 로그인 정보를 어디에 둘지 묻지 않고 운영체제의 암호 저장소에 암호화해 둔다.
    - 로그인 창은 평소 쓰는 Chrome과 별도인 nlm 전용 프로필 창으로 새로 뜬다. 평소 Chrome을 닫지 않아도 된다. 평소 프로필의 북마크·로그인은 쓰지 않는다.
    - 첫 화면은 Google 로그인 화면이 아니라 Gemini Notebook 소개 페이지다(NotebookLM의 새 이름). 오른쪽 위 `Sign in`이나 가운데 `Sign in to Gemini Notebook`을 눌러 Google 로그인으로 넘어간 뒤 NotebookLM을 쓸 본인 계정으로 로그인한다.
-   - 성공 메시지가 나올 때까지 터미널과 로그인 창을 닫지 않는다.
+   - 성공 메시지가 나올 때까지 터미널과 로그인 창을 열어 둔다.
 4. 로그인 상태를 확인한다. `✓ Authentication valid!`가 나오면 된다.
    ```sh
    nlm login --check
@@ -427,17 +426,17 @@ Windows에서 나온 경로는 역슬래시(`\`)로 이어져 있다. 설정 파
 ## 6. 로컬 설정 파일
 
 `npm start`와 `gas:deploy`·`gas:redeploy`·`gas:init` 명령은 저장소의 `config/local-connection.json`을 읽는다.
-어느 폴더에서 실행해도 이 위치는 같다. 이 파일은 Git이 추적하지 않는다.
-clasp 경로에서는 `npm.cmd run gas:deploy`가 이 파일이 없으면 만들고 `GAS_WEBAPP_URL`만 채운다. 직접 만드는 방법은 [README](../README.md)의 "연결 설정 파일 만들기"를 따른다.
+어느 폴더에서 실행해도 이 위치는 같다.
+clasp 경로에서는 `npm.cmd run gas:deploy`가 이 파일이 없으면 만들고 `GAS_WEBAPP_URL`만 채운다. 명령 없이 만드는 방법은 [README](../README.md)의 "연결 설정 파일 만들기"를 따른다.
 
 | 키 | 값 | 얻는 곳 |
 | --- | --- | --- |
-| `GAS_WEBAPP_URL` | 웹 앱 URL(`https://…/exec`) | 1절 단계 6의 `npm.cmd run gas:deploy`가 적는다. 편집기에서 배포했으면 직접 넣는다 |
+| `GAS_WEBAPP_URL` | 웹 앱 URL(`https://…/exec`) | 1절 단계 6의 `npm.cmd run gas:deploy`가 적는다. 편집기에서 배포했으면 그 웹 앱 URL을 넣는다 |
 | `ONEPORT_API_KEY` | OnePort API 키(`sk-`로 시작). `npm.cmd run gas:init`만 읽어 GAS 스크립트 속성으로 보낸다. 로컬 서버는 쓰지 않는다 | 3절, 1절 단계 8 |
 | `NOTEBOOKLM_NOTEBOOK_ID` | 노트북 ID | 4절 |
 | `NOTEBOOKLM_SOURCE_IDS` | 소스 ID. 여러 개면 쉼표로 구분한 문자열 하나(`"ID1,ID2"`) | 4절 |
 | `NOTEBOOKLM_MCP_COMMAND` | MCP 실행 파일 경로나 명령 이름. Antigravity 설정을 쓰면 비워 둔다 | 5절 |
-| `VISION_TM_ROOT` | 학습한 TM 모델을 저장할 폴더. 비워 두면 기본 위치를 쓴다 | 직접 정한다 |
+| `VISION_TM_ROOT` | 학습한 TM 모델을 저장할 폴더. 비워 두면 기본 위치를 쓴다 | 원하는 폴더를 정한다 |
 | `REPOSITORY_IMAGES_ROOT` | 이미지 레포 폴더. 기본 위치에 두었으면 비워 둔다 | 12절 |
 | `STORAGE_MODE`, `GEMINI_MODE`, `NOTEBOOKLM_MODE` | 연동 스위치. 비워 두면 기본값을 쓴다 | 7절 |
 
@@ -446,7 +445,6 @@ clasp 경로에서는 `npm.cmd run gas:deploy`가 이 파일이 없으면 만들
   역슬래시를 하나만 쓰면 서버가 JSON 형식 오류로 멈추거나, 그 값을 경고하고 무시한다.
 - 파일은 UTF-8로 저장한다(메모장의 기본값이다). 파일 맨 앞의 BOM 표시는 서버가 떼고 읽는다.
   UTF-16으로 저장하면 서버가 알려 주고 시작하지 않는다. ANSI로 저장하면 한글 경로가 다른 글자로 바뀐다.
-- 시크릿 값은 이 파일에만 둔다. 이 파일을 커밋하거나 다른 사람에게 보내지 않는다.
 
 다른 위치의 설정 파일을 쓰려면 환경 변수 `VISION_RISK_CONFIG`에 그 파일의 절대 경로를 넣는다.
 
@@ -475,7 +473,7 @@ clasp 경로에서는 `npm.cmd run gas:deploy`가 이 파일이 없으면 만들
 | … 값은 문자열이어야 한다 | 값을 따옴표로 감싼다. 여러 ID는 쉼표로 이은 문자열 하나로 쓴다 |
 | … 값에 줄바꿈·탭 같은 제어 문자가 있다 | 경로의 역슬래시를 `/`나 두 번 쓴 역슬래시로 바꾼다 |
 | … 값이 예시 자리표시자 그대로다 | `/absolute/path/…` 같은 예시 값을 실제 경로나 `""`로 바꾼다 |
-| 예시 파일에 값이 들어 있다 | 예시 파일은 Git이 추적하므로 값을 넣지 않는다. 예시 파일의 값은 빈 문자열로 되돌리고, 값은 `config/local-connection.json`에만 넣는다 |
+| 예시 파일에 값이 들어 있다 | 예시 파일의 값은 빈 문자열로 되돌리고, 값은 `config/local-connection.json`에 넣는다 |
 
 알림:
 
@@ -499,7 +497,7 @@ Teachable Machine은 브라우저 안에서 돌아가므로 스위치가 없다.
 - 스위치는 설정 파일 키와 환경 변수가 같은 이름이다. 설정 파일에 비어 있지 않은 값이 있으면 그 값이 먼저다. 빈 값은 "정하지 않음"이다.
 - 값의 대소문자와 앞뒤 공백은 따지지 않는다.
 - `STORAGE_MODE=mock`(로컬 저장)이면 `preview/_synthetic_store.json`에 저장한다. `GAS_WEBAPP_URL`이 있어도 GAS를 부르지 않는다.
-- 로컬 저장소의 사진은 `preview/_synthetic_store_images/`에 한 장씩 저장되어 서버를 다시 시작해도 남는다. 기록 파일과 함께 git에서 제외된다.
+- 로컬 저장소의 사진은 `preview/_synthetic_store_images/`에 한 장씩 저장되어 서버를 다시 시작해도 남는다.
 - `NOTEBOOKLM_MODE=live`에는 `nlm login`, `NOTEBOOKLM_NOTEBOOK_ID`, `NOTEBOOKLM_SOURCE_IDS`가 필요하다(4절).
 - 환경 변수 `SYNTHETIC_MODE=true`는 `STORAGE_MODE=mock`과 같은 뜻이다. 이때 두 스위치의 기본값도 `mock`이 된다.
 - 수업에서는 `STORAGE_MODE=mock`, `GEMINI_MODE=mock`, `NOTEBOOKLM_MODE=live`로 시작한다. OnePort 키와 GAS 없이 NotebookLM만 실제로 시험하는 조합이다. 실제 연결은 셋 다 `live`다.
@@ -548,7 +546,7 @@ Gemini가 꺼져 있어도 Teachable Machine 예측이 있으면 NotebookLM 기�
      | `MCP_EXITED` | 실행은 됐지만 연결 중에 종료됐다. 터미널에서 같은 명령과 인자가 실행되는지 본다 |
      | `MCP_UNREACHABLE` | 그 밖의 이유로 연결하지 못했다. `error`를 본다 |
 
-   `mcp_status.serverInfo`의 메일 주소는 로컬 서버가 빼고 보낸다. 프로필 이름 같은 나머지 로그인 프로필 정보는 남으므로 화면을 공유할 때는 가린다.
+   `mcp_status.serverInfo`의 메일 주소는 로컬 서버가 빼고 보낸다. 프로필 이름 같은 나머지 로그인 프로필 정보는 그대로 나온다.
 3. `STORAGE_MODE=live`이면 브라우저에서 `http://127.0.0.1:8765/api/records`를 연다.
    `"success":true`가 보이면 GAS에 연결된 것이다. 새로 만든 시트면 `"records":[]`로 나온다.
    오류가 나오면 `error_code`를 본다.
@@ -597,7 +595,7 @@ Gemini가 꺼져 있어도 Teachable Machine 예측이 있으면 NotebookLM 기�
 
 홈의 저장소 사진과 모델 학습 사진은 별도 공개 저장소 `startup-life/vision-risk-student-images`에서 읽는다. 사진은 일반 파일이라 `git clone`만으로 받는다. Git LFS는 필요 없다.
 
-- **ZIP으로 받지 않는다.** GitHub의 **Code**, **Download ZIP**으로 받으면 `.git` 폴더가 없다. 대시보드는 git으로 원격 주소(origin)와 커밋을 확인하고 그 커밋의 매니페스트를 읽으므로 ZIP 폴더는 쓰지 못한다.
+- GitHub의 **Code**, **Download ZIP**으로 받으면 `.git` 폴더가 없다. 대시보드는 git으로 원격 주소(origin)와 커밋을 확인하고 그 커밋의 매니페스트를 읽으므로 ZIP 폴더는 쓰지 못한다. 그래서 단계 2처럼 `git clone`으로 받는다.
 - 공개 저장소라 GitHub 계정 없이 받는다.
 - 받는 양은 약 170MB다. 사진은 Train 180장(품질 90, 산업안전 90)과 Val 30장(트랙별 15)이다. Test 사진과 시퀀스 사진은 들어 있지 않다.
 
