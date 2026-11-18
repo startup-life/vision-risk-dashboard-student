@@ -36,13 +36,13 @@
 ## 4-1. 지침 세팅
 
 ```text
-이번 회차 문서를 이 프로젝트로 가져오기 위해, 수업 저장소(class)를 다시 받아 class/milestone-3의 docs/guide와 AGENTS.md를 이 프로젝트로 가져와 주세요(브랜치는 옮기지 않습니다).
-그다음 AGENTS.md를 작업 지침으로 삼아 주세요. 프롬프트에 없는 상세 구현(주소, 화면 문구, 파일 이름, 거절 규칙)은 docs/guide의 회차 문서와 그 회차 완료 브랜치 코드(class/milestone-4)에서 확인합니다.
+이번 회차 문서를 이 프로젝트로 가져오기 위해, 수업 저장소(class)를 다시 받아 class/milestone-3의 docs/guide와 AGENTS.md를 이 프로젝트의 지금 브랜치로 가져와 주세요.
+그다음 AGENTS.md를 작업 지침으로 삼아 주세요. 프롬프트에 없는 상세 구현(주소, 화면 문구, 파일 이름, 입력 검사)은 docs/guide의 회차 문서와 그 회차 완료 브랜치 코드(class/milestone-4)에서 확인합니다.
 지금은 AGENTS.md, docs/guide/session-1.md, docs/guide/session-4.md를 읽기만 하고, 읽은 파일 이름만 한 줄로 알려 주세요.
 ```
 
 - 하는 일: 수업 저장소에서 지침 파일과 보충 문서를 프로젝트로 가져오고, AI가 지침과 1·4회차 보충 문서를 읽어 둡니다. `docs\guide`에 4회차 보충 문서가 새로 생깁니다.
-- 목표: 4회차의 자세한 약속(주소, 화면 문구, 파일 이름, 거절 규칙)은 4회차 보충 문서와 완료 브랜치 코드에 있으므로, 이 프롬프트를 다른 번호보다 먼저 보냅니다.
+- 목표: 4회차의 자세한 약속(주소, 화면 문구, 파일 이름, 입력 검사)은 4회차 보충 문서와 완료 브랜치 코드에 있으므로, 이 프롬프트를 다른 번호보다 먼저 보냅니다.
 - 완료 기준: 탐색기에서 `docs\guide` 폴더에 `session-4.md`가 있고, AI 답에 `AGENTS.md`, `session-1.md`, `session-4.md`가 나옵니다. 앞 회차 문서 이름이 더 나와도 됩니다. 새 대화를 열 때마다 이 프롬프트를 먼저 보냅니다.
 
 ![4-1 4회차 보충 문서가 추가된 guide 폴더](images/session-4/04-6752ae13-4-1-guides.jpg)
@@ -436,7 +436,7 @@ NotebookLM에 물을 내용을 정하고 실제 연결 없이도 흐름을 연�
 powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
 
-2. 설치가 끝나면 그 PowerShell 창을 닫고 새로 연 뒤 아래를 한 줄씩 칩니다. 판 번호 0.15.6을 꼭 붙이고, 나중에 `Update available`이나 `uv tool upgrade` 안내가 나와도 올리지 않습니다.
+2. 설치가 끝나면 그 PowerShell 창을 닫고 새로 연 뒤 아래를 한 줄씩 칩니다. 판 번호 0.15.6을 붙여 설치합니다. 이 수업은 0.15.6으로 확인했으므로, 나중에 `Update available`이나 `uv tool upgrade` 안내가 나와 판을 올리면 명령의 출력과 앱의 NotebookLM 연결이 이 문서와 다르게 동작할 수 있습니다.
 
 ```powershell
 uv tool install notebooklm-mcp-cli==0.15.6
@@ -444,7 +444,7 @@ nlm --version
 nlm login --storage protected
 ```
 
-3. nlm 전용 Chrome 창이 뜨면 `Sign in`을 눌러 NotebookLM을 쓸 내 Google 계정으로 로그인합니다. PowerShell 창에 성공 줄이 나올 때까지 두 창을 닫지 않습니다. 그다음 `nlm login --check`를 칩니다.
+3. nlm 전용 Chrome 창이 뜨면 `Sign in`을 눌러 NotebookLM을 쓸 내 Google 계정으로 로그인합니다. PowerShell 창에 성공 줄이 나올 때까지 두 창을 그대로 둡니다. 그다음 `nlm login --check`를 칩니다.
 4. 서버 창을 닫고, AI 도구도 닫았다가 다시 엽니다. 같은 폴더에서 새 대화를 시작해 4-1을 다시 보내고, 답이 오면 "서버를 켜 주세요."라고 보냅니다. AI가 새 창에서 켜는 서버는 AI 도구를 열 때의 프로그램 찾는 경로(PATH)를 그대로 씁니다. 설치 전에 연 AI 도구로 켠 서버는 새로 설치한 프로그램을 찾지 못합니다.
 
 - 하는 일: 내 PC에 실제 NotebookLM을 부르는 도구(nlm)가 설치되고, 내 Google 계정으로 로그인한 상태가 저장됩니다. AI 도구를 다시 열고 서버를 새 창에서 켭니다.
@@ -482,13 +482,13 @@ nlm source list <노트북 ID>
 
 ```text
 실제 NotebookLM에 물을 준비가 되도록, 서버에 내 PC의 NotebookLM MCP 프로그램을 찾아 연결하는 기능을 추가하고, 연결 상태를 서버 확인용 데이터 주소와 서버 창 연동 상태 줄에 보여 주세요.
-필요한 패키지 @modelcontextprotocol/sdk 하나만 설치합니다. 질문을 보내는 일은 다음 번호에서 만듭니다.
+필요한 패키지 @modelcontextprotocol/sdk를 설치합니다. 질문을 보내는 일은 다음 번호에서 만듭니다.
 자세한 내용은 docs/guide/session-4.md의 "실행 파일과 연결"과 "연결 상태"를 참고해 주세요.
 ```
 
 - 하는 일: 서버가 4-23에서 설치한 프로그램을 찾아 연결하고, 연결 상태가 `/api/health`와 서버 창 연동 상태 줄에 나옵니다. 패키지 `@modelcontextprotocol/sdk`가 설치됩니다.
 - 목표: 4-26에서 이 연결로 실제 질문을 보냅니다. 연결이 안 되면 질문을 보내기 전에 여기서 알 수 있습니다.
-- AI가 설치 명령을 실행해도 되는지 물으면 승인합니다. 끝나면 AI가 서버를 서버 창에서 다시 켠 뒤 ego 브라우저에서 http://127.0.0.1:8765/api/health 를 엽니다.
+- AI가 설치 명령을 실행해도 되는지 물으면 승인합니다. 끝나면 AI가 서버 창에서 서버를 다시 켭니다. 그다음 ego 브라우저에서 http://127.0.0.1:8765/api/health 를 엽니다.
 - 완료 기준: `"connected":true`와 `"authStatus":"configured"`가 보이고 메일 주소는 없습니다. `"unreachable"`이 보이면 함께 나온 안내를 읽고 4-23부터 다시 봅니다.
 - 알아 두기: MCP 프로그램은 앱의 서버가 NotebookLM에 질문을 보낼 때 쓰는 중간 프로그램입니다. 4-23에서 설치했습니다.
 - 알아 두기: 이제 스위치가 `mock`이어도 화면을 열 때 서버가 이 프로그램을 띄워 로그인 상태를 봅니다. 질문은 보내지 않고 예시 결과도 그대로입니다. 프로그램이 응답할 때까지 화면 알림 줄의 연동 상태가 잠깐 비어 보일 수 있습니다.
@@ -545,9 +545,9 @@ NotebookLM이 내 노트북에 없는 문장을 근거로 내세우지 않도록
 
 4-28 실제 요청이 끝난 뒤의 알림 패널
 
-![4-28 실제 NotebookLM의 근거 확인 결과 (소스 ID가 보이지 않는 위치)](images/session-4/43-0a1fed98-4-28-live-result-no-id.png)
+![4-28 실제 NotebookLM 결과의 위쪽(판정 제목)](images/session-4/43-0a1fed98-4-28-live-result-no-id.png)
 
-4-28 실제 NotebookLM의 근거 확인 결과 (소스 ID가 보이지 않는 위치)
+4-28 실제 NotebookLM 결과의 위쪽(판정 제목)
 
 ## 4회차 끝 확인
 
