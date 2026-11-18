@@ -16,9 +16,9 @@ Google 쪽 코드는 내 컴퓨터 저장소와 같은 동작 이름, 같은 답
 - 4회차 문서에서 비어 있으면 live로 보던 NOTEBOOKLM_MODE("비워 두면 live")는 이제 비워 두면 STORAGE_MODE와 같은 값으로 바꿉니다.
 - 허용하지 않는 값이면 4회차 NOTEBOOKLM_MODE처럼 서버를 켜지 않고 허용 값을 알립니다.
 
-ONEPORT_API_KEY는 npm.cmd run gas:init만 읽어 Google 쪽 설정으로 보냅니다. 서버(npm.cmd start)는 이 값을 읽어 쓰지 않고 환경 변수로도 옮기지 않습니다.
+ONEPORT_API_KEY는 npm.cmd run gas:init이 읽어 Google 쪽 설정으로 보냅니다. 서버(npm.cmd start)는 이 값을 쓰지 않습니다.
 
-사용자가 대화에 OnePort 키를 붙여 넣으면 설정 파일의 ONEPORT_API_KEY 값만 그 키로 바꿉니다. 다른 줄은 그대로 둡니다.
+사용자가 대화에 OnePort 키를 붙여 넣으면 설정 파일의 ONEPORT_API_KEY 값을 그 키로 바꿉니다. 사용자가 함께 부탁하지 않은 줄은 그대로 둡니다.
 
 예전 설정 파일에 GEMINI_API_KEY 줄이 있으면 그 값은 읽지 않고 "알 수 없는 설정 키" 대신 "설정 경고: 설정 키 GEMINI_API_KEY는 더 이상 쓰지 않는다. 사진 판독은 OnePort를 거치므로 OnePort 키를 ONEPORT_API_KEY에 넣고 npm run gas:init을 다시 실행한다. GEMINI_API_KEY 줄은 지운다." 한 줄로 알립니다.
 
@@ -159,7 +159,7 @@ GEMINI_MODE=off여도 위 규칙은 그대로입니다. 판독하지 않은 사�
 
 ### 기본 틀과 답 모양
 
-프로젝트 맨 위 gas 폴더에 Code.gs와 appsscript.json 두 파일만 둡니다. Google에서 돌아가는 코드라 require, module.exports, import, process.env를 쓰지 않고 이 PC에서는 실행해 볼 수 없습니다.
+프로젝트 맨 위 gas 폴더에 Code.gs와 appsscript.json 두 파일을 둡니다. Google에서 돌아가는 코드라 require, module.exports, import, process.env를 쓰지 않고 이 PC의 node로는 실행되지 않습니다.
 
 appsscript.json의 값은 "timeZone": "Asia/Seoul", "runtimeVersion": "V8", "oauthScopes"는 https://www.googleapis.com/auth/spreadsheets, https://www.googleapis.com/auth/drive, https://www.googleapis.com/auth/script.external_request 세 개, "webapp": {"executeAs": "USER_DEPLOYING", "access": "ANYONE_ANONYMOUS"}입니다.
 
@@ -183,7 +183,7 @@ action은 setup, set_oneport_key, create_record, update_record, get_records, get
 
 ### 시트와 비공개 폴더 준비
 
-setup(함수 이름 initialSetup): 내 Drive에 스프레드시트 "Vision_Risk_Records_Master_(오늘 날짜 yyyyMMdd)"와 폴더 "Vision_Risk_Records_Private_(스프레드시트 ID 앞 8글자)"를 만들고 두 ID를 스크립트 속성 SPREADSHEET_ID, DRIVE_FOLDER_ID에 저장합니다. 이미 만든 것이 있으면 그대로 쓰고 빠진 탭과 열만 끝에 더합니다. 시트와 폴더는 비공개로 둡니다. 잠금 안에서 처리하므로 두 번 불려도 하나만 생깁니다.
+setup(함수 이름 initialSetup): 내 Drive에 스프레드시트 "Vision_Risk_Records_Master_(오늘 날짜 yyyyMMdd)"와 폴더 "Vision_Risk_Records_Private_(스프레드시트 ID 앞 8글자)"를 만들고 두 ID를 스크립트 속성 SPREADSHEET_ID, DRIVE_FOLDER_ID에 저장합니다. 이미 만든 것이 있으면 그대로 쓰고 빠진 탭과 열만 끝에 더합니다. setup은 공유 설정을 바꾸지 않으므로 시트와 폴더는 만든 사람만 볼 수 있습니다. 잠금 안에서 처리하므로 두 번 불려도 하나만 생깁니다.
 
 요청은 `{"action": "setup"}`이고 다른 항목은 없습니다. 답은 `{"success": true, "spreadsheet_id": "...", "drive_folder_id": "...", "tabs": [...]}`입니다.
 
@@ -203,7 +203,7 @@ set_oneport_key: 요청은 `{"action": "set_oneport_key", "api_key": "(키)"}`�
 
 ### 사건 상태 계산
 
-사건 상태 요약과 전체 대기열 개수(queue_counts) 계산을 Code.gs 안에도 서버와 같은 규칙으로 둡니다. 서버 코드를 옮겨 와도 되고 서버 코드는 고치지 않습니다. 시트에서 읽은 시각은 날짜 값이든 글자든 같은 ISO 시각 글자로 맞추고 참거짓 칸은 TRUE, true, "TRUE"를 모두 참으로 읽습니다.
+사건 상태 요약과 전체 대기열 개수(queue_counts) 계산을 Code.gs 안에도 서버와 같은 규칙으로 둡니다. 서버 코드를 옮겨 와도 되고, 이 일 때문에 서버 코드를 바꿀 필요는 없습니다. 시트에서 읽은 시각은 날짜 값이든 글자든 같은 ISO 시각 글자로 맞추고 참거짓 칸은 TRUE, true, "TRUE"를 모두 참으로 읽습니다.
 
 ### 사건 등록과 정보 수정
 
@@ -236,7 +236,7 @@ update_record의 요청 항목은 record_id, request_id, operator와 바꾸는 �
 - 지시문은 materials/gemini-prompt.txt의 글을 Code.gs 안에 상수로 글자 그대로 옮겨 사진 뒤에 `{"type": "text", "text": (지시문)}`으로 넣습니다. Google 쪽은 이 PC의 파일을 읽지 못합니다.
 - 요청 본문은 OpenAI 호환 모양입니다. model(판독 모델), messages(role "user"인 메시지 하나이고 content에 번호 글과 사진을 번갈아 넣은 뒤 지시문을 마지막에 둡니다), temperature 0.1, max_tokens 4000, response_format입니다. Gemini는 생각에 쓰는 토큰도 max_tokens에 넣어 세므로 이 값을 줄이지 않습니다.
 - response_format은 `{"type": "json_schema", "json_schema": {"name": "risk_draft", "strict": true, "schema": (판독 초안 스키마)}}`입니다. 판독 초안 스키마는 type "object"이고 properties에 facts, suspected_risk, locations, uncertainty, additional_checks 다섯 필드를 모두 type "string"으로 두며, required에 다섯 필드를 모두 넣고 additionalProperties는 false입니다. ai_drafts 탭에 저장하는 다섯 필드와 같습니다.
-- 모델은 gemini-3.8-flash 하나만 씁니다. 스크립트 속성 GEMINI_MODEL(기본 gemini-3.8-flash)로 바꿀 수 있고 목록 밖의 값이면 SETUP_REQUIRED와 "GAS 스크립트 속성의 GEMINI_MODEL은 gemini-3.8-flash만 쓸 수 있습니다. 값을 지우면 기본 모델을 씁니다."를 돌려줍니다. 예전 설정의 GEMINI_FALLBACK_MODEL은 읽지 않습니다.
+- 판독 모델은 gemini-3.8-flash입니다. 모델은 스크립트 속성 GEMINI_MODEL(비어 있으면 gemini-3.8-flash)에서 읽고, Code.gs의 허용 모델 목록에는 gemini-3.8-flash 하나가 들어 있습니다. 목록 밖의 값이면 SETUP_REQUIRED와 "GAS 스크립트 속성의 GEMINI_MODEL은 gemini-3.8-flash만 쓸 수 있습니다. 값을 지우면 기본 모델을 씁니다."를 돌려줍니다. 예전 설정의 GEMINI_FALLBACK_MODEL은 읽지 않습니다.
 - 주소는 https://oneport.kr/v1/chat/completions이고 POST로 보냅니다. 키는 주소에 넣지 않고 Authorization 헤더에 "Bearer (키)"로 넣습니다. 한 번만 보내고 다른 모델로 다시 보내지 않습니다. 보내다 예외가 나면 NETWORK_TIMEOUT(status "interrupted", interrupted true, 문장 "OnePort(Gemini) 호출 중 네트워크 오류가 발생했습니다.")입니다.
 
 ### 답 읽기와 저장
@@ -319,7 +319,7 @@ live일 때도 작업 기록은 지금 쓰는 작업 폴더(4회차 문서의 ru
 
 ### Drive 사진 보여 주기
 
-live에서 사건 사진 주소를 열면 서버가 get_image로 Drive 사진을 받아 보여 줍니다. 받은 사진은 Drive 파일 ID를 기준으로 runtime 폴더 안 image-cache 폴더에 저장해 두고 다음부터 씁니다. 파일 이름에는 Drive 파일 ID를 그대로 쓰지 않고 사건 번호, 사진 순서, Drive 파일 ID를 합친 글자의 SHA-256 값을 씁니다. 받은 사진이 2MB를 넘거나 JPG·PNG가 아니면 보여 주지 않습니다. 저장해 둔 사진을 읽을 때도 JPG·PNG인지 다시 확인하고, 저장이 실패해도 사진은 보여 줍니다.
+live에서 사건 사진 주소를 열면 서버가 get_image로 Drive 사진을 받아 보여 줍니다. 받은 사진은 Drive 파일 ID를 기준으로 runtime 폴더 안 image-cache 폴더에 저장해 두고 다음부터 씁니다. 파일 이름은 사건 번호, 사진 순서, Drive 파일 ID를 합친 글자의 SHA-256 값입니다. 받은 사진이 2MB를 넘거나 JPG·PNG가 아니면 보여 주지 않습니다. 저장해 둔 사진을 읽을 때도 JPG·PNG인지 다시 확인하고, 저장이 실패해도 사진은 보여 줍니다.
 
 서버와 Code.gs 모두 목록·상세의 사건 정보에 drive_folder_id와 drive_file_ids를 넣습니다. 내 컴퓨터 저장이면 빈 값이어도 됩니다. 사건 상태 요약에는 넣지 않습니다.
 
@@ -370,11 +370,11 @@ clasp create-deployment --description vision-risk로 새 웹앱 배포를 만들
 - 모르는 action이라는 답이면 "GAS 웹앱이 (setup 또는 set_oneport_key) 동작을 모릅니다(BAD_REQUEST). 웹앱 코드가 예전 것입니다. npm.cmd run gas:push와 npm.cmd run gas:redeploy로 최신 코드를 배포한 뒤 다시 실행하세요."를 보여 줍니다.
 - 그 밖의 실패는 "GAS (setup 또는 set_oneport_key) 요청에 실패했습니다((오류 코드)). (이유)"를 보여 줍니다. (이유)에서 키와 주소, 25글자가 넘는 영문·숫자 덩어리는 가립니다.
 - 성공하면 "Google 시트와 비공개 Drive 폴더를 준비했습니다."와 "OnePort API 키를 GAS 스크립트 속성 ONEPORT_API_KEY에 저장했습니다."를 보여 줍니다.
-- 웹앱 주소, 키, 긴 ID는 어느 경우에도 출력하지 않습니다.
+- gas:init은 웹앱 주소, 키, 긴 ID를 출력하지 않습니다.
 
 ### AI가 명령을 실행할 때
 
-gas:deploy는 한 번만 실행합니다. 다시 하면 새 주소가 생깁니다.
+AI가 gas:create, gas:push, gas:deploy, gas:redeploy, gas:init을 실행하면 답에 각 명령의 결과 줄을 알려 줍니다. gas:deploy는 새 웹앱 주소를 만듭니다. 이미 주소가 있으면 gas:redeploy로 같은 주소를 갱신합니다.
 
 ## 만들지 않는 것
 
