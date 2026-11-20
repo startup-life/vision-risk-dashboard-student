@@ -7,7 +7,7 @@
 학습에는 패키지 세 개와 준비 명령 하나가 필요합니다. 이 문서에서 "화면 폴더"는 1회차 문서의 public 폴더입니다. 이미 있는 코드가 화면 파일을 다른 폴더에 두면 index.html이 있는 그 폴더를 화면 폴더로 읽고 새 public 폴더를 만들지 않습니다.
 
 - 학습용 패키지는 @teachablemachine/image 0.8.5, @tensorflow/tfjs 1.3.1, esbuild 0.25.10 세 개입니다. package.json에 버전 앞 ^ 없이 이 버전 그대로 적고 "overrides": { "node-fetch": "2.7.0" }도 넣습니다. 설치는 npm.cmd install로 하고, 세 패키지를 더할 때 이미 있는 패키지 버전은 그대로 둡니다.
-- 준비 명령은 npm.cmd run setup:tm입니다(package.json의 setup:tm). 서버 창이 아닌 터미널에서 한 번 실행합니다. 인터넷이 필요합니다.
+- 준비 명령은 npm.cmd run setup:tm입니다(package.json의 setup:tm). 서버 창이 아닌 터미널에서 한 번 실행합니다. 인터넷이 필요합니다. AI가 npm.cmd install이나 이 명령을 실행할 때는 session-1.md의 "오래 걸리는 명령"대로 새 창에서 실행합니다. setup:tm이 중간에 끊겼으면 같은 명령을 다시 실행해도 됩니다(받은 파일을 덮어씁니다).
 - 준비 명령의 첫째 일: esbuild로 @tensorflow/tfjs와 @teachablemachine/image를 한 파일로 묶어 화면 폴더의 vendor/tm/runtime.js로 저장합니다. 브라우저에서 이 파일을 불러오면 window.tf와 window.tmImage로 쓸 수 있어야 합니다. 묶는 입구 파일은 import * as tf from '@tensorflow/tfjs', import * as tmImage from '@teachablemachine/image'로 불러와 window.tf와 window.tmImage에 넣는 네 줄이고 esbuild 설정은 bundle: true, minify: true, platform: 'browser'입니다.
 - 준비 명령의 둘째 일: 기초 모델 MobileNet v2(0.35)를 https://storage.googleapis.com/teachable-machine-models/mobilenet_v2_weights_tf_dim_ordering_tf_kernels_0.35_224_no_top/ 에서 받아 화면 폴더의 vendor/tm-v2/에 같은 이름으로 저장합니다. 그 주소의 model.json을 읽고 거기 적힌 가중치 파일(weightsManifest 안의 paths)을 모두 받은 뒤 model.json을 마지막에 저장합니다. 받다가 실패하면 어느 파일이 실패했는지 알리고 멈춥니다.
 - 브라우저는 이 파일들을 /vendor/tm/runtime.js, /vendor/tm-v2/model.json 주소로 불러옵니다.
