@@ -92,7 +92,7 @@
 
 홈과 사건 등록 화면의 저장소 사진은 별도 공개 저장소 `startup-life/vision-risk-student-images`에서 읽는다. 사진은 일반 파일이라 `git clone`만으로 받는다. Git LFS는 필요 없다.
 
-- GitHub의 **Code**, **Download ZIP**으로 받으면 `.git` 폴더가 없다. 대시보드는 git으로 원격 주소(origin)와 커밋을 확인하고 그 커밋의 매니페스트를 읽으므로 ZIP 폴더는 쓰지 못한다. 그래서 단계 2처럼 `git clone`으로 받는다.
+- GitHub의 **Code**, **Download ZIP**으로 받으면 `.git` 폴더가 없다. 대시보드는 git으로 origin(원격 주소)과 커밋을 확인하고 그 커밋의 매니페스트를 읽으므로 ZIP 폴더는 쓰지 못한다. 그래서 단계 2처럼 `git clone`으로 받는다.
 - 공개 저장소라 GitHub 계정 없이 받는다.
 - 받는 양은 약 170MB다. 사진은 210장이고, 대시보드는 그중 Train 사진 180장(품질 90, 산업안전 90)을 쓴다.
 
@@ -142,7 +142,7 @@ cd ../vision-risk-dashboard-student
 
 - `git status`가 `nothing to commit, working tree clean`이어야 한다.
 - 둘째 명령은 사진 수를 센다. `210`이어야 한다.
-- 탐색기에서 `vision-risk-student-images/assets/dataset/images`의 PNG 파일을 열어 그림이 보이면 된다.
+- 파일 탐색기(폴더와 파일을 보는 Windows 프로그램)에서 `vision-risk-student-images/assets/dataset/images`의 PNG 파일을 열어 그림이 보이면 된다.
 
 ### 단계 4. 대시보드에서 확인 — AI 도구(터미널)
 
