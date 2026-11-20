@@ -1,4 +1,4 @@
-# 4회차 보충 문서: 관련 기준 확인(NotebookLM)과 요청 알림
+# 4회차 보충 문서: NotebookLM(관련 기준 확인)과 요청 알림
 
 이 회차는 사건 상세에 "2. 관련 기준 확인 (NotebookLM)" 단계를 더합니다. 사용자가 확인 기준을 고르고 "관련 기준 찾기"를 누르면 서버가 요청을 작업 대기열에 넣어 하나씩 처리하고 끝난 결과를 사건 상세, 홈 카드, 판단 화면에 보여 줍니다. 3회차의 사건 기록, 판단, 조치, 이력은 그대로 쓰고 그 위에 더합니다. 먼저 예시 결과(mock)로 화면 흐름을 끝낸 뒤 실제 NotebookLM(live)을 연결합니다.
 
@@ -9,9 +9,9 @@
 설정 파일에 키 네 개를 더합니다.
 
 - NOTEBOOKLM_MODE: 연동 스위치
-- NOTEBOOKLM_NOTEBOOK_ID: 노트북 ID
+- NOTEBOOKLM_NOTEBOOK_ID: NotebookLM 노트북(문서를 모아 두는 곳) ID
 - NOTEBOOKLM_SOURCE_IDS: 소스 ID, 여러 개면 쉼표로 잇습니다
-- NOTEBOOKLM_MCP_COMMAND: NotebookLM MCP 실행 파일 위치, 비워 두면 PATH에서 찾습니다
+- NOTEBOOKLM_MCP_COMMAND: notebooklm-mcp(서버가 NotebookLM에 질문을 보낼 때 쓰는 중간 프로그램) 실행 파일 위치, 비워 두면 PATH에서 찾습니다
 
 NOTEBOOKLM_MODE 값은 off(꺼짐), mock(예시 결과), live(실제 NotebookLM) 세 가지이고 비어 있으면 live로 봅니다. 앞뒤 공백과 대소문자는 따지지 않습니다. 설정 파일에 값이 있으면 그 값을 쓰고 비어 있으면 같은 이름의 환경 변수를 씁니다.
 
@@ -284,7 +284,7 @@ review_summary에는 evidence(가장 최근 결과의 standard_id, source_id, qu
 
 ### 새로고침 뒤 이어 받기
 
-화면은 기다리는 요청(작업 번호, 사건 번호, 기준 번호, 요청 번호, 요청 시각)을 브라우저 탭 저장 공간(sessionStorage)의 vision_active_jobs라는 이름으로 저장합니다.
+화면은 기다리는 요청(작업 번호, 사건 번호, 기준 번호, 요청 번호, 요청 시각)을 sessionStorage(브라우저 탭 저장 공간)의 vision_active_jobs라는 이름으로 저장합니다.
 
 페이지를 열 때 받은 작업 목록에 대기·진행 중인 작업이 있으면 2초마다 상태 확인을 다시 시작합니다.
 
@@ -317,7 +317,7 @@ review_summary에는 evidence(가장 최근 결과의 standard_id, source_id, qu
 
 ## 실제 NotebookLM(live) 연결
 
-NotebookLM 도구는 notebooklm-mcp-cli 0.15.6입니다. 준비는 uv 설치, uv tool install notebooklm-mcp-cli==0.15.6, nlm login --storage protected(뜨는 Chrome 창에서 Google 계정으로 로그인), nlm notebook create "현장 리스크 기준" --json으로 노트북 만들기, nlm source add (노트북 ID) --file materials/factory-criteria-v1.txt --wait로 기준 원문 올리기 순서입니다. 나온 노트북 ID와 소스 ID는 설정 파일의 NOTEBOOKLM_NOTEBOOK_ID와 NOTEBOOKLM_SOURCE_IDS에 넣습니다. AI가 이 준비를 맡으면 uv 설치, uv tool install, nlm login, nlm source add … --wait는 session-1.md의 "오래 걸리는 명령"대로 새 창에서 하나씩 실행합니다. nlm login이 연 Chrome 창은 AI 도구로 누를 수 없으니, 새 창을 띄운 뒤 그 Chrome 창에서 할 일을 사용자에게 한 줄로 알립니다. nlm은 파이썬 프로그램이라 AI가 실행할 때는 같은 명령 맨 앞에(새 창이면 Start-Process 앞에) `$env:PYTHONUTF8='1';`을 둡니다(출력의 ✓와 한글 때문에 오류가 나거나 글이 깨지지 않게). AI의 터미널에서 설치 직후 nlm을 찾지 못하면 경로 다시 읽기 줄을 붙이고, 그래도 찾지 못하면 `& "$env:USERPROFILE\.local\bin\nlm.exe"`처럼 전체 경로로 부릅니다.
+notebooklm-mcp-cli 0.15.6(NotebookLM 도구)을 씁니다. 준비는 uv(Python 도구 관리자) 설치, uv tool install notebooklm-mcp-cli==0.15.6, nlm login --storage protected(뜨는 Chrome 창에서 Google 계정으로 로그인), nlm notebook create "현장 리스크 기준" --json으로 노트북 만들기, nlm source add (노트북 ID) --file materials/factory-criteria-v1.txt --wait로 기준 원문 올리기 순서입니다. 나온 노트북 ID와 소스 ID는 설정 파일의 NOTEBOOKLM_NOTEBOOK_ID와 NOTEBOOKLM_SOURCE_IDS에 넣습니다. AI가 이 준비를 맡으면 uv 설치, uv tool install, nlm login, nlm source add … --wait는 session-1.md의 "오래 걸리는 명령"대로 새 창에서 하나씩 실행합니다. nlm login이 연 Chrome 창은 AI 도구로 누를 수 없으니, 새 창을 띄운 뒤 그 Chrome 창에서 할 일을 사용자에게 한 줄로 알립니다. nlm(NotebookLM을 부르는 도구)은 파이썬 프로그램이라 AI가 실행할 때는 같은 명령 맨 앞에(새 창이면 Start-Process 앞에) `$env:PYTHONUTF8='1';`을 둡니다(출력의 ✓와 한글 때문에 오류가 나거나 글이 깨지지 않게). AI의 터미널에서 설치 직후 nlm을 찾지 못하면 경로 다시 읽기 줄을 붙이고, 그래도 찾지 못하면 `& "$env:USERPROFILE\.local\bin\nlm.exe"`처럼 전체 경로로 부릅니다.
 
 이 회차에 더하는 패키지는 @modelcontextprotocol/sdk입니다. 설치 명령은 npm.cmd install @modelcontextprotocol/sdk이고, session-1.md의 "오래 걸리는 명령"대로 새 창에서 실행합니다. 설치하면 package-lock.json이 새로 생기거나 바뀝니다.
 

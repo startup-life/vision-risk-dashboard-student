@@ -91,7 +91,7 @@ cp -n config/local-connection.example.json config/local-connection.json
 
 ## 4. 실행
 
-처음에는 외부 연결 없이 띄운다. `config/local-connection.json`에서 `NOTEBOOKLM_MODE`를 `mock`(예시 결과)으로 바꾼다. `mock`에서는 노트북 ID와 소스 ID가 비어 있어도 된다.
+처음에는 외부 연결 없이 띄운다. `config/local-connection.json`에서 `NOTEBOOKLM_MODE`를 `mock`(예시 결과)으로 바꾼다. `mock`에서는 NotebookLM 노트북(문서를 모아 두는 곳) ID와 소스 ID가 비어 있어도 된다.
 
 ```json
 "NOTEBOOKLM_MODE": "mock"
@@ -114,12 +114,12 @@ npm start
 
 검사 기준 원문(`courses/vision-96h-v2/preview/factory-criteria-v1.txt`)을 NotebookLM 노트북에 올려 두고, 사건 정보(분류·장소·메모·사진 장수)와 대조한다. 로컬 서버가 내 PC에 설치한 NotebookLM MCP를 직접 실행한다.
 
-1. `uv`를 설치하고 `uv tool install notebooklm-mcp-cli`로 `nlm`과 `notebooklm-mcp`를 설치한다.
+1. `uv`(Python 도구 관리자)를 설치하고 `uv tool install notebooklm-mcp-cli`로 `nlm`(NotebookLM을 부르는 도구)과 `notebooklm-mcp`(서버가 NotebookLM에 질문을 보낼 때 쓰는 중간 프로그램)를 설치한다.
 2. 터미널에서 `nlm login --storage protected`를 실행하고, 뜨는 Chrome 창에서 Google 계정으로 로그인한다.
 3. 노트북을 만들고 기준 문서를 소스로 올린 뒤, 노트북 ID와 소스 ID를 설정 파일의 `NOTEBOOKLM_NOTEBOOK_ID`·`NOTEBOOKLM_SOURCE_IDS`에 넣는다.
 4. `NOTEBOOKLM_MODE`를 `live`로 바꾸고 서버를 다시 시작한다.
 
-명령과 화면은 [로컬 실행 준비 1절](docs/LOCAL-SETUP.md#1-notebooklm-mcp)에, 실행 파일을 찾는 순서는 [2절](docs/LOCAL-SETUP.md#2-notebooklm-실행-파일-찾기-규칙)에, 결과를 읽는 법은 [6절](docs/LOCAL-SETUP.md#6-notebooklm-기준-확인-결과-읽기)에 있다.
+명령과 화면은 [로컬 실행 준비 1절](docs/LOCAL-SETUP.md#1-notebooklm-mcp)에, notebooklm-mcp 실행 파일을 찾는 순서는 [2절](docs/LOCAL-SETUP.md#2-notebooklm-실행-파일-찾기-규칙)에, 결과를 읽는 법은 [6절](docs/LOCAL-SETUP.md#6-notebooklm-기준-확인-결과-읽기)에 있다.
 
 ## 이 PC에 생기는 파일
 
