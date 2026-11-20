@@ -18,12 +18,12 @@
 
 | 연결 | 하는 일 | 준비하는 곳 |
 | --- | --- | --- |
-| GAS 웹앱 | 사건·판단 기록을 Google Sheets와 Drive에 저장하고 OnePort를 거쳐 Gemini를 호출한다 | Google Apps Script |
+| GAS 웹앱 | 사건·판단 기록을 Google Sheets와 Google Drive(내 Google 계정의 파일 보관함)에 저장하고 OnePort를 거쳐 Gemini를 호출한다 | Google Apps Script |
 | NotebookLM MCP | 검사 기준 원문과 사진 판독 결과를 대조한다 | 내 PC |
 | 로컬 설정 파일 | 위 두 곳의 주소·ID를 서버에 알려 주고, OnePort API 키를 GAS로 보낼 때 읽는다 | `config/local-connection.json` |
 
 1절부터 6절까지가 연결 준비다. 7절은 연동을 하나씩 켜고 끄는 스위치, 8절은 연결 확인, 9절은 NotebookLM 결과를 읽는 법, 10절은 서버를 끄는 법, 11절은 알려진 제한, 12절은 사진 저장소(이미지 레포)를 받는 법이다.
-API 키와 웹 앱 주소는 GAS 스크립트 속성과 6절의 설정 파일에 넣는다. 설정 파일에 넣을 때는 AI 도구의 대화창에 붙여 넣어 맡겨도 된다(1절 단계 8).
+API 키와 Apps Script 웹앱 주소(서버가 Apps Script 코드를 부를 때 쓰는 주소)는 GAS 스크립트 속성(Google에 저장해 두는 설정)과 6절의 설정 파일에 넣는다. 설정 파일에 넣을 때는 AI 도구의 대화창에 붙여 넣어 맡겨도 된다(1절 단계 8).
 
 단계마다 **할 곳**을 적었다.
 
@@ -39,11 +39,11 @@ API 키와 웹 앱 주소는 GAS 스크립트 속성과 6절의 설정 파일에
 학교·회사(Google Workspace) 계정은 관리자 설정 때문에 배포 액세스에서 "모든 사용자"를 고를 수 없을 수 있다.
 이 계정의 Drive에 스프레드시트와 비공개 폴더가 새로 생긴다.
 
-기본은 **clasp 경로**다. AI 도구의 터미널에서 명령으로 GAS 프로젝트를 만들고, 코드를 올리고, 웹앱으로 배포한다.
+기본은 **clasp 경로**다. AI 도구의 터미널에서 명령으로 GAS 프로젝트(Google에서 코드를 보관하고 실행하는 프로젝트)를 만들고, 코드를 올리고, 웹앱으로 배포한다.
 웹 화면에서 하는 일은 아래 표의 "웹(클릭)" 단계뿐이다.
-편집기에 코드를 붙여 넣는 방법은 [편집기 붙여넣기 경로(대안)](#편집기-붙여넣기-경로대안)로 남겨 두었다.
+Apps Script 편집기에 코드를 붙여 넣는 방법은 [편집기 붙여넣기 경로(대안)](#편집기-붙여넣기-경로대안)로 남겨 두었다.
 
-- clasp는 `npm run gas:*` 명령이 `npx`로 `@google/clasp@3.4.1`을 받아 실행하므로 따로 설치할 필요가 없다. `npx clasp …`를 바로 치면 3.4.1이 아닌 clasp가 실행될 수 있으므로 보통 npm 명령을 쓴다(편집기 열기도 `npm.cmd run gas:editor`).
+- clasp(내 컴퓨터의 연결 도구)는 `npm run gas:*` 명령이 `npx`로 `@google/clasp@3.4.1`을 받아 실행하므로 따로 설치할 필요가 없다. `npx clasp …`를 바로 치면 3.4.1이 아닌 clasp가 실행될 수 있으므로 보통 npm 명령을 쓴다(편집기 열기도 `npm.cmd run gas:editor`).
 - GAS에 올리는 파일은 `courses/vision-96h-v2/gas/`의 `Code.gs`와 `appsscript.json`이다. `appsscript.json`에 시간대(Asia/Seoul), 권한 범위(Sheets·Drive·외부 요청), 웹앱 설정(실행 사용자: 나, 액세스: 모든 사용자)이 들어 있다.
 - 명령은 Windows PowerShell 기준(`npm.cmd`, `npx.cmd`)으로 적었다. 명령 프롬프트와 macOS 터미널에서는 `.cmd`를 빼고 친다(위 "Windows에서 명령 입력하기").
 
@@ -58,7 +58,7 @@ API 키와 웹 앱 주소는 GAS 스크립트 속성과 6절의 설정 파일에
 | 7 | 배포 접근 설정 확인 | AI 도구(터미널), 이어서 웹(클릭) | `npm.cmd run gas:editor`, 편집기의 배포 관리 |
 | 8 | OnePort API 키 넣기 | 설정 파일 | `config/local-connection.json`의 `ONEPORT_API_KEY` |
 | 9 | 첫 권한 승인 | AI 도구(터미널), 이어서 웹(클릭) | `npm.cmd run gas:open` |
-| 10 | 초기화(시트·폴더 만들기, 키 저장) | AI 도구(터미널) | `npm.cmd run gas:init` |
+| 10 | 초기화(Google 시트(내 Google 계정의 표 문서)·폴더 만들기, 키 저장) | AI 도구(터미널) | `npm.cmd run gas:init` |
 
 ### 단계 2. Apps Script API 켜기 — 웹(클릭)
 
@@ -84,7 +84,7 @@ npm.cmd run gas:login
 npm.cmd run gas:create
 ```
 
-- standalone 프로젝트 "비전 리스크 대시보드"를 만들고 저장소 폴더에 `.clasp.json`을 만든다. 이 파일에는 사람마다 다른 프로젝트 ID가 들어 있다.
+- standalone 프로젝트 "비전 리스크 대시보드"를 만들고 저장소 폴더에 `.clasp.json`(Google 연결 설정 파일)을 만든다. 이 파일에는 사람마다 다른 프로젝트 ID가 들어 있다.
 - clasp는 새 프로젝트의 기본 파일을 `--rootDir` 폴더에 받아 온다. 그래서 빈 폴더 `runtime/gas-create`에서 만든 뒤 `.clasp.json`의 `rootDir`만 `courses/vision-96h-v2/gas`로 바꾼다. 저장소의 `appsscript.json`은 건드리지 않는다.
 - 이미 `.clasp.json`이 있으면 clasp가 `Project file already exists.`를 내고 새 프로젝트를 만들지 않는다.
 
@@ -207,7 +207,7 @@ clasp를 쓸 수 없을 때(Apps Script API를 켤 수 없는 계정 등) 편집
 | 5 | 키 저장 | AI 도구(터미널) 또는 웹(클릭) |
 
 1. [Apps Script](https://script.google.com)에서 **새 프로젝트**를 만든다. 편집기의 `Code.gs` 내용을 모두 지우고 이 저장소의 `courses/vision-96h-v2/gas/Code.gs` 내용을 그대로 붙여 넣은 뒤 저장한다.
-   매니페스트(`appsscript.json`)는 붙여 넣지 않아도 동작한다. 시간대까지 맞추려면 **프로젝트 설정**에서 "편집기에 'appsscript.json' 매니페스트 파일 표시"를 켜고 저장소의 `appsscript.json` 내용으로 바꾼다.
+   `appsscript.json`(매니페스트)은 붙여 넣지 않아도 동작한다. 시간대까지 맞추려면 **프로젝트 설정**에서 "편집기에 'appsscript.json' 매니페스트 파일 표시"를 켜고 저장소의 `appsscript.json` 내용으로 바꾼다.
 2. 상단 함수 목록에서 `initialSetup`을 고르고 **실행**을 누른다. 권한 확인 창은 9단계의 2번처럼 허용한다. 실행이 끝나면 10단계 1번의 시트와 폴더가 생긴다.
 3. **배포** 메뉴에서 **새 배포**를 누르고 유형을 **웹 앱**으로 고른다. 실행 사용자는 **나**(Me), 액세스 권한이 있는 사용자는 **모든 사용자**(Anyone)로 한다(7단계 설명을 본다).
 4. 배포가 끝나면 나오는 **웹 앱 URL**(`https://`로 시작하고 `/exec`로 끝난다)을 `config/local-connection.json`의 `GAS_WEBAPP_URL`에 넣는다.
@@ -324,12 +324,12 @@ NotebookLM 연결은 패키지 `notebooklm-mcp-cli`(저장소 [jacob-bd/gemini-n
 
 ### 설치와 로그인
 
-1. Python 도구 관리자 [uv](https://docs.astral.sh/uv/getting-started/installation/)를 설치한다. 설치가 끝나면 터미널 창을 닫고 새로 연다.
+1. [uv](https://docs.astral.sh/uv/getting-started/installation/)(Python 도구 관리자)를 설치한다. 설치가 끝나면 터미널 창을 닫고 새로 연다.
 2. 새 터미널에서 설치한다.
    ```sh
    uv tool install notebooklm-mcp-cli
    ```
-   명령줄 도구 `nlm`과 MCP 서버 `notebooklm-mcp`가 함께 설치된다.
+   `nlm`(NotebookLM을 부르는 도구)과 `notebooklm-mcp`(서버가 NotebookLM에 질문을 보낼 때 쓰는 중간 프로그램)가 함께 설치된다.
    `nlm`을 찾을 수 없다고 나오면 `uv tool update-shell`을 실행하고 터미널 창을 다시 연다(Windows에서는 확인하지 않았다).
    로컬 서버는 `notebooklm-mcp`를 PATH에서 찾으므로 따로 등록하지 않아도 된다(5절). 설치한 뒤 새로 연 터미널에서 서버를 시작한다.
    Windows에서 `nlm`을 찾지 못하면 uv의 설치 폴더(`%USERPROFILE%\.local\bin`)가 PATH에 들어 있는지 본다.
@@ -355,7 +355,7 @@ NotebookLM 연결은 패키지 `notebooklm-mcp-cli`(저장소 [jacob-bd/gemini-n
 아래 명령은 이 저장소 폴더에서 실행한다(파일을 상대 경로로 가리키기 때문이다).
 `<노트북 ID>`는 꺾쇠(`<`, `>`)까지 지우고 실제 ID로 바꿔 넣는다. PowerShell에서는 `<`가 특수 기호라 그대로 두면 오류가 난다.
 
-1. 노트북을 만든다. 출력되는 JSON의 `"notebook_id"` 값(36자 UUID)이 노트북 ID다.
+1. NotebookLM 노트북(문서를 모아 두는 곳)을 만든다. 출력되는 JSON의 `"notebook_id"` 값(36자 UUID)이 노트북 ID다.
    ```sh
    nlm notebook create "현장 리스크 기준" --json
    ```
@@ -376,9 +376,9 @@ NotebookLM 연결은 패키지 `notebooklm-mcp-cli`(저장소 [jacob-bd/gemini-n
 
 ## 5. NotebookLM 실행 파일 찾기 규칙
 
-로컬 서버는 아래 순서로 MCP 실행 파일을 찾는다. 앞에서 찾으면 뒤는 보지 않는다.
+로컬 서버는 아래 순서로 notebooklm-mcp 실행 파일을 찾는다. 앞에서 찾으면 뒤는 보지 않는다.
 
-1. 설정 파일(`config/local-connection.json`)의 `NOTEBOOKLM_MCP_COMMAND`. 같은 이름의 환경 변수도 된다.
+1. `config/local-connection.json`(설정 파일)의 `NOTEBOOKLM_MCP_COMMAND`. 같은 이름의 환경 변수도 된다.
    절대 경로나, PATH에 있는 명령 이름(`notebooklm-mcp`)을 쓴다.
 2. 값이 없으면 Antigravity의 MCP 설정 파일을 이 순서로 읽는다. 앞 파일에 항목이 있으면 뒤 파일은 읽지 않는다.
    - `~/.gemini/config/mcp_config.json` (Windows: `%USERPROFILE%\.gemini\config\mcp_config.json`)
@@ -596,7 +596,7 @@ Gemini가 꺼져 있어도 Teachable Machine 예측이 있으면 NotebookLM 기�
 
 홈의 저장소 사진과 모델 학습 사진은 별도 공개 저장소 `startup-life/vision-risk-student-images`에서 읽는다. 사진은 일반 파일이라 `git clone`만으로 받는다. Git LFS는 필요 없다.
 
-- GitHub의 **Code**, **Download ZIP**으로 받으면 `.git` 폴더가 없다. 대시보드는 git으로 원격 주소(origin)와 커밋을 확인하고 그 커밋의 매니페스트를 읽으므로 ZIP 폴더는 쓰지 못한다. 그래서 단계 2처럼 `git clone`으로 받는다.
+- GitHub의 **Code**, **Download ZIP**으로 받으면 `.git` 폴더가 없다. 대시보드는 git으로 origin(원격 주소)과 커밋을 확인하고 그 커밋의 매니페스트를 읽으므로 ZIP 폴더는 쓰지 못한다. 그래서 단계 2처럼 `git clone`으로 받는다.
 - 공개 저장소라 GitHub 계정 없이 받는다.
 - 받는 양은 약 170MB다. 사진은 Train 180장(품질 90, 산업안전 90)과 Val 30장(트랙별 15)이다. Test 사진과 시퀀스 사진은 들어 있지 않다.
 
@@ -646,7 +646,7 @@ cd ../vision-risk-dashboard-student
 
 - `git status`가 `nothing to commit, working tree clean`이어야 한다.
 - 둘째 명령은 사진 수를 센다. `210`이어야 한다.
-- 탐색기에서 `vision-risk-student-images/assets/dataset/images`의 PNG 파일을 열어 그림이 보이면 된다.
+- 파일 탐색기(폴더와 파일을 보는 Windows 프로그램)에서 `vision-risk-student-images/assets/dataset/images`의 PNG 파일을 열어 그림이 보이면 된다.
 
 ### 단계 4. 대시보드에서 확인 — AI 도구(터미널)
 

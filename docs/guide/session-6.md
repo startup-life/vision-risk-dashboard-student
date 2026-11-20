@@ -110,7 +110,7 @@ DELETE /api/tm/projects/(프로젝트 ID)/samples/(사진 항목 id): 프로젝�
 - 학습한 모델의 입력 방식("전체 사진 여백 맞춤"): 사진을 224×224 흰 바탕에 비율을 지키면서 잘라 내지 않고 통째로 넣습니다. 학습·검증·예측 모두 같습니다.
 - 사진이 적은 유형은 같은 사진을 반복해 넣어 유형마다 넣는 장수를 가장 많은 유형에 맞춥니다. 그 유형의 Train 장수가 n이고 가장 많은 유형이 max장이면 그 유형의 k번째 사진(0부터)은 floor(max / n)번 넣고 k가 max % n보다 작으면 한 번 더 넣습니다. 장수 차이가 크면 모델이 사진이 많은 유형만 고르기 쉽기 때문입니다.
 - 진행 문구는 "학습 파일을 준비하고 있어요.", "학습 사진 준비 3/20장", "학습 중 12/50회", "Val 확인 중 3/15장", "모델을 저장하고 있어요."입니다. "학습 사진 준비 3/20장"의 20은 반복해 넣기 전의 Train 사진 수입니다.
-- runtime.js를 불러오지 못하면 "학습 파일이 없습니다. 터미널에서 npm.cmd run setup:tm(macOS: npm run setup:tm)을 실행한 뒤 페이지를 새로 고쳐 주세요."를 보여 줍니다. createTeachable의 오류 글에 status code 404가 있으면 기초 모델을 불러오지 못한 것으로 보고 "학습 기초 모델 파일이 없습니다. 터미널에서 npm.cmd run setup:tm(macOS: npm run setup:tm)을 다시 실행한 뒤 페이지를 새로 고쳐 주세요."를 보여 줍니다.
+- runtime.js를 불러오지 못하면 "학습 파일이 없습니다. 터미널에서 npm.cmd run setup:tm(macOS: npm run setup:tm)을 실행한 뒤 페이지를 새로 고쳐 주세요."를 보여 줍니다. createTeachable의 오류 글에 status code 404가 있으면 MobileNet v2(기초 모델)를 불러오지 못한 것으로 보고 "학습 기초 모델 파일이 없습니다. 터미널에서 npm.cmd run setup:tm(macOS: npm run setup:tm)을 다시 실행한 뒤 페이지를 새로 고쳐 주세요."를 보여 줍니다.
 
 ### 검증과 저장
 

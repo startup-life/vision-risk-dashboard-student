@@ -15,7 +15,7 @@
 택배 발송 확인 기준
 
 현장 리스크 대시보드의 화면 틀을 만들고 확인 기준 9개를 표로 보여 줍니다.
-빈 폴더에 만든 내 저장소에서 코드 없이 시작하고, 1-2에서 AI가 수업 저장소의 `milestone-0` 브랜치에서 강사가 준 자료(`materials` 폴더), 프로젝트 규칙(`AGENTS.md`), 1회차 보충 문서(`docs/guide` 폴더)를 가져옵니다.
+빈 폴더에 만든 내 저장소에서 코드 없이 시작하고, 1-2에서 AI가 수업 저장소의 `milestone-0` 브랜치에서 `materials` 폴더(강사가 준 자료), `AGENTS.md`(프로젝트 규칙), `docs/guide` 폴더(1회차 보충 문서)를 가져옵니다.
 1-4에서 AI가 서버를 켜면 ego 브라우저에 화면 틀(머리말, 홈, 확인 기준 화면)이 보이고, 확인 기준 화면에 기준 9개가 표로 나옵니다.
 
 ## 시작 전에
@@ -27,7 +27,7 @@
 아래를 먼저 합니다.
 
 1. AI 도구: 강사가 안내한 AI 도구를 설치하고 로그인합니다.
-2. 프로젝트 폴더 만들기: 탐색기에서 `C:\vision-ai\vision-risk-dashboard` 폴더를 만듭니다. 바탕 화면, 문서 폴더, 한글이 든 경로에 만들면 오류가 날 수 있습니다.
+2. 프로젝트 폴더 만들기: 파일 탐색기(폴더와 파일을 보는 Windows 프로그램)에서 `C:\vision-ai\vision-risk-dashboard` 폴더를 만듭니다. 바탕 화면, 문서 폴더, 한글이 든 경로에 만들면 오류가 날 수 있습니다.
 3. AI 도구로 폴더 열기: AI 도구에서 이 폴더를 엽니다. 폴더를 신뢰할지 물으면 신뢰합니다. 명령을 실행하기 전에 승인을 묻는 설정이 있으면 켜 둡니다(도구마다 메뉴가 다릅니다). 그다음 새 대화를 시작합니다.
 
 ## 먼저 알아 둘 말
@@ -59,7 +59,7 @@
 
 ```text
 이 폴더에서 웹 서비스를 만들 준비를 하기 위해, 이 PC에 Node.js(22.9 이상, 새로 설치할 때는 24 LTS)와 Git이 있는지 확인하고 없으면 설치해 주세요.
-설치는 30초를 넘길 수 있으니 새 PowerShell 창에서 실행하고(winget이면 --accept-source-agreements --accept-package-agreements를 붙여서), 끝났는지는 20초 이하 간격으로 따로 확인해 주세요. 설치를 시작할 때 설치 승인 창이 뜨면 "예"를 눌러 달라고 먼저 알려 주세요. 설치한 뒤 명령을 찾지 못하면 프로그램 찾는 경로(PATH)를 다시 읽어 확인해 주세요.
+설치는 30초를 넘길 수 있으니 새 PowerShell 창에서 실행하고(winget이면 --accept-source-agreements --accept-package-agreements를 붙여서), 끝났는지는 20초 이하 간격으로 따로 확인해 주세요. 설치를 시작할 때 설치 승인 창이 뜨면 "예"를 눌러 달라고 먼저 알려 주세요. 설치한 뒤 명령을 찾지 못하면 PATH(프로그램 찾는 경로)를 다시 읽어 확인해 주세요.
 그다음 이 폴더를 내 git 저장소로 만들어 주세요. 끝나면 Node.js와 Git의 버전만 한 줄로 알려 주세요.
 ```
 
@@ -78,14 +78,14 @@
 ## 1-2. 지침 세팅
 
 ```text
-수업 자료를 이 프로젝트로 가져오기 위해, 수업 저장소 https://github.com/startup-life/vision-risk-dashboard-student 를 이 프로젝트에 class라는 이름의 원격 저장소로 추가해 milestone-0 브랜치를 받아 오고, class/milestone-0의 AGENTS.md, docs/guide, materials를 이 프로젝트의 지금 브랜치로 가져와 주세요. git 명령을 찾지 못하면 프로그램 찾는 경로(PATH)를 다시 읽어 실행해 주세요.
-그다음 AGENTS.md를 작업 지침으로 삼아 주세요. 프롬프트에 없는 상세 구현(주소, 화면 문구, 파일 이름, 입력 검사)은 docs/guide의 회차 문서와 그 회차 완료 브랜치 코드(class/milestone-1)에서 확인합니다.
+수업 자료를 이 프로젝트로 가져오기 위해, 수업 저장소 https://github.com/startup-life/vision-risk-dashboard-student 를 이 프로젝트에 class라는 이름의 원격 저장소로 추가해 milestone-0 브랜치를 받아 오고, class/milestone-0의 AGENTS.md, docs/guide, materials를 이 프로젝트의 지금 브랜치로 가져와 주세요. git 명령을 찾지 못하면 PATH(프로그램 찾는 경로)를 다시 읽어 실행해 주세요.
+그다음 AGENTS.md를 작업 지침으로 삼아 주세요. 프롬프트에 없는 상세 구현(주소, 화면 문구, 파일 이름, 입력 검사)은 docs/guide의 회차 문서와 class/milestone-1(그 회차 완료 브랜치 코드)에서 확인합니다.
 지금은 AGENTS.md와 docs/guide/session-1.md를 읽기만 하고, 읽은 파일 이름만 한 줄로 알려 주세요.
 ```
 
-- 하는 일: 수업 저장소의 `milestone-0` 브랜치에서 강사가 준 자료(`materials` 폴더), 지침(`AGENTS.md`), 1회차 보충 문서(`docs/guide` 폴더)를 프로젝트 폴더로 가져오고, AI가 지침과 1회차 보충 문서를 읽어 둡니다.
+- 하는 일: 수업 저장소의 `milestone-0` 브랜치에서 `materials` 폴더(강사가 준 자료), `AGENTS.md`(지침), `docs/guide` 폴더(1회차 보충 문서)를 프로젝트 폴더로 가져오고, AI가 지침과 1회차 보충 문서를 읽어 둡니다.
 - 목표: 프롬프트에 없는 주소, 화면 문구, 입력 검사는 AI가 지침과 보충 문서, 완료 브랜치 코드에서 찾아 따르므로 웹 서비스를 만드는 1-3보다 먼저 보냅니다.
-- 완료 기준: 탐색기의 프로젝트 폴더에 `AGENTS.md`, `docs`, `materials`가 생기고, AI 답에 `AGENTS.md`와 `session-1.md`가 나옵니다. 새 대화를 열 때마다 이 프롬프트를 먼저 보냅니다.
+- 완료 기준: 파일 탐색기의 프로젝트 폴더에 `AGENTS.md`, `docs`, `materials`가 생기고, AI 답에 `AGENTS.md`와 `session-1.md`가 나옵니다. 새 대화를 열 때마다 이 프롬프트를 먼저 보냅니다.
 
 ![1-2 지침과 수업 자료를 가져온 프로젝트 폴더](images/session-1/06-40832e44-1-2-instructions.png)
 
@@ -248,8 +248,8 @@
 자세한 내용은 docs/guide/session-1.md의 "설정 파일"을 참고해 주세요.
 ```
 
-- 하는 일: 서버가 켜질 때 설정 파일(`config/local-connection.json`)을 읽게 되고, `config` 폴더에 설정 예시 파일이 생깁니다.
-- 목표: 4회차의 NotebookLM 설정과 5회차의 Google 웹앱 주소·OnePort 키를 이 설정 파일에 모아 넣습니다.
+- 하는 일: 서버가 켜질 때 `config/local-connection.json`(설정 파일)을 읽게 되고, `config` 폴더에 설정 예시 파일이 생깁니다.
+- 목표: 4회차의 NotebookLM 설정과 5회차의 Apps Script 웹앱 주소(서버가 Apps Script 코드를 부를 때 쓰는 주소)·OnePort 키를 이 설정 파일에 모아 넣습니다.
 - 완료 기준: 프로젝트 폴더의 `config` 폴더에 `local-connection.example.json`이 생기고, AI가 다시 켠 서버 창에 경고 없이 `현장 리스크 대시보드: http://127.0.0.1:8765`가 나옵니다.
 
 ![1-11 설정 예시 파일이 만들어진 config 폴더](images/session-1/19-2b8f52f9-1-11-config-example.png)
