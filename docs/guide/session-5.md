@@ -1,7 +1,7 @@
-# 5회차 보충 문서: 사진 판독(Gemini)과 Google 시트 저장
+# 5회차 보충 문서: Gemini(사진 판독)와 Google 시트 저장
 
-이 회차는 사건 상세에 Gemini 사진 설명 단계를 넣고 사건 기록을 Google 시트와 Drive 비공개 폴더에 저장하는 기능을 더합니다. 4회차까지 내 컴퓨터 저장소와 NotebookLM으로 만든 웹 서비스는 그대로 두고 설정 파일의 스위치로 연습용 결과와 실제 연결을 고릅니다.
-Google 쪽 코드는 내 컴퓨터 저장소와 같은 동작 이름, 같은 답 모양을 쓰므로 화면 코드는 어느 저장소를 쓰는지 몰라도 됩니다. 앞 회차 문서와 다른 내용은 이 문서에 "바꿉니다"라고 적었습니다.
+이 회차는 사건 상세에 Gemini 사진 설명 단계를 넣고 사건 기록을 Google 시트(내 Google 계정의 표 문서)와 Google Drive(내 Google 계정의 파일 보관함) 비공개 폴더에 저장하는 기능을 더합니다. 4회차까지 내 컴퓨터 저장소와 NotebookLM으로 만든 웹 서비스는 그대로 두고 설정 파일의 스위치로 연습용 결과와 실제 연결을 고릅니다.
+Apps Script 코드(Google에서 돌아가는 코드)는 내 컴퓨터 저장소와 같은 동작 이름, 같은 답 모양을 쓰므로 화면 코드는 어느 저장소를 쓰는지 몰라도 됩니다. 앞 회차 문서와 다른 내용은 이 문서에 "바꿉니다"라고 적었습니다.
 
 이 문서는 3회차 문서(이력, 사건 상태)와 4회차 문서(연동 상태 줄, 작업 대기열, 요청 알림 패널, 관련 기준 확인)를 이어 받습니다. 이 기능을 건드릴 때는 session-3.md와 session-4.md도 읽습니다.
 
@@ -9,14 +9,14 @@ Google 쪽 코드는 내 컴퓨터 저장소와 같은 동작 이름, 같은 답
 
 ### 설정 파일의 새 키와 스위치
 
-설정 파일에 GAS_WEBAPP_URL(Google 웹앱 주소), ONEPORT_API_KEY(OnePort 키), STORAGE_MODE(저장소 스위치), GEMINI_MODE(Gemini 스위치)를 더합니다. 사진 판독은 Google 쪽 코드가 OnePort를 거쳐 Gemini 모델에 사진을 보내므로 키는 OnePort 키(sk-로 시작)를 씁니다.
+설정 파일에 GAS_WEBAPP_URL(Apps Script 웹앱 주소), ONEPORT_API_KEY(OnePort 키), STORAGE_MODE(저장소 스위치), GEMINI_MODE(Gemini 스위치)를 더합니다. 사진 판독은 Apps Script 코드가 OnePort를 거쳐 Gemini 모델에 사진을 보내므로 키는 OnePort 키(sk-로 시작)를 씁니다.
 
-- STORAGE_MODE는 live(Google 쪽 코드를 거쳐 Google 시트와 Drive에 저장) 또는 mock(지금처럼 이 PC의 파일에 저장)입니다. 비워 두면 live입니다.
+- STORAGE_MODE는 live(Apps Script 코드를 거쳐 Google 시트와 Drive에 저장) 또는 mock(지금처럼 이 PC의 파일에 저장)입니다. 비워 두면 live입니다.
 - GEMINI_MODE는 off(쓰지 않음), mock(모의 사진 설명), live(실제 Gemini)입니다. 비워 두면 STORAGE_MODE와 같은 값입니다.
 - 4회차 문서에서 비어 있으면 live로 보던 NOTEBOOKLM_MODE("비워 두면 live")는 이제 비워 두면 STORAGE_MODE와 같은 값으로 바꿉니다.
 - 허용하지 않는 값이면 4회차 NOTEBOOKLM_MODE처럼 서버를 켜지 않고 허용 값을 알립니다.
 
-ONEPORT_API_KEY는 npm.cmd run gas:init이 읽어 Google 쪽 설정으로 보냅니다. 서버(npm.cmd start)는 이 값을 쓰지 않습니다.
+ONEPORT_API_KEY는 npm.cmd run gas:init이 읽어 Apps Script 스크립트 속성(Google에 저장해 두는 설정)으로 보냅니다. 서버(npm.cmd start)는 이 값을 쓰지 않습니다.
 
 사용자가 대화에 OnePort 키를 붙여 넣으면 설정 파일의 ONEPORT_API_KEY 값을 그 키로 바꿉니다. 사용자가 함께 부탁하지 않은 줄은 그대로 둡니다.
 
@@ -48,7 +48,7 @@ STORAGE_MODE=live인데 GAS_WEBAPP_URL이 비어 있으면 사건 저장·조회
 
 ## 저장소 동작 이름
 
-서버는 데이터 주소로 받은 입력을 검사한 뒤 아래 동작 이름으로 저장소를 부릅니다. 지금은 모든 동작이 내 컴퓨터 저장소를 읽고 씁니다. 뒤에서 저장소 스위치가 live일 때 같은 이름을 Google 쪽 코드로 보내려면 이 층이 먼저 있어야 합니다. 화면과 기능은 바뀌지 않고 이미 이렇게 나뉘어 있으면 그대로 둡니다.
+서버는 데이터 주소로 받은 입력을 검사한 뒤 아래 동작 이름으로 저장소를 부릅니다. 지금은 모든 동작이 내 컴퓨터 저장소를 읽고 씁니다. 뒤에서 저장소 스위치가 live일 때 같은 이름을 Apps Script 코드로 보내려면 이 층이 먼저 있어야 합니다. 화면과 기능은 바뀌지 않고 이미 이렇게 나뉘어 있으면 그대로 둡니다.
 
 - create_record: 받는 항목은 request_id, location, category, memo, images(사진마다 base64, mimeType, filename)입니다. 답은 `{"success": true, "idempotent": false, "record_id": "...", "request_id": "...", "status": "REGISTERED", "created_at": "...", "image_count": 1, "drive_file_ids": [...], "version": 1, "updated_at": "...", "record": {...}}`입니다. 같은 request_id로 다시 오면 idempotent를 true로 두고 저장된 사건을 돌려줍니다.
 - update_record: 받는 항목은 record_id, request_id, operator와 바꾸는 값(location, category, memo)입니다. 답은 `{"success": true, "idempotent": false, "status": "updated", "record_id": "...", "version": 2, "updated_at": "...", "record": {...}}`입니다.
@@ -155,11 +155,11 @@ GEMINI_MODE=off여도 위 규칙은 그대로입니다. 판독하지 않은 사�
 - 판단 기록 화면의 "NotebookLM 기준 확인:" 칸 맨 위에 "Gemini 관찰 사실: (관찰 사실)"을 더합니다. 설명이 없으면 "AI 초안 미등록"입니다. 제목 아래 작은 사진 옆에는 판단 근거가 없을 때 관찰 사실을 보여 줍니다.
 - 사건 이력에서 단계 AI_ANALYSIS는 "Gemini 판독"으로, 작업자 끝의 "(Synthetic)"은 "(mock)"으로 보여 줍니다.
 
-## Google 쪽 코드(Apps Script)
+## Apps Script 코드
 
 ### 기본 틀과 답 모양
 
-프로젝트 맨 위 gas 폴더에 Code.gs와 appsscript.json 두 파일을 둡니다. Google에서 돌아가는 코드라 require, module.exports, import, process.env를 쓰지 않고 이 PC의 node로는 실행되지 않습니다.
+프로젝트 맨 위 gas 폴더에 Code.gs와 appsscript.json 두 파일을 둡니다. Apps Script 코드라 require, module.exports, import, process.env를 쓰지 않고 이 PC의 node로는 실행되지 않습니다.
 
 appsscript.json의 값은 "timeZone": "Asia/Seoul", "runtimeVersion": "V8", "oauthScopes"는 https://www.googleapis.com/auth/spreadsheets, https://www.googleapis.com/auth/drive, https://www.googleapis.com/auth/script.external_request 세 개, "webapp": {"executeAs": "USER_DEPLOYING", "access": "ANYONE_ANONYMOUS"}입니다.
 
@@ -226,14 +226,14 @@ update_record의 요청 항목은 record_id, request_id, operator와 바꾸는 �
 - 시트에 쓰다 실패하면 save_evidence_check는 INTERNAL_ERROR와 "근거 확인 저장 실패: (이유)", save_review는 STORAGE_FAILED와 "판단 기록을 시트에 저장하지 못했습니다: (이유)", save_action은 STORAGE_FAILED와 "조치 기록을 시트에 저장하지 못했습니다: (이유)"입니다.
 - reconcile_job은 판독(analyze)과 기준 확인 작업(evidence_check)의 저장 결과를 request_id로 찾아 돌려줍니다. 요청 항목과 답은 위 "사진 판독 요청"의 저장소 동작 reconcile_job과 같고 job_type이 없으면 analyze로 봅니다.
 
-## Google 쪽의 Gemini 판독(analyze_gemini)
+## Apps Script의 Gemini 판독(analyze_gemini)
 
 ### 사진과 지시문 보내기
 
 요청 항목은 record_id, request_id, input_version, image_ids, input_snapshot입니다(서버가 보내는 이름 그대로입니다). 같은 request_id의 설명이 이미 있으면 그것을 돌려줍니다. 스크립트 속성 ONEPORT_API_KEY가 없으면 SETUP_REQUIRED와 "GAS 스크립트 속성에 ONEPORT_API_KEY가 없습니다. npm.cmd run gas:init(macOS: npm run gas:init)으로 OnePort API 키를 넣어 주세요."입니다.
 
 - 서버가 보낸 사진 목록(image_ids, 없으면 사건의 drive_file_ids)을 Drive에서 순서대로 읽고 사진마다 앞에 "[사진 프레임 1/3]"처럼 번호 글을 붙입니다. 번호 글은 `{"type": "text", "text": "[사진 프레임 1/3]"}`, 사진은 `{"type": "image_url", "image_url": {"url": "data:(사진 종류);base64,(사진 내용)"}}` 모양입니다. 사진이 없으면 NO_IMAGES("분석할 원본 사진이 없습니다: (사건번호)"), 읽지 못하면 IMAGE_READ_FAILED("Drive 원본 사진(프레임 (번호), fileId: (파일 ID)) 읽기 실패: (이유)")입니다. status는 둘 다 "error"입니다.
-- 지시문은 materials/gemini-prompt.txt의 글을 Code.gs 안에 상수로 글자 그대로 옮겨 사진 뒤에 `{"type": "text", "text": (지시문)}`으로 넣습니다. Google 쪽은 이 PC의 파일을 읽지 못합니다.
+- 지시문은 materials/gemini-prompt.txt의 글을 Code.gs 안에 상수로 글자 그대로 옮겨 사진 뒤에 `{"type": "text", "text": (지시문)}`으로 넣습니다. Apps Script 코드는 이 PC의 파일을 읽지 못합니다.
 - 요청 본문은 OpenAI 호환 모양입니다. model(판독 모델), messages(role "user"인 메시지 하나이고 content에 번호 글과 사진을 번갈아 넣은 뒤 지시문을 마지막에 둡니다), temperature 0.1, max_tokens 4000, response_format입니다. Gemini는 생각에 쓰는 토큰도 max_tokens에 넣어 세므로 이 값을 줄이지 않습니다.
 - response_format은 `{"type": "json_schema", "json_schema": {"name": "risk_draft", "strict": true, "schema": (판독 초안 스키마)}}`입니다. 판독 초안 스키마는 type "object"이고 properties에 facts, suspected_risk, locations, uncertainty, additional_checks 다섯 필드를 모두 type "string"으로 두며, required에 다섯 필드를 모두 넣고 additionalProperties는 false입니다. ai_drafts 탭에 저장하는 다섯 필드와 같습니다.
 - 판독 모델은 gemini-3.8-flash입니다. 모델은 스크립트 속성 GEMINI_MODEL(비어 있으면 gemini-3.8-flash)에서 읽고, Code.gs의 허용 모델 목록에는 gemini-3.8-flash 하나가 들어 있습니다. 목록 밖의 값이면 SETUP_REQUIRED와 "GAS 스크립트 속성의 GEMINI_MODEL은 gemini-3.8-flash만 쓸 수 있습니다. 값을 지우면 기본 모델을 씁니다."를 돌려줍니다. 예전 설정의 GEMINI_FALLBACK_MODEL은 읽지 않습니다.
@@ -271,7 +271,7 @@ OnePort 오류 답의 본문은 `{"error": {"type": "...", "code": "...", "messa
 
 gemini_settings는 요청 항목이 없고 `{"success": true, "model": "(판독 모델)"}`을 돌려줍니다.
 
-## 서버가 Google 쪽을 부르는 법
+## 서버가 Apps Script 코드를 부르는 법
 
 ### 요청 보내기와 실패 이름
 
@@ -281,7 +281,7 @@ gemini_settings는 요청 항목이 없고 `{"success": true, "model": "(판독 
 
 Google 로그인 화면은 이동할 주소의 호스트가 accounts.google.com이거나 받은 글에 accounts.google.com/ServiceLogin이나 accounts.google.com/signin(가운데 v3/가 있어도)이 들어 있는 경우입니다.
 
-실패는 이렇게 바꿉니다. Google 로그인 화면으로 이동하거나 401·403이면 GAS_AUTH_REQUIRED, 접속을 못 하면 GAS_UNREACHABLE, 404면 GAS_URL_INVALID, 429면 RATE_LIMIT_EXCEEDED, JSON이 아니면 GAS_NON_JSON_RESPONSE, 그 밖의 HTTP 오류는 GAS_HTTP_ERROR, 시간 초과면 NETWORK_TIMEOUT입니다. 302를 받은 뒤의 실패와 시간 초과는 Google 쪽이 이미 실행했을 수 있으니 status "interrupted"로 둡니다. 오류 문장에 웹앱 주소를 넣지 않습니다.
+실패는 이렇게 바꿉니다. Google 로그인 화면으로 이동하거나 401·403이면 GAS_AUTH_REQUIRED, 접속을 못 하면 GAS_UNREACHABLE, 404면 GAS_URL_INVALID, 429면 RATE_LIMIT_EXCEEDED, JSON이 아니면 GAS_NON_JSON_RESPONSE, 그 밖의 HTTP 오류는 GAS_HTTP_ERROR, 시간 초과면 NETWORK_TIMEOUT입니다. 302를 받은 뒤의 실패와 시간 초과는 Apps Script 코드가 이미 실행했을 수 있으니 status "interrupted"로 둡니다. 오류 문장에 Apps Script 웹앱 주소(서버가 Apps Script 코드를 부를 때 쓰는 주소)를 넣지 않습니다.
 
 오류 코드마다 status와 문장은 아래와 같습니다.
 
@@ -305,7 +305,7 @@ status가 "interrupted"인 답에는 interrupted를 true로 둡니다.
 
 ### 저장소 고르기
 
-앞의 "저장소 동작 이름"을 부르는 자리에서 고릅니다. STORAGE_MODE=live이면 사건 등록, 정보 수정, 목록, 상세, 판단·조치 저장, 사진 판독, 기준 확인 결과 저장, 작업 맞춰 보기를 내 컴퓨터 저장소 대신 Google 쪽에 같은 action 이름으로 보냅니다. live 전용 처리를 따로 만들지 않습니다. mock이면 GAS_WEBAPP_URL에 값이 있어도 Google 쪽을 부르지 않습니다. 어느 쪽을 쓸지는 서버 한 곳에서 고릅니다. Google 쪽 사건 번호는 "R-" 뒤에 16진수 10글자가 오고 내 컴퓨터 저장소의 번호는 R-101 모양입니다. 화면 주소, 서버 데이터 주소, 작업 기록에서 사건 번호를 숫자 모양으로 검사하지 않고 두 모양을 모두 받습니다. 사건 등록, 정보 수정, 목록, 상세, 판단·조치 저장처럼 바로 답하는 주소는 Google 쪽 답을 기다렸다가(await) 그 결과나 오류로 응답합니다. 사진 판독과 기준 확인은 바로 202로 답하고 작업 대기열 안에서 Google 쪽 답을 기다립니다.
+앞의 "저장소 동작 이름"을 부르는 자리에서 고릅니다. STORAGE_MODE=live이면 사건 등록, 정보 수정, 목록, 상세, 판단·조치 저장, 사진 판독, 기준 확인 결과 저장, 작업 맞춰 보기를 내 컴퓨터 저장소 대신 Apps Script 코드에 같은 action 이름으로 보냅니다. live 전용 처리를 따로 만들지 않습니다. mock이면 GAS_WEBAPP_URL에 값이 있어도 Apps Script 코드를 부르지 않습니다. 어느 쪽을 쓸지는 서버 한 곳에서 고릅니다. Apps Script 코드가 만드는 사건 번호는 "R-" 뒤에 16진수 10글자가 오고 내 컴퓨터 저장소의 번호는 R-101 모양입니다. 화면 주소, 서버 데이터 주소, 작업 기록에서 사건 번호를 숫자 모양으로 검사하지 않고 두 모양을 모두 받습니다. 사건 등록, 정보 수정, 목록, 상세, 판단·조치 저장처럼 바로 답하는 주소는 Apps Script 코드의 답을 기다렸다가(await) 그 결과나 오류로 응답합니다. 사진 판독과 기준 확인은 바로 202로 답하고 작업 대기열 안에서 Apps Script 코드의 답을 기다립니다.
 
 서버를 켤 때는 연동 상태 줄을 먼저 보여 줍니다. Gemini가 live이면 이어서 gemini_settings로 판독 모델을 물어 "연동 상태: 저장소 Google 시트 · Gemini live(gemini-3.8-flash) · NotebookLM live"처럼 모델을 붙인 줄을 한 번 더 보여 주고 /api/health의 integration_status에도 같은 줄을 씁니다. 묻지 못하면 "Gemini 판독 모델을 GAS에서 확인하지 못했습니다: (이유)"를 보여 주고 서버는 그대로 켜 둡니다.
 
@@ -323,11 +323,11 @@ live에서 사건 사진 주소를 열면 서버가 get_image로 Drive 사진을
 
 서버와 Code.gs 모두 목록·상세의 사건 정보에 drive_folder_id와 drive_file_ids를 넣습니다. 내 컴퓨터 저장이면 빈 값이어도 됩니다. 사건 상태 요약에는 넣지 않습니다.
 
-## Google 쪽 명령(package.json의 npm.cmd run gas:…)
+## Apps Script 명령(package.json의 npm.cmd run gas:…)
 
 프로젝트 맨 위의 .clasp.json을 "Google 연결 설정 파일"이라고 부릅니다.
 
-clasp는 npx --yes @google/clasp@3.4.1로 부르고 묻는 질문 없이 끝나게 합니다. 도우미 스크립트에서 부를 때 Windows에서는 셸로 실행하고, clasp 출력은 그대로 보여 줍니다. 셸로 실행하면 셸이 명령 줄을 띄어쓰기로 나누므로, 프로젝트 제목처럼 띄어쓰기가 있는 값은 큰따옴표까지 함께 넘겨 한 덩어리로 전달합니다.
+clasp(내 컴퓨터의 연결 도구)는 npx --yes @google/clasp@3.4.1로 부르고 묻는 질문 없이 끝나게 합니다. 도우미 스크립트에서 부를 때 Windows에서는 셸로 실행하고, clasp 출력은 그대로 보여 줍니다. 셸로 실행하면 셸이 명령 줄을 띄어쓰기로 나누므로, 프로젝트 제목처럼 띄어쓰기가 있는 값은 큰따옴표까지 함께 넘겨 한 덩어리로 전달합니다.
 
 도우미 스크립트는 clasp의 실행 오류, 신호로 중단됨, 종료 코드가 0이 아닌 경우를 먼저 확인합니다. 하나라도 해당하면 "clasp 명령을 완료하지 못했습니다. 위 출력을 확인하세요."로 끝냅니다(종료 코드 1). 성공 문구가 함께 나와도 성공으로 처리하지 않습니다. 정상 종료해도 아래 각 명령의 성공 결과까지 맞아야 합니다. 성공 결과는 표준 출력(stdout)에서만 읽고, 오류 출력(stderr)은 보여 주기만 합니다. 오류 출력에 적힌 ID나 성공 문구를 쓰지 않습니다. npm의 일반 경고만으로 실패 처리하지는 않습니다.
 
@@ -369,7 +369,7 @@ Windows에서는 `spawnSync('start "" "' + url + '"', { shell: true })`처럼 �
 
 ### gas:init
 
-서버의 Google 쪽 요청 부품을 함께 씁니다. 설정 파일의 GAS_WEBAPP_URL로 Google 쪽에 setup을 보내고, ONEPORT_API_KEY에 값이 있으면 set_oneport_key로 키를 보냅니다. 다시 실행해도 됩니다. 키는 설정 파일에서만 읽고 같은 이름의 환경 변수는 읽지 않습니다. 아래 순서로 진행합니다.
+서버의 Apps Script 요청 부품(Apps Script 코드로 요청을 보내는 함수)을 함께 씁니다. 설정 파일의 GAS_WEBAPP_URL로 Apps Script 코드에 setup을 보내고, ONEPORT_API_KEY에 값이 있으면 set_oneport_key로 키를 보냅니다. 다시 실행해도 됩니다. 키는 설정 파일에서만 읽고 같은 이름의 환경 변수는 읽지 않습니다. 아래 순서로 진행합니다.
 
 1. GAS_WEBAPP_URL이 비어 있으면 "GAS_WEBAPP_URL이 비어 있습니다. npm.cmd run gas:deploy로 배포하면 자동으로 적힙니다. 편집기에서 배포했다면 웹 앱 URL을 config/local-connection.json의 GAS_WEBAPP_URL에 넣으세요."를 보여 주고 끝납니다.
 2. setup을 보내기 전에 키 형식을 검사합니다. 키가 있는데 형식이 틀리면 "ONEPORT_API_KEY 값이 OnePort API 키 형식이 아닙니다(sk-로 시작하고 영문·숫자·-·_ 20자 이상이 이어짐). sk-로 시작하는 OnePort 키를 따옴표 안에 그대로 넣었는지 확인하세요. 아무것도 보내지 않았습니다."를 보여 주고 아무것도 보내지 않습니다.
@@ -378,7 +378,7 @@ Windows에서는 `spawnSync('start "" "' + url + '"', { shell: true })`처럼 �
 
 상황별로 아래 문장을 보여 줍니다.
 
-- Google 쪽이 승인·로그인 화면을 돌려주면 "GAS 웹앱이 아직 권한 승인 전입니다. npm.cmd run gas:open으로 웹앱 주소를 한 번 열어 허용하세요. 안 되면 npm.cmd run gas:editor로 편집기를 열고 initialSetup을 한 번 실행하세요."를 보여 줍니다.
+- Apps Script가 승인·로그인 화면을 돌려주면 "GAS 웹앱이 아직 권한 승인 전입니다. npm.cmd run gas:open으로 웹앱 주소를 한 번 열어 허용하세요. 안 되면 npm.cmd run gas:editor로 편집기를 열고 initialSetup을 한 번 실행하세요."를 보여 줍니다.
 - 모르는 action이라는 답이면 "GAS 웹앱이 (setup 또는 set_oneport_key) 동작을 모릅니다(BAD_REQUEST). 웹앱 코드가 예전 것입니다. npm.cmd run gas:push와 npm.cmd run gas:redeploy로 최신 코드를 배포한 뒤 다시 실행하세요."를 보여 줍니다.
 - 그 밖의 실패는 "GAS (setup 또는 set_oneport_key) 요청에 실패했습니다((오류 코드)). (이유)"를 보여 줍니다. (이유)에서 키와 주소, 25글자가 넘는 영문·숫자 덩어리는 가립니다.
 - 성공하면 "Google 시트와 비공개 Drive 폴더를 준비했습니다."와 "OnePort API 키를 GAS 스크립트 속성 ONEPORT_API_KEY에 저장했습니다."를 보여 줍니다.
