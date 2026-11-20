@@ -51,12 +51,12 @@ Start-Process powershell -ArgumentList '-NoExit','-Command','$env:Path = [Enviro
 ```
 
 - 몇 초 뒤 "켜기 전 확인"의 포트 명령으로 8765번 포트를 듣는 프로세스가 생겼는지 봅니다.
-- 생겼으면 새 PowerShell 창에서 서버를 켰다고 알리고 주소 http://127.0.0.1:8765 를 알려 줍니다. 사용자가 화면을 열어 달라고 하면 AI가 ego 브라우저로 엽니다.
+- 생겼으면 새 PowerShell 창에서 서버를 켰다고 알리고 주소 http://127.0.0.1:8765 를 알려 줍니다. 사용자가 화면을 열어 달라고 하면 AI가 ego (lite) 브라우저로 엽니다.
 - 생기지 않았으면 "감시 확인"을 합니다. 줄이 나오면 새 창을 더 열지 않고 원인을 찾아 고친 뒤 "다시 켤 때"대로 같은 창에서 다시 켭니다. 줄이 나오지 않으면(경로가 틀려 서버 창에서 npm.cmd start가 시작되지 않은 경우 등) 원인을 고친 뒤 "새 창에서 켜기"로 다시 켭니다. 원인을 찾지 못하면 서버 창에 나온 빨간 줄을 복사해 붙여 넣어 달라고 합니다.
 
 **다시 켤 때.** 따로 부탁이 없으면 서버를 끄거나 새 창을 열지 않고 같은 창에서 다시 켭니다. 사용자가 끄고 새 창에서 켜 달라고 하면 "끄기"대로 끈 뒤 "새 창에서 켜기"로 켭니다.
 
-- server 폴더의 .js 파일을 고쳤으면 서버가 같은 창에서 알아서 다시 켜집니다. 서버 창에 `Restarting`으로 시작하는 줄과 시작 줄이 다시 나옵니다. 화면 파일(public 폴더)만 고쳤으면 서버는 그대로이고, 서버가 캐시를 끄므로 ego 브라우저에서 새로고침(F5)만 하면 바뀐 화면이 보입니다.
+- server 폴더의 .js 파일을 고쳤으면 서버가 같은 창에서 알아서 다시 켜집니다. 서버 창에 `Restarting`으로 시작하는 줄과 시작 줄이 다시 나옵니다. 화면 파일(public 폴더)만 고쳤으면 서버는 그대로이고, 서버가 캐시를 끄므로 ego (lite) 브라우저에서 새로고침(F5)만 하면 바뀐 화면이 보입니다.
 - server 폴더 밖의 파일(package.json, .env, 설정 파일)을 고쳤거나 파일을 고치지 않고 다시 켜야 하면(사용자가 다시 켜 달라고 할 때 등) 시작 파일의 수정 시각만 바꿉니다. 서버가 파일이 바뀐 것으로 보고 같은 창에서 다시 켜집니다. 프로젝트 폴더가 다르면 경로를 바꿉니다.
 
 ```powershell
@@ -92,7 +92,7 @@ AI 도구에 따라서는 AI가 실행하는 명령에 아래 제한이 있습�
 $env:Path = [Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [Environment]::GetEnvironmentVariable('Path','User'); <명령>
 ```
 
-- 외부 프로그램에 넘기는 글: `curl.exe`, `git`, `ego-browser` 같은 외부 프로그램의 인자 안에 큰따옴표를 넣지 않습니다. PowerShell 판에 따라 큰따옴표가 사라집니다. 외부 프로그램에 파이프(`|`)로 한글을 넘기지도 않습니다. 판에 따라 `?`로 바뀝니다. 큰따옴표가 든 글(JSON 본문 등)과 브라우저 스크립트는 AI 도구의 파일 쓰기로 파일에 저장한 뒤 파일로 넘깁니다. 예: `curl.exe`의 본문은 `--data-binary '@(파일 전체 경로)'`, 브라우저 스크립트는 아래 "ego 브라우저"의 꼴. `npm.cmd`처럼 `.cmd`로 설치된 명령도 같습니다. 작은따옴표로 감싼 인자 속 한글(예: `git commit -m '고친 내용'`)은 이 규칙에 들지 않습니다.
+- 외부 프로그램에 넘기는 글: `curl.exe`, `git`, `ego-browser` 같은 외부 프로그램의 인자 안에 큰따옴표를 넣지 않습니다. PowerShell 판에 따라 큰따옴표가 사라집니다. 외부 프로그램에 파이프(`|`)로 한글을 넘기지도 않습니다. 판에 따라 `?`로 바뀝니다. 큰따옴표가 든 글(JSON 본문 등)과 브라우저 스크립트는 AI 도구의 파일 쓰기로 파일에 저장한 뒤 파일로 넘깁니다. 예: `curl.exe`의 본문은 `--data-binary '@(파일 전체 경로)'`, 브라우저 스크립트는 아래 "ego (lite) 브라우저"의 꼴. `npm.cmd`처럼 `.cmd`로 설치된 명령도 같습니다. 작은따옴표로 감싼 인자 속 한글(예: `git commit -m '고친 내용'`)은 이 규칙에 들지 않습니다.
 - 묻는 명령: 묻지 않게 하는 옵션을 붙입니다. 예: `npx --yes`, `Remove-Item -Force`, `winget install (이름) --accept-source-agreements --accept-package-agreements`.
 - `2>&1`: `git`, `npm.cmd` 같은 프로그램의 출력에 `2>&1`이나 `2>(파일)`을 붙이면 경고 한 줄에도 명령이 멈출 수 있습니다. 붙여야 하면 같은 명령 맨 앞에 `$ErrorActionPreference='Continue';`를 둡니다.
 - 출력 줄이기: 출력이 길 것 같으면 `| Select-Object -Last 40`이나 `| Select-String '(찾을 글)'`을 붙여 필요한 줄만 봅니다. 파일 전체를 봐야 하면 아래 "긴 출력 읽기"대로 합니다.
@@ -152,7 +152,7 @@ if (Get-Process -Id (번호) -ErrorAction SilentlyContinue) { '실행 중' } els
 - 30초에 끊긴 명령은 시간 초과 오류만 남고 출력은 오지 않습니다. 실패가 아니라 어디까지 됐는지 모르는 상태입니다.
 - 다시 실행하기 전에 그 명령의 결과가 이미 생겼는지 먼저 봅니다. 예: 만들어진 파일이나 폴더, 설치된 명령의 버전, Apps Script 배포 목록, 시트의 끝 줄.
 - 결과가 생겼으면 다시 실행하지 않습니다. 생기지 않았으면 "새 창에서 실행하기"로 다시 실행합니다. 설치가 중간에 끊겼으면 새 창에서 같은 설치를 다시 실행합니다.
-- ego 브라우저에서 단추를 누르는 실행이 끊겼을 때도 같습니다. 같은 단추를 다시 누르기 전에 결과가 생겼는지 먼저 봅니다.
+- ego (lite) 브라우저에서 단추를 누르는 실행이 끊겼을 때도 같습니다. 같은 단추를 다시 누르기 전에 결과가 생겼는지 먼저 봅니다.
 
 ### 긴 출력 읽기
 
@@ -169,9 +169,9 @@ if (Get-Process -Id (번호) -ErrorAction SilentlyContinue) { '실행 중' } els
 $s = 0; $t = Get-Content -Raw -Encoding UTF8 "$env:TEMP\ai-out.txt"; $t.Substring($s, [Math]::Min(7000, $t.Length - $s))
 ```
 
-### ego 브라우저
+### ego (lite) 브라우저
 
-- 이 대화에서 ego 브라우저를 처음 쓸 때 아래 명령으로 사용법 안내를 파일로 저장하고, "긴 출력 읽기"대로 첫 줄부터 `[ego-browser:skill] end of guide`로 시작하는 끝 줄까지 읽습니다. 안내를 명령 출력으로 바로 보면 가운데가 빠져도 끝 줄은 남아서 다 읽은 것처럼 보이므로, 꼭 파일로 읽습니다. 이 대화에서 이미 읽었으면 다시 읽지 않습니다.
+- 이 대화에서 ego (lite) 브라우저를 처음 쓸 때 아래 명령으로 사용법 안내를 파일로 저장하고, "긴 출력 읽기"대로 첫 줄부터 `[ego-browser:skill] end of guide`로 시작하는 끝 줄까지 읽습니다. 안내를 명령 출력으로 바로 보면 가운데가 빠져도 끝 줄은 남아서 다 읽은 것처럼 보이므로, 꼭 파일로 읽습니다. 이 대화에서 이미 읽었으면 다시 읽지 않습니다.
 
 ```powershell
 $env:Path = [Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [Environment]::GetEnvironmentVariable('Path','User'); [Console]::OutputEncoding = [Text.Encoding]::UTF8; ego-browser skill | Out-File -Encoding utf8 -FilePath "$env:TEMP\ego-browser-skill.md"; "$env:TEMP\ego-browser-skill.md"
@@ -188,7 +188,7 @@ console.log({ taskSpaceId: task.spaceId });
 console.log(String(await page.snapshot()).slice(0, 7000));
 ```
 
-- 그다음 아래 명령으로 실행합니다. 실행이 끝나면 스크립트 파일을 지우고 ego 브라우저의 종료 코드를 찍습니다. 스크립트를 바꿀 때마다 파일을 다시 저장하고 이 명령을 다시 실행합니다.
+- 그다음 아래 명령으로 실행합니다. 실행이 끝나면 스크립트 파일을 지우고 ego (lite) 브라우저의 종료 코드를 찍습니다. 스크립트를 바꿀 때마다 파일을 다시 저장하고 이 명령을 다시 실행합니다.
 
 ```powershell
 $env:Path = [Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [Environment]::GetEnvironmentVariable('Path','User'); [Console]::OutputEncoding = [Text.Encoding]::UTF8; cmd /c "ego-browser nodejs < %TEMP%\ego-script.js"; $c = $LASTEXITCODE; Remove-Item $env:TEMP\ego-script.js; "ego-browser 종료 코드: $c"
@@ -202,7 +202,7 @@ $env:Path = [Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [Env
 ### 사용자에게 넘기는 일
 
 - 사람이 해야 하는 순간의 예: 비밀번호와 본인 확인 같은 로그인 단계, 사용자 계정 컨트롤(설치 승인 창), Git 로그인 창이나 로그인 명령이 연 Chrome 창처럼 AI가 누를 수 없는 창.
-- 로그인 명령의 출력("끝났는지 보기" 명령으로 본 글)에 로그인 주소가 나오면 그 주소를 ego 브라우저에서 열어 AI가 할 수 있는 데까지 합니다. 비밀번호, 본인 확인, AI가 누를 수 없는 창에서만 할 일을 알리고 답을 끝냅니다.
+- 로그인 명령의 출력("끝났는지 보기" 명령으로 본 글)에 로그인 주소가 나오면 그 주소를 ego (lite) 브라우저에서 열어 AI가 할 수 있는 데까지 합니다. 비밀번호, 본인 확인, AI가 누를 수 없는 창에서만 할 일을 알리고 답을 끝냅니다.
 - 그 순간을 만드는 명령은 "새 창에서 실행하기"로 띄우고, 브라우저 안의 일은 `task.handOff()`로 넘깁니다. 그다음 무엇을 하면 되는지 한 줄로 알리고 답을 끝냅니다. 한 명령 안에서 사람이 마치기를 기다리지 않습니다.
 - 사용자가 마쳤다고 하면 "끝났는지 보기"나 그 일의 확인 명령으로 보고 이어서 합니다.
 
