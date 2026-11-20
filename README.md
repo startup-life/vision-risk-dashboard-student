@@ -47,8 +47,8 @@ cd vision-risk-dashboard-student
 ```
 
 - 사진 저장소는 공개 저장소라 GitHub 계정 없이 받는다. 사진은 일반 파일이라 Git LFS는 필요 없다.
-- **ZIP으로 받지 않는다.** 대시보드는 git으로 사진 저장소의 원격 주소와 커밋을 확인한 뒤 사진을 읽는다. ZIP으로 받은 폴더에는 `.git`이 없어 쓰지 못한다.
-- 사진 저장소 주소는 위 https 주소를 그대로 쓴다. 다른 주소(fork 등)에서 받은 폴더는 쓰지 않는다.
+- 위 `git clone` 명령으로 받는다. 대시보드는 git으로 사진 저장소의 원격 주소와 커밋을 확인한 뒤 사진을 읽는데, ZIP으로 받은 폴더에는 `.git`이 없어 쓰지 못한다.
+- 사진 저장소 주소는 위 https 주소를 그대로 쓴다. 대시보드는 origin이 이 저장소인지 확인하므로 다른 주소(fork 등)에서 받은 폴더의 사진은 읽지 못한다.
 - 사진 저장소를 다른 위치에 두었으면 아래 설정 파일의 `REPOSITORY_IMAGES_ROOT`에 그 폴더의 절대 경로를 `C:/work/vision-risk-student-images`처럼 `/`로 적는다.
 - Git 설치, 사진 수 확인, 사진을 읽지 못할 때의 원인은 [로컬 실행 준비 4절](docs/LOCAL-SETUP.md#4-사진-저장소-받기)에 적었다.
 
@@ -64,7 +64,7 @@ npm ci
 
 ## 3. 설정 파일 만들기
 
-`npm start`는 `config/local-connection.json`을 읽는다. 이 파일은 Git이 추적하지 않는다.
+`npm start`는 `config/local-connection.json`을 읽는다.
 1번처럼 사진 저장소를 나란히 받았으면 이 파일 없이 실행해도 된다.
 사진 저장소를 다른 위치에 두었으면 [예시 파일](config/local-connection.example.json)을 복사해서 만든다. 아래 명령은 파일이 이미 있으면 덮어쓰지 않는다.
 
@@ -83,7 +83,7 @@ if not exist config\local-connection.json copy config\local-connection.example.j
 cp -n config/local-connection.example.json config/local-connection.json
 ```
 
-- 값은 복사한 `config/local-connection.json`에만 넣는다. 예시 파일은 고치지 않는다.
+- 값은 복사한 `config/local-connection.json`에 넣는다. 서버는 예시 파일의 값을 쓰지 않는다.
 - 쓰지 않는 항목은 빈 문자열(`""`)로 둔다.
 - 각 키의 뜻과 터미널에 나오는 설정 메시지는 [로컬 실행 준비 1절](docs/LOCAL-SETUP.md#1-로컬-설정-파일)에 있다.
 
@@ -100,7 +100,7 @@ npm start
 
 ## 이 PC에 생기는 파일
 
-아래 파일은 모두 Git이 추적하지 않는다. 지우면 그 기록이 없어진다.
+아래 파일을 지우면 그 기록이 없어진다.
 
 | 위치 | 내용 |
 | --- | --- |
