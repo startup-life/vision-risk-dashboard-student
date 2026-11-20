@@ -114,7 +114,7 @@ npm start
 
 | 스위치 | 값 | 비워 두면 |
 | --- | --- | --- |
-| `STORAGE_MODE` | `live`(GAS를 거쳐 Google 시트에 저장), `mock`(로컬 저장: 이 PC의 파일에 저장) | `live` |
+| `STORAGE_MODE` | `live`(GAS를 거쳐 Google 시트(내 Google 계정의 표 문서)에 저장), `mock`(로컬 저장: 이 PC의 파일에 저장) | `live` |
 | `GEMINI_MODE` | `off`, `mock`, `live` | 저장소 모드를 따른다 |
 | `NOTEBOOKLM_MODE` | `off`, `mock`, `live` | 저장소 모드를 따른다 |
 
@@ -128,23 +128,23 @@ npm start
 
 ### NotebookLM (관련 기준 확인)
 
-검사 기준 원문(`courses/vision-96h-v2/preview/factory-criteria-v1.txt`)을 NotebookLM 노트북에 올려 두고, 사진 판독 결과와 대조한다. 로컬 서버가 내 PC에 설치한 NotebookLM MCP를 직접 실행한다.
+검사 기준 원문(`courses/vision-96h-v2/preview/factory-criteria-v1.txt`)을 NotebookLM 노트북(문서를 모아 두는 곳)에 올려 두고, 사진 판독 결과와 대조한다. 로컬 서버가 내 PC에 설치한 NotebookLM MCP를 직접 실행한다.
 
-1. `uv`를 설치하고 `uv tool install notebooklm-mcp-cli`로 `nlm`과 `notebooklm-mcp`를 설치한다.
+1. `uv`(Python 도구 관리자)를 설치하고 `uv tool install notebooklm-mcp-cli`로 `nlm`(NotebookLM을 부르는 도구)과 `notebooklm-mcp`(서버가 NotebookLM에 질문을 보낼 때 쓰는 중간 프로그램)를 설치한다.
 2. 터미널에서 `nlm login --storage protected`를 실행하고, 뜨는 Chrome 창에서 Google 계정으로 로그인한다.
 3. 노트북을 만들고 기준 문서를 소스로 올린 뒤, 노트북 ID와 소스 ID를 설정 파일의 `NOTEBOOKLM_NOTEBOOK_ID`·`NOTEBOOKLM_SOURCE_IDS`에 넣는다.
 4. `NOTEBOOKLM_MODE`를 `live`로 바꾸고 서버를 다시 시작한다.
 
 GAS 없이 NotebookLM만 실제로 써 보려면 `STORAGE_MODE=mock`, `GEMINI_MODE=mock`, `NOTEBOOKLM_MODE=live`로 시작한다.
-명령과 화면은 [로컬 실행 준비 4절](docs/LOCAL-SETUP.md#4-notebooklm-mcp)에, 실행 파일을 찾는 순서는 [5절](docs/LOCAL-SETUP.md#5-notebooklm-실행-파일-찾기-규칙)에, 결과를 읽는 법은 [9절](docs/LOCAL-SETUP.md#9-notebooklm-기준-확인-결과-읽기)에 있다.
+명령과 화면은 [로컬 실행 준비 4절](docs/LOCAL-SETUP.md#4-notebooklm-mcp)에, notebooklm-mcp 실행 파일을 찾는 순서는 [5절](docs/LOCAL-SETUP.md#5-notebooklm-실행-파일-찾기-규칙)에, 결과를 읽는 법은 [9절](docs/LOCAL-SETUP.md#9-notebooklm-기준-확인-결과-읽기)에 있다.
 
 ### GAS와 Gemini (시트 저장과 AI 사진 설명)
 
-사건·판단 기록을 내 Google 계정의 시트와 Drive에 저장하고, 사진 판독(Gemini)을 GAS 안에서 OnePort를 거쳐 호출한다. GAS 코드는 `courses/vision-96h-v2/gas/`에 있다.
+사건·판단 기록을 내 Google 계정의 시트와 Google Drive(내 Google 계정의 파일 보관함)에 저장하고, Gemini(사진 판독)를 GAS 안에서 OnePort를 거쳐 호출한다. GAS 코드는 `courses/vision-96h-v2/gas/`에 있다.
 
 1. OnePort API 키(`sk-`로 시작)를 준비한다. 키를 받는 방법은 강사 안내를 따른다.
 2. `script.google.com/home/usersettings`에서 Google Apps Script API를 켠다.
-3. 아래 명령으로 GAS 프로젝트를 만들고, 코드를 올리고, 웹앱으로 배포한다. `gas:deploy`가 설정 파일의 `GAS_WEBAPP_URL`을 채운다.
+3. 아래 명령으로 GAS 프로젝트(Google에서 코드를 보관하고 실행하는 프로젝트)를 만들고, 코드를 올리고, 웹앱으로 배포한다. `gas:deploy`가 설정 파일의 `GAS_WEBAPP_URL`을 채운다.
    ```sh
    npm run gas:login
    npm run gas:create
@@ -153,8 +153,8 @@ GAS 없이 NotebookLM만 실제로 써 보려면 `STORAGE_MODE=mock`, `GEMINI_MO
    ```
 4. Apps Script 편집기(`npm run gas:editor`)의 배포 관리에서 액세스가 "모든 사용자"인지 확인한다.
 5. 설정 파일의 `ONEPORT_API_KEY`에 키를 넣는다.
-6. `npm run gas:open`으로 웹앱 주소를 열어 권한을 허용한다.
-7. `npm run gas:init`으로 시트·폴더를 만들고 키를 GAS 스크립트 속성에 저장한다.
+6. `npm run gas:open`으로 Apps Script 웹앱 주소(서버가 Apps Script 코드를 부를 때 쓰는 주소)를 열어 권한을 허용한다.
+7. `npm run gas:init`으로 시트·폴더를 만들고 키를 GAS 스크립트 속성(Google에 저장해 두는 설정)에 저장한다.
 8. `STORAGE_MODE`·`GEMINI_MODE`·`NOTEBOOKLM_MODE`를 `live`로 바꾸고 서버를 다시 시작한다. NotebookLM을 아직 준비하지 않았으면 `NOTEBOOKLM_MODE`는 `off`로 둔다.
 
 `ONEPORT_API_KEY`는 `gas:init`만 읽어 GAS로 보낸다. `npm start`로 띄운 로컬 서버는 이 값을 쓰지 않는다.
@@ -171,7 +171,7 @@ GAS 없이 NotebookLM만 실제로 써 보려면 `STORAGE_MODE=mock`, `GEMINI_MO
 | `courses/vision-96h-v2/preview/_synthetic_store.json`, `_synthetic_store_images/` | 로컬 저장(`STORAGE_MODE=mock`)의 사건 기록과 사진 |
 | `courses/vision-96h-v2/preview/_jobs/`, `_synthetic_jobs/` | AI 판독·기준 확인 작업 기록 |
 | `courses/vision-96h-v2/scratch/image-cache/` | Google Drive에서 받은 사건 사진 캐시 |
-| `.clasp.json` | 내 GAS 프로젝트 ID |
+| `.clasp.json`(Google 연결 설정 파일) | 내 GAS 프로젝트 ID |
 
 ## 폴더 구조
 
