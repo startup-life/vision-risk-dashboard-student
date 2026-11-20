@@ -21,13 +21,13 @@
 | 로컬 설정 파일 | NotebookLM 노트북·소스 ID와 실행 파일 위치를 서버에 알려 준다 | `config/local-connection.json` |
 
 1절부터 3절까지가 연결 준비다. 4절은 연동을 켜고 끄는 스위치, 5절은 연결 확인, 6절은 NotebookLM 결과를 읽는 법, 7절은 서버를 끄는 법, 8절은 알려진 제한, 9절은 사진 저장소(이미지 레포)를 받는 법이다.
-노트북 ID와 소스 ID는 3절의 설정 파일에만 둔다. 문서·메신저·커밋에는 붙여 넣지 않는다. 설정 파일에 넣을 때는 Antigravity 채팅에 붙여 넣어 맡겨도 된다.
+노트북 ID와 소스 ID는 3절의 설정 파일에 넣는다. 설정 파일에 넣을 때는 Antigravity 채팅에 붙여 넣어 맡겨도 된다.
 
 단계마다 **할 곳**을 적었다.
 
 - **Antigravity(터미널)**: 저장소 폴더의 터미널에서 명령으로 끝난다. Antigravity 에이전트가 명령을 대신 실행해도 된다.
-- **웹(클릭)**: 브라우저의 Google 화면에서 본인이 직접 로그인하고 누른다. 에이전트가 대신하지 않는다.
-- **설정 파일**: `config/local-connection.json`의 값을 바꾼다. 값을 Antigravity 채팅에 붙여 넣으면 Antigravity가 그 파일의 해당 한 줄만 바꾸고, 값을 화면이나 대화에 다시 출력하지 않는다. 본인이 파일을 열어 고쳐도 된다.
+- **웹(클릭)**: 브라우저의 Google 화면에서 로그인 화면이 뜨면 계정을 골라 로그인하고, 안내한 버튼을 누른다.
+- **설정 파일**: `config/local-connection.json`의 값을 바꾼다. 값을 Antigravity 채팅에 붙여 넣으면 Antigravity가 그 파일의 해당 줄을 바꾼다. 파일을 열어 고쳐도 된다.
 
 단계 끝의 「확인:」 줄은 그 단계가 끝났을 때 보이는 것이다.
 
@@ -48,14 +48,14 @@ NotebookLM 연결은 패키지 `notebooklm-mcp-cli`(저장소 [jacob-bd/gemini-n
    로컬 서버는 `notebooklm-mcp`를 PATH에서 찾으므로 따로 등록하지 않아도 된다(2절). 설치한 뒤 새로 연 터미널에서 서버를 시작한다.
    Windows에서 `nlm`을 찾지 못하면 uv의 설치 폴더(`%USERPROFILE%\.local\bin`)가 PATH에 들어 있는지 본다.
    `nlm setup add antigravity`는 Antigravity에서 NotebookLM을 MCP 도구로 쓰려고 Antigravity 설정 파일(`~/.gemini/antigravity/mcp_config.json`)에 등록하는 명령이다. 대시보드를 실행하는 데는 필요 없다. 등록해 두면 로컬 서버도 그 항목을 쓴다(2절 2번).
-3. 로그인한다. 이 명령은 Antigravity 터미널에 **본인이 직접** 입력한다. 로그인을 5분(300초)까지만 기다리므로 에이전트에게 시키지 않는다.
+3. 로그인한다. 명령을 실행하면 로그인 창이 뜨고, 로그인을 5분(300초)까지만 기다리므로 바로 이어서 로그인한다.
    ```sh
    nlm login --storage protected
    ```
    - `--storage protected`는 로그인 정보를 어디에 둘지 묻지 않고 운영체제의 암호 저장소에 암호화해 둔다.
    - 로그인 창은 평소 쓰는 Chrome과 별도인 nlm 전용 프로필 창으로 새로 뜬다. 평소 Chrome을 닫지 않아도 된다. 평소 프로필의 북마크·로그인은 쓰지 않는다.
    - 첫 화면은 Google 로그인 화면이 아니라 Gemini Notebook 소개 페이지다(NotebookLM의 새 이름). 오른쪽 위 `Sign in`이나 가운데 `Sign in to Gemini Notebook`을 눌러 Google 로그인으로 넘어간 뒤 NotebookLM을 쓸 본인 계정으로 로그인한다.
-   - 성공 메시지가 나올 때까지 터미널과 로그인 창을 닫지 않는다.
+   - 성공 메시지가 나올 때까지 터미널과 로그인 창을 열어 둔다.
 4. 로그인 상태를 확인한다. `✓ Authentication valid!`가 나오면 된다.
    ```sh
    nlm login --check
@@ -141,7 +141,7 @@ Windows에서 나온 경로는 역슬래시(`\`)로 이어져 있다. 설정 파
 ## 3. 로컬 설정 파일
 
 `npm start`는 저장소의 `config/local-connection.json`을 읽는다.
-어느 폴더에서 실행해도 이 위치는 같다. 이 파일은 Git이 추적하지 않는다.
+어느 폴더에서 실행해도 이 위치는 같다.
 만드는 방법은 [README](../README.md)의 "연결 설정 파일 만들기"를 따른다.
 
 | 키 | 값 | 얻는 곳 |
@@ -157,7 +157,6 @@ Windows에서 나온 경로는 역슬래시(`\`)로 이어져 있다. 설정 파
   역슬래시를 하나만 쓰면 서버가 JSON 형식 오류로 멈추거나, 그 값을 경고하고 무시한다.
 - 파일은 UTF-8로 저장한다(메모장의 기본값이다). 파일 맨 앞의 BOM 표시는 서버가 떼고 읽는다.
   UTF-16으로 저장하면 서버가 알려 주고 시작하지 않는다. ANSI로 저장하면 한글 경로가 다른 글자로 바뀐다.
-- 노트북·소스 ID는 이 파일에만 둔다. 이 파일을 커밋하거나 다른 사람에게 보내지 않는다.
 
 다른 위치의 설정 파일을 쓰려면 환경 변수 `VISION_RISK_CONFIG`에 그 파일의 절대 경로를 넣는다.
 
@@ -186,7 +185,7 @@ Windows에서 나온 경로는 역슬래시(`\`)로 이어져 있다. 설정 파
 | … 값은 문자열이어야 한다 | 값을 따옴표로 감싼다. 여러 ID는 쉼표로 이은 문자열 하나로 쓴다 |
 | … 값에 줄바꿈·탭 같은 제어 문자가 있다 | 경로의 역슬래시를 `/`나 두 번 쓴 역슬래시로 바꾼다 |
 | … 값이 예시 자리표시자 그대로다 | `/absolute/path/…` 같은 예시 값을 실제 경로나 `""`로 바꾼다 |
-| 예시 파일에 값이 들어 있다 | 예시 파일은 Git이 추적하므로 값을 넣지 않는다. 예시 파일의 값은 빈 문자열로 되돌리고, 값은 `config/local-connection.json`에만 넣는다 |
+| 예시 파일에 값이 들어 있다 | 예시 파일의 값은 빈 문자열로 되돌리고, 값은 `config/local-connection.json`에 넣는다 |
 
 알림:
 
@@ -206,7 +205,7 @@ Windows에서 나온 경로는 역슬래시(`\`)로 이어져 있다. 설정 파
 
 - 스위치는 설정 파일 키와 환경 변수가 같은 이름이다. 설정 파일에 비어 있지 않은 값이 있으면 그 값이 먼저다. 빈 값은 "정하지 않음"이다.
 - 값의 대소문자와 앞뒤 공백은 따지지 않는다.
-- 로컬 저장소의 사진은 `preview/_synthetic_store_images/`에 한 장씩 저장되어 서버를 다시 시작해도 남는다. 기록 파일과 함께 git에서 제외된다.
+- 로컬 저장소의 사진은 `preview/_synthetic_store_images/`에 한 장씩 저장되어 서버를 다시 시작해도 남는다.
 - `NOTEBOOKLM_MODE=live`에는 `nlm login`, `NOTEBOOKLM_NOTEBOOK_ID`, `NOTEBOOKLM_SOURCE_IDS`가 필요하다(1절). 준비 전에 화면만 시험하려면 `mock`으로 둔다.
 
 알 수 없는 값이 있으면 서버는 시작하지 않고 종료 코드 1로 끝난다. 터미널에 이유와 고칠 방법이 한 줄로 나온다.
@@ -246,7 +245,7 @@ API로 요청하면 HTTP 409와 `error_code` `INTEGRATION_OFF`를 돌려준다.
      | `MCP_EXITED` | 실행은 됐지만 연결 중에 종료됐다. 터미널에서 같은 명령과 인자가 실행되는지 본다 |
      | `MCP_UNREACHABLE` | 그 밖의 이유로 연결하지 못했다. `error`를 본다 |
 
-   `mcp_status.serverInfo`의 메일 주소는 로컬 서버가 빼고 보낸다. 프로필 이름 같은 나머지 로그인 프로필 정보는 남으므로 화면을 공유할 때는 가린다.
+   `mcp_status.serverInfo`의 메일 주소는 로컬 서버가 빼고 보낸다. 프로필 이름 같은 나머지 로그인 프로필 정보는 그대로 나온다.
 
 ## 6. NotebookLM 기준 확인 결과 읽기
 
@@ -277,7 +276,7 @@ API로 요청하면 HTTP 409와 `error_code` `INTEGRATION_OFF`를 돌려준다.
 
 홈과 사건 등록 화면의 저장소 사진은 별도 공개 저장소 `startup-life/vision-risk-student-images`에서 읽는다. 사진은 일반 파일이라 `git clone`만으로 받는다. Git LFS는 필요 없다.
 
-- **ZIP으로 받지 않는다.** GitHub의 **Code**, **Download ZIP**으로 받으면 `.git` 폴더가 없다. 대시보드는 git으로 원격 주소(origin)와 커밋을 확인하고 그 커밋의 매니페스트를 읽으므로 ZIP 폴더는 쓰지 못한다.
+- GitHub의 **Code**, **Download ZIP**으로 받으면 `.git` 폴더가 없다. 대시보드는 git으로 원격 주소(origin)와 커밋을 확인하고 그 커밋의 매니페스트를 읽으므로 ZIP 폴더는 쓰지 못한다. 그래서 단계 2처럼 `git clone`으로 받는다.
 - 공개 저장소라 GitHub 계정 없이 받는다.
 - 받는 양은 약 170MB다. 사진은 210장이고, 대시보드는 그중 Train 사진 180장(품질 90, 산업안전 90)을 쓴다.
 
