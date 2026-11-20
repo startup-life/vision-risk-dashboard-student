@@ -386,7 +386,7 @@ Windows에서는 `spawnSync('start "" "' + url + '"', { shell: true })`처럼 �
 
 ### AI가 명령을 실행할 때
 
-AI가 gas:create, gas:push, gas:deploy, gas:redeploy, gas:init을 실행하면 답에 각 명령의 결과 줄을 알려 줍니다. gas:로 시작하는 명령은 clasp를 처음 내려받거나 Google에 요청하느라 30초를 넘길 수 있으니 session-1.md의 "오래 걸리는 명령"대로 새 창에서 한 번에 하나씩 실행하고, 결과 줄은 그 절의 "끝났는지 보기"로 읽습니다. gas:login은 로그인을 기다리는 명령이라 새 창에서 띄우고, 출력에 나온 로그인 주소를 ego 브라우저에서 열어 계정 고르기와 권한 허용까지 AI가 합니다. 비밀번호나 본인 확인이 나오면 할 일을 한 줄로 알리고, 사용자가 마쳤다고 하면 `AI-CMD-END` 줄이나 `Test-Path $env:USERPROFILE\.clasprc.json`으로 봅니다. gas:create나 gas:deploy가 시간 초과로 끊겼거나 `AI-CMD-END` 줄 없이 창이 닫혔으면, 다시 실행하면 프로젝트나 배포 주소가 하나 더 생길 수 있으니 먼저 .clasp.json과 설정 파일의 GAS_WEBAPP_URL, `npx.cmd --yes @google/clasp@3.4.1 list-deployments`의 출력을 보고 사용자에게 알립니다. gas:deploy는 새 웹앱 주소를 만듭니다. 이미 주소가 있으면 gas:redeploy로 같은 주소를 갱신합니다.
+AI가 gas:create, gas:push, gas:deploy, gas:redeploy, gas:init을 실행하면 답에 각 명령의 결과 줄을 알려 줍니다. gas:로 시작하는 명령은 clasp를 처음 내려받거나 Google에 요청하느라 30초를 넘길 수 있으니 session-1.md의 "오래 걸리는 명령"대로 새 창에서 한 번에 하나씩 실행하고, 결과 줄은 그 절의 "끝났는지 보기"로 읽습니다. gas:login은 로그인을 기다리는 명령이라 새 창에서 띄우고, 출력에 나온 로그인 주소를 ego (lite) 브라우저에서 열어 계정 고르기와 권한 허용까지 AI가 합니다. 비밀번호나 본인 확인이 나오면 할 일을 한 줄로 알리고, 사용자가 마쳤다고 하면 `AI-CMD-END` 줄이나 `Test-Path $env:USERPROFILE\.clasprc.json`으로 봅니다. gas:create나 gas:deploy가 시간 초과로 끊겼거나 `AI-CMD-END` 줄 없이 창이 닫혔으면, 다시 실행하면 프로젝트나 배포 주소가 하나 더 생길 수 있으니 먼저 .clasp.json과 설정 파일의 GAS_WEBAPP_URL, `npx.cmd --yes @google/clasp@3.4.1 list-deployments`의 출력을 보고 사용자에게 알립니다. gas:deploy는 새 웹앱 주소를 만듭니다. 이미 주소가 있으면 gas:redeploy로 같은 주소를 갱신합니다.
 
 ## 만들지 않는 것
 

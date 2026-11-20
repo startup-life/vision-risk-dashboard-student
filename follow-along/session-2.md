@@ -22,9 +22,9 @@
 
 1회차를 끝낸 프로젝트 폴더 `C:\vision-ai\vision-risk-dashboard`에서 이어서 합니다. 아래 1~3을 먼저 합니다.
 
-준비물: AI 도구에서 연 프로젝트 폴더, 서버 창(AI가 열어 서버를 켠 PowerShell 창), ego 브라우저, 프로젝트 폴더 옆에 받은 사진 저장소(`C:\vision-ai\vision-risk-student-images`, 아래 2에서 받습니다).
+준비물: AI 도구에서 연 프로젝트 폴더, 서버 창(AI가 열어 서버를 켠 PowerShell 창), ego (lite) 브라우저, 프로젝트 폴더 옆에 받은 사진 저장소(`C:\vision-ai\vision-risk-student-images`, 아래 2에서 받습니다).
 
-1. 서버 켜 보기: 서버 창(서버가 켜진 창)이 있으면 ego 브라우저에서 http://127.0.0.1:8765 를 엽니다. 서버 창이 없으면 아래 2-1을 먼저 보내고, 답이 오면 AI에게 "서버를 켜 주세요."라고 보낸 뒤 같은 주소를 엽니다. 이때는 아래 2~3을 마친 뒤 2-2부터 이어 갑니다. 1회차 홈과 "확인 기준 보기" 단추가 보이면 됩니다.
+1. 서버 켜 보기: 서버 창(서버가 켜진 창)이 있으면 ego (lite) 브라우저에서 http://127.0.0.1:8765 를 엽니다. 서버 창이 없으면 아래 2-1을 먼저 보내고, 답이 오면 AI에게 "서버를 켜 주세요."라고 보낸 뒤 같은 주소를 엽니다. 이때는 아래 2~3을 마친 뒤 2-2부터 이어 갑니다. 1회차 홈과 "확인 기준 보기" 단추가 보이면 됩니다.
 2. 사진 저장소 받기: 사진 저장소는 강사가 공개한 연습용 현장 사진 모음입니다. 웹 서비스는 프로젝트 폴더 옆에 git으로 받은 `vision-risk-student-images` 폴더에서 사진을 읽으므로, ZIP으로 받거나 폴더 이름을 바꾸면 사진을 읽지 못합니다. `C:\vision-ai` 안에 이 폴더가 이미 있으면 건너뜁니다. 없으면 시작 메뉴에서 PowerShell 창을 새로 열고 아래 두 줄을 한 줄씩 칩니다.
 
 ```powershell
@@ -43,7 +43,7 @@ git clone https://github.com/startup-life/vision-risk-student-images.git
 - 사진을 고를 때는 사진 고르는 창에서 `C:\vision-ai\vision-risk-student-images\assets\dataset\images` 폴더로 가서 PNG 파일을 고릅니다. 여러 장은 Ctrl을 누른 채 차례로 누릅니다.
 - 완료 기준에 적힌 사건 번호(`R-101`, `R-102`, `R-103`)는 적힌 대로 등록했을 때의 값입니다. 사건을 더 등록해 보았으면 번호가 더 커도 됩니다.
 
-화면이 멈추거나 단추를 눌러도 아무 일이 없으면 ego 브라우저에서 F12를 눌러 Console 탭의 빨간 글을 복사하고, "이렇게 나와요. 고쳐 주세요." 다음에 붙여 AI에게 보냅니다. 나머지 진행 방법은 1회차와 같습니다.
+화면이 멈추거나 단추를 눌러도 아무 일이 없으면 ego (lite) 브라우저에서 F12를 눌러 Console 탭의 빨간 글을 복사하고, "이렇게 나와요. 고쳐 주세요." 다음에 붙여 AI에게 보냅니다. 나머지 진행 방법은 1회차와 같습니다.
 
 ## 2-1. 지침 세팅
 
@@ -79,7 +79,7 @@ git clone https://github.com/startup-life/vision-risk-student-images.git
 ```
 - 하는 일: 저장소 사진의 번호, 분류, 사진 주소를 돌려주는 `/api/repository-images` 주소가 생기고, `?track=`을 붙이면 한 분류만 돌려줍니다.
 - 목표: 2-16의 등록 화면 사진 고르기와 2-21의 홈 "등록할 사진 찾기"가 이 주소로 사진 목록을 받습니다.
-- ego 브라우저에서 http://127.0.0.1:8765/api/repository-images 를 열고, 그다음 http://127.0.0.1:8765/api/repository-images?track=safety 를 엽니다.
+- ego (lite) 브라우저에서 http://127.0.0.1:8765/api/repository-images 를 열고, 그다음 http://127.0.0.1:8765/api/repository-images?track=safety 를 엽니다.
 - 완료 기준: 처음 주소에는 `"total":180`과 `Q-IND-001`이 보이고, 두 번째 주소에는 `"total":90`과 `S-IND`로 시작하는 번호만 보입니다.
 
 ![2-3 전체 사진 목록 180장](images/session-2/06-1be8b13e-2-3-all.png)
@@ -98,7 +98,7 @@ git clone https://github.com/startup-life/vision-risk-student-images.git
 ```
 - 하는 일: 사진 번호를 넣은 주소를 열면 그 저장소 사진(PNG)이 브라우저에 보입니다.
 - 목표: 등록 화면의 사진 고르기와 홈 "등록할 사진 찾기"가 이 주소로 사진을 띄웁니다.
-- ego 브라우저에서 http://127.0.0.1:8765/api/repository-images/Q-IND-001/file 을 엽니다.
+- ego (lite) 브라우저에서 http://127.0.0.1:8765/api/repository-images/Q-IND-001/file 을 엽니다.
 - 완료 기준: 물류창고 현장 사진 한 장이 보입니다.
 
 ![2-4 사진 주소로 연 Q-IND-001 현장 사진](images/session-2/08-492e2fb9-2-4-image.png)
@@ -114,7 +114,7 @@ git clone https://github.com/startup-life/vision-risk-student-images.git
 ```
 - 하는 일: 서버가 쓰는 `runtime` 폴더 자리가 정해집니다. `/api/records` 주소가 아직 빈 사건 목록을 돌려줍니다.
 - 목표: 2-8부터 등록한 사건과 사진이 이 폴더에 저장되어 서버를 다시 켜도 남고, 사건 목록 화면과 홈이 이 주소로 사건을 받습니다.
-- ego 브라우저에서 http://127.0.0.1:8765/api/records 를 엽니다.
+- ego (lite) 브라우저에서 http://127.0.0.1:8765/api/records 를 엽니다.
 - 완료 기준: `"success":true`와 빈 목록 `"records":[]`가 보입니다.
 - 알아 두기: 사건은 현장 사진 1~5장과 장소, 분류, 메모를 묶은 기록 하나입니다. 서버가 `R-101`, `R-102`처럼 번호를 붙입니다.
 
@@ -196,7 +196,7 @@ git clone https://github.com/startup-life/vision-risk-student-images.git
 ```
 - 하는 일: 사건 번호와 순서(0부터)를 넣은 주소를 열면 그 사건에 등록한 사진 한 장이 보입니다.
 - 목표: 2-12의 홈 카드가 이 주소로 사건의 첫 사진을 띄웁니다.
-- ego 브라우저에서 http://127.0.0.1:8765/api/records/R-101/images/0 을 엽니다.
+- ego (lite) 브라우저에서 http://127.0.0.1:8765/api/records/R-101/images/0 을 엽니다.
 - 완료 기준: 2-8에서 올린 사진이 보입니다.
 
 ![2-10 사건 번호와 사진 순서로 등록한 사진을 연 화면](images/session-2/14-786cd3a9-2-10-record-image.png)
@@ -347,7 +347,7 @@ git clone https://github.com/startup-life/vision-risk-student-images.git
 ```
 - 하는 일: 저장소 사진 탭에서 고른 사진으로 사건이 등록되고, 그 사진이 `runtime` 폴더에 저장되며 저장한 메모 끝에 사진 출처가 붙습니다.
 - 목표: 내 사진 없이도 연습용 사진으로 사건을 만들고, 저장한 메모의 출처로 어느 사진을 썼는지 나중에 확인할 수 있게 합니다.
-- 같은 분류의 저장소 사진 2장을 고르고 메모에 "저장소 사진 사건"이라고 적은 뒤 "사건 등록"을 누릅니다. 그다음 ego 브라우저에서 http://127.0.0.1:8765/api/records 를 엽니다.
+- 같은 분류의 저장소 사진 2장을 고르고 메모에 "저장소 사진 사건"이라고 적은 뒤 "사건 등록"을 누릅니다. 그다음 ego (lite) 브라우저에서 http://127.0.0.1:8765/api/records 를 엽니다.
 - 완료 기준: "사건이 등록되었습니다: R-103"이 보이고 사건 목록 맨 위에 `R-103`이 사진 수 "2장"으로 나옵니다. 데이터 주소의 맨 앞 사건 메모에는 `Repository Images`와 사진 번호가 보이고, 홈의 그 사건 카드에는 "현장 메모: 저장소 사진 사건"만 보입니다.
 
 ![2-19 저장소 사진 두 장으로 등록한 R-103](images/session-2/27-c0634fff-2-19-record-list.png)
