@@ -19,7 +19,7 @@
 | 연결 | 하는 일 | 준비하는 곳 |
 | --- | --- | --- |
 | NotebookLM MCP | 검사 기준 원문과 사건 정보를 대조한다 | 내 PC |
-| 로컬 설정 파일 | NotebookLM 노트북·소스 ID와 실행 파일 위치를 서버에 알려 준다 | `config/local-connection.json` |
+| 로컬 설정 파일 | NotebookLM 노트북(문서를 모아 두는 곳) ID·소스 ID와 notebooklm-mcp(서버가 NotebookLM에 질문을 보낼 때 쓰는 중간 프로그램) 실행 파일 위치를 서버에 알려 준다 | `config/local-connection.json` |
 
 1절부터 3절까지가 연결 준비다. 4절은 연동을 켜고 끄는 스위치, 5절은 연결 확인, 6절은 NotebookLM 결과를 읽는 법, 7절은 서버를 끄는 법, 8절은 알려진 제한, 9절은 사진 저장소(이미지 레포)를 받는 법이다.
 노트북 ID와 소스 ID는 3절의 설정 파일에 넣는다. 설정 파일에 넣을 때는 AI 도구의 대화창에 붙여 넣어 맡겨도 된다.
@@ -39,12 +39,12 @@ NotebookLM 연결은 패키지 `notebooklm-mcp-cli`(저장소 [jacob-bd/gemini-n
 
 ### 설치와 로그인
 
-1. Python 도구 관리자 [uv](https://docs.astral.sh/uv/getting-started/installation/)를 설치한다. 설치가 끝나면 터미널 창을 닫고 새로 연다.
+1. [uv](https://docs.astral.sh/uv/getting-started/installation/)(Python 도구 관리자)를 설치한다. 설치가 끝나면 터미널 창을 닫고 새로 연다.
 2. 새 터미널에서 설치한다.
    ```sh
    uv tool install notebooklm-mcp-cli
    ```
-   명령줄 도구 `nlm`과 MCP 서버 `notebooklm-mcp`가 함께 설치된다.
+   `nlm`(NotebookLM을 부르는 도구)과 MCP 서버 `notebooklm-mcp`가 함께 설치된다.
    `nlm`을 찾을 수 없다고 나오면 `uv tool update-shell`을 실행하고 터미널 창을 다시 연다(Windows에서는 확인하지 않았다).
    로컬 서버는 `notebooklm-mcp`를 PATH에서 찾으므로 따로 등록하지 않아도 된다(2절). 설치한 뒤 새로 연 터미널에서 서버를 시작한다.
    Windows에서 `nlm`을 찾지 못하면 uv의 설치 폴더(`%USERPROFILE%\.local\bin`)가 PATH에 들어 있는지 본다.
@@ -93,7 +93,7 @@ NotebookLM 연결은 패키지 `notebooklm-mcp-cli`(저장소 [jacob-bd/gemini-n
 
 로컬 서버는 아래 순서로 MCP 실행 파일을 찾는다. 앞에서 찾으면 뒤는 보지 않는다.
 
-1. 설정 파일(`config/local-connection.json`)의 `NOTEBOOKLM_MCP_COMMAND`. 같은 이름의 환경 변수도 된다.
+1. `config/local-connection.json`(설정 파일)의 `NOTEBOOKLM_MCP_COMMAND`. 같은 이름의 환경 변수도 된다.
    절대 경로나, PATH에 있는 명령 이름(`notebooklm-mcp`)을 쓴다.
 2. 값이 없으면 Antigravity의 MCP 설정 파일을 이 순서로 읽는다. 앞 파일에 항목이 있으면 뒤 파일은 읽지 않는다.
    - `~/.gemini/config/mcp_config.json` (Windows: `%USERPROFILE%\.gemini\config\mcp_config.json`)
@@ -277,7 +277,7 @@ API로 요청하면 HTTP 409와 `error_code` `INTEGRATION_OFF`를 돌려준다.
 
 홈과 사건 등록 화면의 저장소 사진은 별도 공개 저장소 `startup-life/vision-risk-student-images`에서 읽는다. 사진은 일반 파일이라 `git clone`만으로 받는다. Git LFS는 필요 없다.
 
-- GitHub의 **Code**, **Download ZIP**으로 받으면 `.git` 폴더가 없다. 대시보드는 git으로 원격 주소(origin)와 커밋을 확인하고 그 커밋의 매니페스트를 읽으므로 ZIP 폴더는 쓰지 못한다. 그래서 단계 2처럼 `git clone`으로 받는다.
+- GitHub의 **Code**, **Download ZIP**으로 받으면 `.git` 폴더가 없다. 대시보드는 git으로 origin(원격 주소)과 커밋을 확인하고 그 커밋의 매니페스트를 읽으므로 ZIP 폴더는 쓰지 못한다. 그래서 단계 2처럼 `git clone`으로 받는다.
 - 공개 저장소라 GitHub 계정 없이 받는다.
 - 받는 양은 약 170MB다. 사진은 210장이고, 대시보드는 그중 Train 사진 180장(품질 90, 산업안전 90)을 쓴다.
 
@@ -327,7 +327,7 @@ cd ../vision-risk-dashboard-student
 
 - `git status`가 `nothing to commit, working tree clean`이어야 한다.
 - 둘째 명령은 사진 수를 센다. `210`이어야 한다.
-- 탐색기에서 `vision-risk-student-images/assets/dataset/images`의 PNG 파일을 열어 그림이 보이면 된다.
+- 파일 탐색기(폴더와 파일을 보는 Windows 프로그램)에서 `vision-risk-student-images/assets/dataset/images`의 PNG 파일을 열어 그림이 보이면 된다.
 
 ### 단계 4. 대시보드에서 확인 — AI 도구(터미널)
 
