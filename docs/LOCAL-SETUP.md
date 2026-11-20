@@ -7,9 +7,10 @@
 - 명령 프롬프트에서는 안내한 명령을 그대로 칩니다. 예: `npm start`
 - PowerShell에서는 `npm`을 `npm.cmd`로, `npx`를 `npx.cmd`로 바꿔 칩니다. 예: `npm.cmd start`
 - PowerShell에서 `.cmd` 없이 쳤다가 "이 시스템에서 스크립트를 실행할 수 없으므로 … npm.ps1 파일을 로드할 수 없습니다" 오류가 나면 `npm.cmd`로 다시 칩니다.
-- 매번 바꿔 치기 번거로우면 PowerShell에서 아래 명령을 한 번만 실행합니다. 확인을 물으면 `Y`를 누르고, PowerShell 창을 닫았다가 새로 엽니다. 지금 로그인한 사용자 계정에만 적용되고, 그 뒤로는 `npm`을 그대로 쳐도 됩니다.
-  `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned`
+- 매번 바꿔 치기 번거로우면 PowerShell에서 아래 명령을 한 번만 실행하고, PowerShell 창을 닫았다가 새로 엽니다. 지금 로그인한 사용자 계정에만 적용되고, 그 뒤로는 `npm`을 그대로 쳐도 됩니다.
+  `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned -Force`
 - 학교·회사 PC에서 이 명령이 "더 구체적인 범위에서 정의된 정책" 같은 문구로 적용되지 않으면 관리자 정책 때문입니다. 그때는 계속 `npm.cmd`로 칩니다.
+- AI 도구가 이 문서의 명령을 실행할 때는 한 번에 한 명령씩 실행합니다. AI 도구에 따라 30초가 지난 명령을 강제로 끝내므로, 설치·내려받기(`git clone`, `npm.cmd ci` 등)·로그인처럼 오래 걸릴 수 있는 명령은 docs/guide/session-1.md의 "오래 걸리는 명령"대로 새 PowerShell 창에서 실행하고, 서버(`npm.cmd start`)도 새 PowerShell 창을 열어 그 창에서 켭니다. 기다리기는 한 번에 20초 이하로 나누고, 서버가 켜졌는지는 `Invoke-RestMethod -TimeoutSec 15 http://127.0.0.1:8765/api/health`로 봅니다.
 
 이 문서의 `npm` 명령은 위 안내대로 입력한다.
 
@@ -22,13 +23,13 @@
 | 로컬 설정 파일 | 위 두 곳의 주소·ID를 서버에 알려 주고, OnePort API 키를 GAS로 보낼 때 읽는다 | `config/local-connection.json` |
 
 1절부터 6절까지가 연결 준비다. 7절은 연동을 하나씩 켜고 끄는 스위치, 8절은 연결 확인, 9절은 NotebookLM 결과를 읽는 법, 10절은 서버를 끄는 법, 11절은 알려진 제한, 12절은 사진 저장소(이미지 레포)를 받는 법이다.
-API 키와 웹 앱 주소는 GAS 스크립트 속성과 6절의 설정 파일에 넣는다. 설정 파일에 넣을 때는 Antigravity 채팅에 붙여 넣어 맡겨도 된다(1절 단계 8).
+API 키와 웹 앱 주소는 GAS 스크립트 속성과 6절의 설정 파일에 넣는다. 설정 파일에 넣을 때는 AI 도구의 대화창에 붙여 넣어 맡겨도 된다(1절 단계 8).
 
 단계마다 **할 곳**을 적었다.
 
-- **Antigravity(터미널)**: 저장소 폴더의 터미널에서 명령으로 끝난다. Antigravity 에이전트가 명령을 대신 실행해도 된다.
+- **AI 도구(터미널)**: 저장소 폴더의 터미널에서 명령으로 끝난다. AI 도구가 명령을 대신 실행해도 된다.
 - **웹(클릭)**: 브라우저의 Google 화면에서 로그인 화면이 뜨면 계정을 골라 로그인하고, 안내한 버튼을 누른다.
-- **설정 파일**: `config/local-connection.json`의 값을 바꾼다. 값을 Antigravity 채팅에 붙여 넣으면 Antigravity가 그 파일의 해당 줄을 바꾼다. 파일을 열어 고쳐도 된다.
+- **설정 파일**: `config/local-connection.json`의 값을 바꾼다. 값을 AI 도구의 대화창에 붙여 넣으면 AI가 그 파일의 해당 줄을 바꾼다. 파일을 열어 고쳐도 된다.
 
 단계 끝의 「확인:」 줄은 그 단계가 끝났을 때 보이는 것이다.
 
@@ -38,7 +39,7 @@ API 키와 웹 앱 주소는 GAS 스크립트 속성과 6절의 설정 파일에
 학교·회사(Google Workspace) 계정은 관리자 설정 때문에 배포 액세스에서 "모든 사용자"를 고를 수 없을 수 있다.
 이 계정의 Drive에 스프레드시트와 비공개 폴더가 새로 생긴다.
 
-기본은 **clasp 경로**다. Antigravity 터미널에서 명령으로 GAS 프로젝트를 만들고, 코드를 올리고, 웹앱으로 배포한다.
+기본은 **clasp 경로**다. AI 도구의 터미널에서 명령으로 GAS 프로젝트를 만들고, 코드를 올리고, 웹앱으로 배포한다.
 웹 화면에서 하는 일은 아래 표의 "웹(클릭)" 단계뿐이다.
 편집기에 코드를 붙여 넣는 방법은 [편집기 붙여넣기 경로(대안)](#편집기-붙여넣기-경로대안)로 남겨 두었다.
 
@@ -50,14 +51,14 @@ API 키와 웹 앱 주소는 GAS 스크립트 속성과 6절의 설정 파일에
 | --- | --- | --- | --- |
 | 1 | OnePort API 키 준비 | 강사 안내 | 3절 |
 | 2 | Apps Script API 켜기 | 웹(클릭) | `script.google.com/home/usersettings` |
-| 3 | clasp 로그인 | Antigravity(터미널), 이어서 웹(클릭) | `npm.cmd run gas:login` |
-| 4 | GAS 프로젝트 만들기 | Antigravity(터미널) | `npm.cmd run gas:create` |
-| 5 | 코드 올리기 | Antigravity(터미널) | `npm.cmd run gas:push` |
-| 6 | 웹앱 배포와 주소 기록 | Antigravity(터미널) | `npm.cmd run gas:deploy` |
-| 7 | 배포 접근 설정 확인 | Antigravity(터미널), 이어서 웹(클릭) | `npm.cmd run gas:editor`, 편집기의 배포 관리 |
+| 3 | clasp 로그인 | AI 도구(터미널), 이어서 웹(클릭) | `npm.cmd run gas:login` |
+| 4 | GAS 프로젝트 만들기 | AI 도구(터미널) | `npm.cmd run gas:create` |
+| 5 | 코드 올리기 | AI 도구(터미널) | `npm.cmd run gas:push` |
+| 6 | 웹앱 배포와 주소 기록 | AI 도구(터미널) | `npm.cmd run gas:deploy` |
+| 7 | 배포 접근 설정 확인 | AI 도구(터미널), 이어서 웹(클릭) | `npm.cmd run gas:editor`, 편집기의 배포 관리 |
 | 8 | OnePort API 키 넣기 | 설정 파일 | `config/local-connection.json`의 `ONEPORT_API_KEY` |
-| 9 | 첫 권한 승인 | Antigravity(터미널), 이어서 웹(클릭) | `npm.cmd run gas:open` |
-| 10 | 초기화(시트·폴더 만들기, 키 저장) | Antigravity(터미널) | `npm.cmd run gas:init` |
+| 9 | 첫 권한 승인 | AI 도구(터미널), 이어서 웹(클릭) | `npm.cmd run gas:open` |
+| 10 | 초기화(시트·폴더 만들기, 키 저장) | AI 도구(터미널) | `npm.cmd run gas:init` |
 
 ### 단계 2. Apps Script API 켜기 — 웹(클릭)
 
@@ -66,7 +67,7 @@ API 키와 웹 앱 주소는 GAS 스크립트 속성과 6절의 설정 파일에
 
 확인: 그 화면의 Google Apps Script API가 켜져 있다.
 
-### 단계 3. clasp 로그인 — Antigravity(터미널), 이어서 웹(클릭)
+### 단계 3. clasp 로그인 — AI 도구(터미널), 이어서 웹(클릭)
 
 ```powershell
 npm.cmd run gas:login
@@ -77,7 +78,7 @@ npm.cmd run gas:login
 
 확인: 명령이 오류 없이 끝나고 홈 폴더에 `.clasprc.json`이 생긴다.
 
-### 단계 4. GAS 프로젝트 만들기 — Antigravity(터미널)
+### 단계 4. GAS 프로젝트 만들기 — AI 도구(터미널)
 
 ```powershell
 npm.cmd run gas:create
@@ -89,7 +90,7 @@ npm.cmd run gas:create
 
 확인: `Created new script:`와 `.clasp.json이 courses/vision-96h-v2/gas 폴더를 가리키게 했습니다.`가 나오고, `git status`에 `appsscript.json` 변경이 없다.
 
-### 단계 5. 코드 올리기 — Antigravity(터미널)
+### 단계 5. 코드 올리기 — AI 도구(터미널)
 
 ```powershell
 npm.cmd run gas:push
@@ -100,7 +101,7 @@ npm.cmd run gas:push
 
 확인: `Pushed 2 files`가 나온다.
 
-### 단계 6. 웹앱 배포와 주소 기록 — Antigravity(터미널)
+### 단계 6. 웹앱 배포와 주소 기록 — AI 도구(터미널)
 
 ```powershell
 npm.cmd run gas:deploy
@@ -116,11 +117,11 @@ npm.cmd run gas:deploy
 
 확인: `GAS_WEBAPP_URL을 적었습니다.`가 나오고, 설정 파일의 `STORAGE_MODE`가 `live`다(원래 `mock`이었으면 그대로다).
 
-### 단계 7. 배포 접근 설정 확인 — Antigravity(터미널), 이어서 웹(클릭)
+### 단계 7. 배포 접근 설정 확인 — AI 도구(터미널), 이어서 웹(클릭)
 
 `appsscript.json`에는 "실행 사용자: 나, 액세스: 모든 사용자"가 들어 있다. 그런데 clasp가 배포를 만들 때 이 설정을 보내지 않는다는 보고가 있다(clasp 이슈 #1115). 그래서 편집기에서 한 번 본다.
 
-1. Antigravity 터미널에서 편집기를 연다. 기본 브라우저에 Apps Script 편집기가 열린다.
+1. AI 도구의 터미널에서 편집기를 연다. 기본 브라우저에 Apps Script 편집기가 열린다.
    ```powershell
    npm.cmd run gas:editor
    ```
@@ -134,9 +135,9 @@ npm.cmd run gas:deploy
 
 ### 단계 8. OnePort API 키 넣기 — 설정 파일
 
-3절의 OnePort 키를 Antigravity 채팅에 붙여 넣고 `config/local-connection.json`의 `ONEPORT_API_KEY`에 넣어 달라고 한다. Antigravity가 그 파일의 `ONEPORT_API_KEY` 줄을 바꾼다.
+3절의 OnePort 키를 AI 도구의 대화창에 붙여 넣고 `config/local-connection.json`의 `ONEPORT_API_KEY`에 넣어 달라고 한다. AI가 그 파일의 `ONEPORT_API_KEY` 줄을 바꾼다.
 
-직접 고쳐도 된다. 파일을 메모장(macOS: 텍스트 편집기)이나 Antigravity 편집기로 열고 키를 `ONEPORT_API_KEY`의 따옴표 안에 붙여 넣고 저장한다.
+직접 고쳐도 된다. 파일을 메모장(macOS: 텍스트 편집기)으로 열고 키를 `ONEPORT_API_KEY`의 따옴표 안에 붙여 넣고 저장한다.
 
 ```json
 "ONEPORT_API_KEY": "여기에 sk-로 시작하는 키를 붙여 넣는다",
@@ -149,11 +150,11 @@ npm.cmd run gas:deploy
 
 확인: 파일을 저장한 뒤 `npm start`를 실행했을 때 `설정 경고:`로 시작하는 줄이 없다.
 
-### 단계 9. 첫 권한 승인 — Antigravity(터미널), 이어서 웹(클릭)
+### 단계 9. 첫 권한 승인 — AI 도구(터미널), 이어서 웹(클릭)
 
 웹앱은 배포한 사람의 권한(Sheets·Drive·외부 요청)으로 실행된다. 그 권한을 한 번 허용해야 웹앱이 응답한다.
 
-1. Antigravity 터미널에서 웹앱 주소를 연다. 설정 파일의 `GAS_WEBAPP_URL`을 터미널에 출력하고 기본 브라우저로 연다. 브라우저가 열리지 않으면 터미널에 나온 주소를 브라우저 주소창에 붙여 넣는다.
+1. AI 도구의 터미널에서 웹앱 주소를 연다. 설정 파일의 `GAS_WEBAPP_URL`을 터미널에 출력하고 기본 브라우저로 연다. 브라우저가 열리지 않으면 터미널에 나온 주소를 브라우저 주소창에 붙여 넣는다.
    ```powershell
    npm.cmd run gas:open
    ```
@@ -164,13 +165,13 @@ npm.cmd run gas:deploy
 
 주소를 여는 것만으로 승인되지 않을 수 있다. 승인 화면이 나오지 않거나 10단계가 같은 안내를 다시 내면 편집기에서 승인한다.
 
-1. Antigravity 터미널에서 `npm.cmd run gas:editor`로 편집기를 연다.
+1. AI 도구의 터미널에서 `npm.cmd run gas:editor`로 편집기를 연다.
 2. 상단 함수 목록에서 `initialSetup`을 고르고 **실행**을 누른다.
 3. 권한 확인 창에서 위 2번처럼 허용한다. 이 실행이 시트와 폴더도 만든다.
 
 확인: 10단계가 승인 안내 없이 끝난다. `gas:open`은 Windows에서 `start ""`, macOS에서 `open`으로 브라우저를 연다.
 
-### 단계 10. 초기화 — Antigravity(터미널)
+### 단계 10. 초기화 — AI 도구(터미널)
 
 ```powershell
 npm.cmd run gas:init
@@ -203,7 +204,7 @@ clasp를 쓸 수 없을 때(Apps Script API를 켤 수 없는 계정 등) 편집
 | 2 | `initialSetup` 실행과 권한 승인 | 웹(클릭) |
 | 3 | 웹 앱 배포 | 웹(클릭) |
 | 4 | 웹 앱 URL을 설정 파일에 넣기 | 설정 파일 |
-| 5 | 키 저장 | Antigravity(터미널) 또는 웹(클릭) |
+| 5 | 키 저장 | AI 도구(터미널) 또는 웹(클릭) |
 
 1. [Apps Script](https://script.google.com)에서 **새 프로젝트**를 만든다. 편집기의 `Code.gs` 내용을 모두 지우고 이 저장소의 `courses/vision-96h-v2/gas/Code.gs` 내용을 그대로 붙여 넣은 뒤 저장한다.
    매니페스트(`appsscript.json`)는 붙여 넣지 않아도 동작한다. 시간대까지 맞추려면 **프로젝트 설정**에서 "편집기에 'appsscript.json' 매니페스트 파일 표시"를 켜고 저장소의 `appsscript.json` 내용으로 바꾼다.
@@ -218,7 +219,7 @@ clasp를 쓸 수 없을 때(Apps Script API를 켤 수 없는 계정 등) 편집
 
 `Code.gs`나 `appsscript.json`을 바꾸면 다시 배포해야 반영된다. 같은 웹앱 주소를 유지한다. 새 배포를 만들면 주소가 바뀌어 설정 파일도 바꿔야 한다.
 
-clasp 경로는 Antigravity(터미널)에서 이렇게 한다.
+clasp 경로는 AI 도구(터미널)에서 이렇게 한다.
 
 ```powershell
 npm.cmd run gas:push
@@ -254,7 +255,7 @@ npm.cmd run gas:init
 
 ## 2. 스크립트 속성
 
-스크립트 속성은 편집기 왼쪽의 **프로젝트 설정**(톱니바퀴), **스크립트 속성**에서 보고 고친다. 편집기는 Antigravity 터미널에서 `npm.cmd run gas:editor`로 연다.
+스크립트 속성은 편집기 왼쪽의 **프로젝트 설정**(톱니바퀴), **스크립트 속성**에서 보고 고친다. 편집기는 AI 도구의 터미널에서 `npm.cmd run gas:editor`로 연다.
 
 | 속성 | 넣는 방법 | 비고 |
 | --- | --- | --- |
@@ -526,7 +527,7 @@ API로 요청하면 HTTP 409와 `error_code` `INTEGRATION_OFF`를 돌려준다.
 ## 8. 연결 확인
 
 1. `npm start`로 서버를 띄운다.
-2. 브라우저에서 `http://127.0.0.1:8765/api/health`를 연다.
+2. 브라우저에서 `http://127.0.0.1:8765/api/health`를 연다. AI 도구는 `Invoke-RestMethod -TimeoutSec 15 http://127.0.0.1:8765/api/health | ConvertTo-Json -Depth 5`로 본다.
    - `gas_configured`가 `true`면 웹 앱 URL이 설정된 것이다. 실제 연결 여부는 3번에서 확인한다.
    - `mcp_status.connected`가 `true`면 MCP 실행 파일을 찾아 실행한 것이다.
    - `mcp_status.authStatus`가 `configured`여야 기준 대조가 동작한다.
@@ -599,7 +600,7 @@ API로 요청하면 HTTP 409와 `error_code` `INTEGRATION_OFF`를 돌려준다.
 ### 단계 1. Git for Windows 설치 — 웹(클릭)
 
 1. [git-scm.com/download/win](https://git-scm.com/download/win)에서 설치 파일을 받아 실행한다. 설정은 기본값으로 둔다.
-2. 설치가 끝나면 Antigravity를 완전히 닫고 다시 연다. 열려 있던 터미널은 새로 설치한 `git`을 찾지 못한다.
+2. 설치가 끝나면 열어 둔 PowerShell 창을 닫고 새로 연다. 열려 있던 창은 새로 설치한 `git`을 찾지 못한다. AI 도구의 터미널이 `git`을 찾지 못하면 docs/guide/session-1.md "오래 걸리는 명령"의 경로 다시 읽기 줄을 붙여 실행한다.
 
 macOS는 Homebrew로 설치한다: `brew install git`.
 
@@ -609,7 +610,7 @@ git --version
 
 확인: `git version`으로 시작하는 줄이 나온다.
 
-### 단계 2. 받기(clone) — Antigravity(터미널)
+### 단계 2. 받기(clone) — AI 도구(터미널)
 
 대시보드 저장소(`vision-risk-dashboard-student`)와 같은 상위 폴더에 받는다. 그러면 설정 없이 기본 위치에서 찾는다. 아래는 `vision-risk-dashboard-student` 폴더의 터미널에서 실행한다. Windows와 macOS 명령이 같다.
 
@@ -622,7 +623,7 @@ cd vision-risk-dashboard-student
 - 주소는 위 https 주소를 그대로 쓴다. 대시보드는 origin이 이 저장소인지 확인하고, 다른 주소(fork 등)면 사진을 쓰지 않는다.
 - 폴더 이름은 `vision-risk-student-images` 그대로 둔다. 다른 위치나 이름으로 받았으면 6절 설정 파일의 `REPOSITORY_IMAGES_ROOT`에 그 절대 경로를 `C:/work/vision-risk-student-images`처럼 `/`로 적는다.
 
-### 단계 3. 사진 파일 확인 — Antigravity(터미널)
+### 단계 3. 사진 파일 확인 — AI 도구(터미널)
 
 ```powershell
 # Windows (PowerShell)
@@ -644,7 +645,7 @@ cd ../vision-risk-dashboard-student
 - 둘째 명령은 사진 수를 센다. `210`이어야 한다.
 - 탐색기에서 `vision-risk-student-images/assets/dataset/images`의 PNG 파일을 열어 그림이 보이면 된다.
 
-### 단계 4. 대시보드에서 확인 — Antigravity(터미널)
+### 단계 4. 대시보드에서 확인 — AI 도구(터미널)
 
 `npm.cmd start`로 서버를 띄운다. 서버 콘솔에 `[RepositoryImages`로 시작하는 경고가 없고, 홈과 사건 등록 화면에 저장소 사진이 보이면 된다.
 경고가 있으면 `불러오지 못했습니다:` 뒤의 원인을 본다.
@@ -652,7 +653,7 @@ cd ../vision-risk-dashboard-student
 | 원인 | 할 일 |
 | --- | --- |
 | 경로 없음 | 단계 2의 위치에 받았는지, `REPOSITORY_IMAGES_ROOT` 경로가 맞는지 본다 |
-| git 미설치 | 단계 1을 하고 Antigravity를 다시 연다 |
+| git 미설치 | 단계 1을 하고 서버를 끈 뒤 새 PowerShell 창에서 다시 켠다. AI 도구가 켤 때는 새 창 명령 앞에 경로 다시 읽기 줄을 넣는다(docs/guide/session-1.md "서버 켜기"의 새 창 명령과 같은 꼴) |
 | git 저장소가 아님 | ZIP으로 받은 폴더다. 지우고 단계 2로 다시 받는다 |
 | origin 원격 없음, origin이 … 아님 | 단계 2의 https 주소로 다시 받는다 |
 | origin/main 없음(git fetch 필요) | `vision-risk-student-images` 폴더에서 `git fetch origin`을 실행한다 |
