@@ -18,14 +18,14 @@
 단계마다 **할 곳**을 적었다.
 
 - **Antigravity(터미널)**: 저장소 폴더의 터미널에서 명령으로 끝난다. Antigravity 에이전트가 명령을 대신 실행해도 된다.
-- **웹(클릭)**: 브라우저에서 본인이 직접 누른다.
+- **웹(클릭)**: 브라우저에서 안내한 버튼을 누른다.
 
 단계 끝의 「확인:」 줄은 그 단계가 끝났을 때 보이는 것이다.
 
 ## 1. 로컬 설정 파일
 
 `npm start`는 저장소의 `config/local-connection.json`을 읽는다.
-어느 폴더에서 실행해도 이 위치는 같다. 이 파일은 Git이 추적하지 않는다.
+어느 폴더에서 실행해도 이 위치는 같다.
 만드는 방법은 [README](../README.md)의 "설정 파일 만들기"를 따른다. 설정 파일이 없어도 서버는 시작한다.
 
 | 키 | 값 | 얻는 곳 |
@@ -65,7 +65,7 @@
 | … 값은 문자열이어야 한다 | 값을 따옴표로 감싼다 |
 | … 값에 줄바꿈·탭 같은 제어 문자가 있다 | 경로의 역슬래시를 `/`나 두 번 쓴 역슬래시로 바꾼다 |
 | … 값이 예시 자리표시자 그대로다 | `/absolute/path/…` 같은 예시 값을 실제 경로나 `""`로 바꾼다 |
-| 예시 파일에 값이 들어 있다 | 예시 파일은 Git이 추적하므로 값을 넣지 않는다. 예시 파일의 값은 빈 문자열로 되돌리고, 값은 `config/local-connection.json`에만 넣는다 |
+| 예시 파일에 값이 들어 있다 | 예시 파일의 값은 빈 문자열로 되돌리고, 값은 `config/local-connection.json`에 넣는다 |
 
 알림:
 
@@ -81,7 +81,7 @@
 2. 브라우저에서 `http://127.0.0.1:8765/api/health`를 연다. `"status":"ok"`가 보이면 서버가 떠 있다.
 3. 브라우저에서 `http://127.0.0.1:8765/api/records`를 연다. `"success":true`가 보이면 로컬 저장소를 읽은 것이다. 처음에는 `"records":[]`로 나온다.
 
-사건 기록은 `courses/vision-96h-v2/preview/_synthetic_store.json`에, 사진은 `courses/vision-96h-v2/preview/_synthetic_store_images/`에 한 장씩 저장되어 서버를 다시 시작해도 남는다. 둘 다 Git이 추적하지 않는다.
+사건 기록은 `courses/vision-96h-v2/preview/_synthetic_store.json`에, 사진은 `courses/vision-96h-v2/preview/_synthetic_store_images/`에 한 장씩 저장되어 서버를 다시 시작해도 남는다.
 
 ## 3. 서버 끄기
 
@@ -91,7 +91,7 @@
 
 홈과 사건 등록 화면의 저장소 사진은 별도 공개 저장소 `startup-life/vision-risk-student-images`에서 읽는다. 사진은 일반 파일이라 `git clone`만으로 받는다. Git LFS는 필요 없다.
 
-- **ZIP으로 받지 않는다.** GitHub의 **Code**, **Download ZIP**으로 받으면 `.git` 폴더가 없다. 대시보드는 git으로 원격 주소(origin)와 커밋을 확인하고 그 커밋의 매니페스트를 읽으므로 ZIP 폴더는 쓰지 못한다.
+- GitHub의 **Code**, **Download ZIP**으로 받으면 `.git` 폴더가 없다. 대시보드는 git으로 원격 주소(origin)와 커밋을 확인하고 그 커밋의 매니페스트를 읽으므로 ZIP 폴더는 쓰지 못한다. 그래서 단계 2처럼 `git clone`으로 받는다.
 - 공개 저장소라 GitHub 계정 없이 받는다.
 - 받는 양은 약 170MB다. 사진은 210장이고, 대시보드는 그중 Train 사진 180장(품질 90, 산업안전 90)을 쓴다.
 
