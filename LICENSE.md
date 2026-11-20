@@ -4,7 +4,7 @@
 
 ## 코드 — MIT
 
-대상: `courses/`(화면·서버·GAS 코드와 그림 파일), `config/`, `package.json`·`package-lock.json` 등 앱을 설치하고 실행하는 데 쓰는 파일
+대상: `courses/`(화면·서버·GAS 코드와 그림 파일), `config/`, `package.json`·`package-lock.json` 등 웹 서비스를 설치하고 실행하는 데 쓰는 파일
 
 ```
 MIT License
