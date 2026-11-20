@@ -317,9 +317,9 @@ review_summary에는 evidence(가장 최근 결과의 standard_id, source_id, qu
 
 ## 실제 NotebookLM(live) 연결
 
-NotebookLM 도구는 notebooklm-mcp-cli 0.15.6입니다. 준비는 uv 설치, uv tool install notebooklm-mcp-cli==0.15.6, nlm login --storage protected(뜨는 Chrome 창에서 Google 계정으로 로그인), nlm notebook create "현장 리스크 기준" --json으로 노트북 만들기, nlm source add (노트북 ID) --file materials/factory-criteria-v1.txt --wait로 기준 원문 올리기 순서입니다. 나온 노트북 ID와 소스 ID는 설정 파일의 NOTEBOOKLM_NOTEBOOK_ID와 NOTEBOOKLM_SOURCE_IDS에 넣습니다.
+NotebookLM 도구는 notebooklm-mcp-cli 0.15.6입니다. 준비는 uv 설치, uv tool install notebooklm-mcp-cli==0.15.6, nlm login --storage protected(뜨는 Chrome 창에서 Google 계정으로 로그인), nlm notebook create "현장 리스크 기준" --json으로 노트북 만들기, nlm source add (노트북 ID) --file materials/factory-criteria-v1.txt --wait로 기준 원문 올리기 순서입니다. 나온 노트북 ID와 소스 ID는 설정 파일의 NOTEBOOKLM_NOTEBOOK_ID와 NOTEBOOKLM_SOURCE_IDS에 넣습니다. AI가 이 준비를 맡으면 uv 설치, uv tool install, nlm login, nlm source add … --wait는 session-1.md의 "오래 걸리는 명령"대로 새 창에서 하나씩 실행합니다. nlm login이 연 Chrome 창은 AI 도구로 누를 수 없으니, 새 창을 띄운 뒤 그 Chrome 창에서 할 일을 사용자에게 한 줄로 알립니다. nlm은 파이썬 프로그램이라 AI가 실행할 때는 같은 명령 맨 앞에(새 창이면 Start-Process 앞에) `$env:PYTHONUTF8='1';`을 둡니다(출력의 ✓와 한글 때문에 오류가 나거나 글이 깨지지 않게). AI의 터미널에서 설치 직후 nlm을 찾지 못하면 경로 다시 읽기 줄을 붙이고, 그래도 찾지 못하면 `& "$env:USERPROFILE\.local\bin\nlm.exe"`처럼 전체 경로로 부릅니다.
 
-이 회차에 더하는 패키지는 @modelcontextprotocol/sdk입니다. 설치 명령은 npm.cmd install @modelcontextprotocol/sdk입니다. 설치하면 package-lock.json이 새로 생기거나 바뀝니다.
+이 회차에 더하는 패키지는 @modelcontextprotocol/sdk입니다. 설치 명령은 npm.cmd install @modelcontextprotocol/sdk이고, session-1.md의 "오래 걸리는 명령"대로 새 창에서 실행합니다. 설치하면 package-lock.json이 새로 생기거나 바뀝니다.
 
 ### 실행 파일과 연결
 
