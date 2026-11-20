@@ -44,7 +44,7 @@ Get-CimInstance Win32_Process -Filter "ProcessId=(프로세스 번호)" | Select
 Get-CimInstance Win32_Process -Filter "Name='node.exe'" | Where-Object { $_.CommandLine -like '* --watch *server/server.js*' } | Select-Object ProcessId, CommandLine
 ```
 
-**새 창에서 켜기.** 아래 명령으로 새 PowerShell 창을 열고 그 창에서 서버를 켭니다. 프로젝트 폴더가 `C:\vision-ai\vision-risk-dashboard`가 아니면 아래 명령의 경로를 프로젝트 폴더 경로로 바꿉니다. 서버가 꺼진 예전 서버 창이 남아 있으면 사용자에게 알리고, 닫아 달라고 하면 AI가 닫습니다. 명령 앞부분은 프로그램 찾는 경로(PATH)를 다시 읽는 줄입니다. AI 도구를 켠 뒤에 설치한 프로그램(1회차의 Node.js, 4회차의 nlm 등)도 서버 창에서 찾게 합니다.
+**새 창에서 켜기.** 아래 명령으로 새 PowerShell 창을 열고 그 창에서 서버를 켭니다. 프로젝트 폴더가 `C:\vision-ai\vision-risk-dashboard`가 아니면 아래 명령의 경로를 프로젝트 폴더 경로로 바꿉니다. 서버가 꺼진 예전 서버 창이 남아 있으면 사용자에게 알리고, 닫아 달라고 하면 AI가 닫습니다. 명령 앞부분은 PATH(프로그램 찾는 경로)를 다시 읽는 줄입니다. AI 도구를 켠 뒤에 설치한 프로그램(1회차의 Node.js, 4회차의 nlm(NotebookLM을 부르는 도구) 등)도 서버 창에서 찾게 합니다.
 
 ```powershell
 Start-Process powershell -ArgumentList '-NoExit','-Command','$env:Path = [Environment]::GetEnvironmentVariable(''Path'',''Machine'') + '';'' + [Environment]::GetEnvironmentVariable(''Path'',''User''); cd C:\vision-ai\vision-risk-dashboard; npm.cmd start'
@@ -65,7 +65,7 @@ Start-Process powershell -ArgumentList '-NoExit','-Command','$env:Path = [Enviro
 
 - 다시 켜기 전에 8765번 포트를 듣는 프로세스 번호를 봐 둡니다. 다시 켠 뒤 몇 초 기다렸다가 그 번호가 바뀌었는지 봅니다. 바뀌었으면 다시 켜진 것입니다. 포트가 비어 있으면 원인을 찾아 고친 뒤 위 순서로 다시 켜고, 원인을 찾지 못하면 서버 창의 빨간 줄을 복사해 붙여 넣어 달라고 합니다.
 - 포트를 듣는 서버는 있는데 "감시 확인"에 아무것도 나오지 않으면 `--watch` 없이 켠 예전 방식 서버라 알아서 다시 켜지지 않습니다. 이때는 "켜기 전 확인"대로 package.json을 고치고, 8765번 포트를 듣는 프로세스를 끝낸 뒤 포트가 빈 것을 확인하고 "새 창에서 켜기"로 켭니다.
-- 프로그램을 새로 설치한 뒤(4회차의 nlm 등) 서버가 그 프로그램을 써야 하면, 같은 창에서 다시 켜는 서버는 설치 전의 경로(PATH)를 그대로 써서 그 프로그램을 찾지 못합니다. 이때는 "끄기"대로 끈 뒤 "새 창에서 켜기"로 켭니다. 새 창 명령이 경로를 다시 읽습니다.
+- 프로그램을 새로 설치한 뒤(4회차의 nlm 등) 서버가 그 프로그램을 써야 하면, 같은 창에서 다시 켜는 서버는 설치 전의 PATH(경로)를 그대로 써서 그 프로그램을 찾지 못합니다. 이때는 "끄기"대로 끈 뒤 "새 창에서 켜기"로 켭니다. 새 창 명령이 경로를 다시 읽습니다.
 
 **끄기.** 서버 창을 닫거나 그 창에서 Ctrl+C를 누르면 꺼집니다. "일괄 작업을 끝내시겠습니까 (Y/N)?"가 나오면 `Y`를 칩니다. 사용자가 꺼 달라고 하면 AI가 "감시 확인"에 나온 --watch 프로세스와 8765번 포트를 듣는 프로세스를 끝냅니다.
 
@@ -150,7 +150,7 @@ if (Get-Process -Id (번호) -ErrorAction SilentlyContinue) { '실행 중' } els
 ### 시간 초과로 끊겼을 때
 
 - 30초에 끊긴 명령은 시간 초과 오류만 남고 출력은 오지 않습니다. 실패가 아니라 어디까지 됐는지 모르는 상태입니다.
-- 다시 실행하기 전에 그 명령의 결과가 이미 생겼는지 먼저 봅니다. 예: 만들어진 파일이나 폴더, 설치된 명령의 버전, Google 쪽 배포 목록, 시트의 끝 줄.
+- 다시 실행하기 전에 그 명령의 결과가 이미 생겼는지 먼저 봅니다. 예: 만들어진 파일이나 폴더, 설치된 명령의 버전, Apps Script 배포 목록, 시트의 끝 줄.
 - 결과가 생겼으면 다시 실행하지 않습니다. 생기지 않았으면 "새 창에서 실행하기"로 다시 실행합니다. 설치가 중간에 끊겼으면 새 창에서 같은 설치를 다시 실행합니다.
 - ego 브라우저에서 단추를 누르는 실행이 끊겼을 때도 같습니다. 같은 단추를 다시 누르기 전에 결과가 생겼는지 먼저 봅니다.
 
@@ -178,7 +178,7 @@ $env:Path = [Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [Env
 ```
 
 - 스크립트는 파일로 넘깁니다. `-e`로 인자에 넣거나 파이프(`|`)로 넘기지 않습니다. 먼저 `$env:TEMP`를 실행해 임시 폴더의 전체 경로를 보고, AI 도구의 파일 쓰기로 `(그 전체 경로)\ego-script.js`에 UTF-8로 저장합니다. 파일 쓰기에 `$env:TEMP`나 `%TEMP%`를 글자 그대로 쓰지 않습니다. 그 글자 이름의 폴더가 작업 폴더 안에 생깁니다.
-- 첫 실행은 아래처럼 작업 공간(TaskSpace)을 만들고 그 번호를 찍습니다. 다음 실행부터는 `taskSpace("(작업 이름)")` 대신 찍힌 번호로 `await taskSpace((번호))`를 씁니다. 다음 답에서 같은 일을 이어 갈 때는 사용법 안내의 "Starting and ending a reply"대로 그 번호로 잇습니다.
+- 첫 실행은 아래처럼 TaskSpace(작업 공간)를 만들고 그 번호를 찍습니다. 다음 실행부터는 `taskSpace("(작업 이름)")` 대신 찍힌 번호로 `await taskSpace((번호))`를 씁니다. 다음 답에서 같은 일을 이어 갈 때는 사용법 안내의 "Starting and ending a reply"대로 그 번호로 잇습니다.
 
 ```javascript
 const task = await taskSpace("(작업 이름)");
@@ -201,7 +201,7 @@ $env:Path = [Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [Env
 
 ### 사용자에게 넘기는 일
 
-- 사람이 해야 하는 순간의 예: 비밀번호와 본인 확인 같은 로그인 단계, 설치 승인 창(사용자 계정 컨트롤), Git 로그인 창이나 로그인 명령이 연 Chrome 창처럼 AI가 누를 수 없는 창.
+- 사람이 해야 하는 순간의 예: 비밀번호와 본인 확인 같은 로그인 단계, 사용자 계정 컨트롤(설치 승인 창), Git 로그인 창이나 로그인 명령이 연 Chrome 창처럼 AI가 누를 수 없는 창.
 - 로그인 명령의 출력("끝났는지 보기" 명령으로 본 글)에 로그인 주소가 나오면 그 주소를 ego 브라우저에서 열어 AI가 할 수 있는 데까지 합니다. 비밀번호, 본인 확인, AI가 누를 수 없는 창에서만 할 일을 알리고 답을 끝냅니다.
 - 그 순간을 만드는 명령은 "새 창에서 실행하기"로 띄우고, 브라우저 안의 일은 `task.handOff()`로 넘깁니다. 그다음 무엇을 하면 되는지 한 줄로 알리고 답을 끝냅니다. 한 명령 안에서 사람이 마치기를 기다리지 않습니다.
 - 사용자가 마쳤다고 하면 "끝났는지 보기"나 그 일의 확인 명령으로 보고 이어서 합니다.
