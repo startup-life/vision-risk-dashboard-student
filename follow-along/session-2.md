@@ -48,13 +48,13 @@ git clone https://github.com/startup-life/vision-risk-student-images.git
 ## 2-1. 지침 세팅
 
 ```text
-이번 회차 문서를 이 프로젝트로 가져오기 위해, 수업 저장소(class)를 다시 받아 class/milestone-1의 docs/guide와 AGENTS.md를 이 프로젝트의 지금 브랜치로 가져와 주세요.
-그다음 AGENTS.md를 작업 지침으로 삼아 주세요. 프롬프트에 없는 상세 구현(주소, 화면 문구, 파일 이름, 입력 검사)은 docs/guide의 회차 문서와 그 회차 완료 브랜치 코드(class/milestone-2)에서 확인합니다.
+이번 회차 문서를 이 프로젝트로 가져오기 위해, class(수업 저장소)를 다시 받아 class/milestone-1의 docs/guide와 AGENTS.md를 이 프로젝트의 지금 브랜치로 가져와 주세요.
+그다음 AGENTS.md를 작업 지침으로 삼아 주세요. 프롬프트에 없는 상세 구현(주소, 화면 문구, 파일 이름, 입력 검사)은 docs/guide의 회차 문서와 class/milestone-2(그 회차 완료 브랜치 코드)에서 확인합니다.
 지금은 AGENTS.md, docs/guide/session-1.md, docs/guide/session-2.md를 읽기만 하고, 읽은 파일 이름만 한 줄로 알려 주세요.
 ```
 - 하는 일: 수업 저장소 `milestone-1`에서 규칙 파일과 보충 문서를 프로젝트 폴더로 가져오고, AI가 1~2회차 문서를 읽어 둡니다. `docs\guide`에 2회차 보충 문서가 새로 생깁니다.
 - 목표: 2회차의 자세한 약속(주소, 화면 문구, 파일 이름, 입력 검사)은 2회차 보충 문서와 완료 브랜치 `milestone-2` 코드에 있으므로, 이 프롬프트를 다른 번호보다 먼저 보냅니다.
-- 완료 기준: 탐색기에서 `docs\guide` 폴더에 `session-2.md`가 있고, AI 답에 `AGENTS.md`, `session-1.md`, `session-2.md`가 나옵니다. 새 대화를 열 때마다 이 프롬프트를 먼저 보냅니다.
+- 완료 기준: 파일 탐색기(폴더와 파일을 보는 Windows 프로그램)에서 `docs\guide` 폴더에 `session-2.md`가 있고, AI 답에 `AGENTS.md`, `session-1.md`, `session-2.md`가 나옵니다. 새 대화를 열 때마다 이 프롬프트를 먼저 보냅니다.
 
 ![2-1 1회차와 2회차 보충 문서가 있는 폴더](images/session-2/04-6846840b-2-1-guides.png)
 
@@ -206,7 +206,7 @@ git clone https://github.com/startup-life/vision-risk-student-images.git
 ## 2-11. 사건 하나 더 등록하고 서버 다시 켜 보기
 
 1. 등록 화면에서 장소 칸에 "물류창고 A"를 넣고, 메모는 비운 채 PNG 두 장을 골라 "사건 등록"을 누릅니다.
-2. 서버 창을 닫고 AI에게 "서버를 켜 주세요."라고 보냅니다. AI가 새 서버 창에서 서버를 켜면 사건 목록을 새로고침합니다. 탐색기에서 프로젝트 폴더의 `runtime` 폴더도 열어 봅니다.
+2. 서버 창을 닫고 AI에게 "서버를 켜 주세요."라고 보냅니다. AI가 새 서버 창에서 서버를 켜면 사건 목록을 새로고침합니다. 파일 탐색기에서 프로젝트 폴더의 `runtime` 폴더도 열어 봅니다.
 
 - 하는 일: 메모 없이 사진 두 장으로 사건을 하나 더 등록하고, 서버를 다시 켠 뒤에도 사건과 `runtime` 폴더의 파일이 남아 있는지 봅니다.
 - 목표: 서버를 껐다 켜도 기록이 남는 것을 여기서 확인합니다. 2-12~2-14의 홈 화면은 이 두 사건(메모가 있는 사건, 사진이 두 장인 사건)으로 확인합니다.
