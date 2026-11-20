@@ -19,9 +19,10 @@
 - 명령 프롬프트에서는 안내한 명령을 그대로 칩니다. 예: `npm start`
 - PowerShell에서는 `npm`을 `npm.cmd`로 바꿔 칩니다. 예: `npm.cmd start`
 - PowerShell에서 `.cmd` 없이 쳤다가 "이 시스템에서 스크립트를 실행할 수 없으므로 … npm.ps1 파일을 로드할 수 없습니다" 오류가 나면 `npm.cmd`로 다시 칩니다.
-- 매번 바꿔 치기 번거로우면 PowerShell에서 아래 명령을 한 번만 실행합니다. 확인을 물으면 `Y`를 누르고, PowerShell 창을 닫았다가 새로 엽니다. 지금 로그인한 사용자 계정에만 적용되고, 그 뒤로는 `npm`을 그대로 쳐도 됩니다.
-  `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned`
+- 매번 바꿔 치기 번거로우면 PowerShell에서 아래 명령을 한 번만 실행하고, PowerShell 창을 닫았다가 새로 엽니다. 지금 로그인한 사용자 계정에만 적용되고, 그 뒤로는 `npm`을 그대로 쳐도 됩니다.
+  `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned -Force`
 - 학교·회사 PC에서 이 명령이 "더 구체적인 범위에서 정의된 정책" 같은 문구로 적용되지 않으면 관리자 정책 때문입니다. 그때는 계속 `npm.cmd`로 칩니다.
+- AI 도구가 이 문서의 명령을 실행할 때는 한 번에 한 명령씩 실행합니다. AI 도구에 따라 30초가 지난 명령을 강제로 끝내므로, 설치·내려받기(`git clone`, `npm.cmd ci` 등)·로그인처럼 오래 걸릴 수 있는 명령은 docs/guide/session-1.md의 "오래 걸리는 명령"대로 새 PowerShell 창에서 실행하고, 서버(`npm.cmd start`)도 새 PowerShell 창을 열어 그 창에서 켭니다. 기다리기는 한 번에 20초 이하로 나누고, 서버가 켜졌는지는 `Invoke-RestMethod -TimeoutSec 15 http://127.0.0.1:8765/api/health`로 봅니다.
 
 ## 1. 저장소 두 개 받기
 

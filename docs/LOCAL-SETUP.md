@@ -7,9 +7,10 @@
 - 명령 프롬프트에서는 안내한 명령을 그대로 칩니다. 예: `npm start`
 - PowerShell에서는 `npm`을 `npm.cmd`로 바꿔 칩니다. 예: `npm.cmd start`
 - PowerShell에서 `.cmd` 없이 쳤다가 "이 시스템에서 스크립트를 실행할 수 없으므로 … npm.ps1 파일을 로드할 수 없습니다" 오류가 나면 `npm.cmd`로 다시 칩니다.
-- 매번 바꿔 치기 번거로우면 PowerShell에서 아래 명령을 한 번만 실행합니다. 확인을 물으면 `Y`를 누르고, PowerShell 창을 닫았다가 새로 엽니다. 지금 로그인한 사용자 계정에만 적용되고, 그 뒤로는 `npm`을 그대로 쳐도 됩니다.
-  `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned`
+- 매번 바꿔 치기 번거로우면 PowerShell에서 아래 명령을 한 번만 실행하고, PowerShell 창을 닫았다가 새로 엽니다. 지금 로그인한 사용자 계정에만 적용되고, 그 뒤로는 `npm`을 그대로 쳐도 됩니다.
+  `Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy RemoteSigned -Force`
 - 학교·회사 PC에서 이 명령이 "더 구체적인 범위에서 정의된 정책" 같은 문구로 적용되지 않으면 관리자 정책 때문입니다. 그때는 계속 `npm.cmd`로 칩니다.
+- AI 도구가 이 문서의 명령을 실행할 때는 한 번에 한 명령씩 실행합니다. AI 도구에 따라 30초가 지난 명령을 강제로 끝내므로, 설치·내려받기(`git clone`, `npm.cmd ci` 등)·로그인처럼 오래 걸릴 수 있는 명령은 docs/guide/session-1.md의 "오래 걸리는 명령"대로 새 PowerShell 창에서 실행하고, 서버(`npm.cmd start`)도 새 PowerShell 창을 열어 그 창에서 켭니다. 기다리기는 한 번에 20초 이하로 나누고, 서버가 켜졌는지는 `Invoke-RestMethod -TimeoutSec 15 http://127.0.0.1:8765/api/health`로 봅니다.
 
 이 문서의 `npm` 명령은 위 안내대로 입력한다.
 
@@ -17,7 +18,7 @@
 
 단계마다 **할 곳**을 적었다.
 
-- **Antigravity(터미널)**: 저장소 폴더의 터미널에서 명령으로 끝난다. Antigravity 에이전트가 명령을 대신 실행해도 된다.
+- **AI 도구(터미널)**: 저장소 폴더의 터미널에서 명령으로 끝난다. AI 도구가 명령을 대신 실행해도 된다.
 - **웹(클릭)**: 브라우저에서 안내한 버튼을 누른다.
 
 단계 끝의 「확인:」 줄은 그 단계가 끝났을 때 보이는 것이다.
@@ -78,7 +79,7 @@
 ## 2. 연결 확인
 
 1. `npm start`로 서버를 띄운다.
-2. 브라우저에서 `http://127.0.0.1:8765/api/health`를 연다. `"status":"ok"`가 보이면 서버가 떠 있다.
+2. 브라우저에서 `http://127.0.0.1:8765/api/health`를 연다. AI 도구는 `Invoke-RestMethod -TimeoutSec 15 http://127.0.0.1:8765/api/health | ConvertTo-Json -Depth 5`로 본다. `"status":"ok"`가 보이면 서버가 떠 있다.
 3. 브라우저에서 `http://127.0.0.1:8765/api/records`를 연다. `"success":true`가 보이면 로컬 저장소를 읽은 것이다. 처음에는 `"records":[]`로 나온다.
 
 사건 기록은 `courses/vision-96h-v2/preview/_synthetic_store.json`에, 사진은 `courses/vision-96h-v2/preview/_synthetic_store_images/`에 한 장씩 저장되어 서버를 다시 시작해도 남는다.
@@ -98,7 +99,7 @@
 ### 단계 1. Git for Windows 설치 — 웹(클릭)
 
 1. [git-scm.com/download/win](https://git-scm.com/download/win)에서 설치 파일을 받아 실행한다. 설정은 기본값으로 둔다.
-2. 설치가 끝나면 Antigravity를 완전히 닫고 다시 연다. 열려 있던 터미널은 새로 설치한 `git`을 찾지 못한다.
+2. 설치가 끝나면 열어 둔 PowerShell 창을 닫고 새로 연다. 열려 있던 창은 새로 설치한 `git`을 찾지 못한다. AI 도구의 터미널이 `git`을 찾지 못하면 docs/guide/session-1.md "오래 걸리는 명령"의 경로 다시 읽기 줄을 붙여 실행한다.
 
 macOS는 Homebrew로 설치한다: `brew install git`.
 
@@ -108,7 +109,7 @@ git --version
 
 확인: `git version`으로 시작하는 줄이 나온다.
 
-### 단계 2. 받기(clone) — Antigravity(터미널)
+### 단계 2. 받기(clone) — AI 도구(터미널)
 
 대시보드 저장소(`vision-risk-dashboard-student`)와 같은 상위 폴더에 받는다. 그러면 설정 없이 기본 위치에서 찾는다. 아래는 `vision-risk-dashboard-student` 폴더의 터미널에서 실행한다. Windows와 macOS 명령이 같다.
 
@@ -121,7 +122,7 @@ cd vision-risk-dashboard-student
 - 주소는 위 https 주소를 그대로 쓴다. 대시보드는 origin이 이 저장소인지 확인하고, 다른 주소(fork 등)면 사진을 쓰지 않는다.
 - 폴더 이름은 `vision-risk-student-images` 그대로 둔다. 다른 위치나 이름으로 받았으면 1절 설정 파일의 `REPOSITORY_IMAGES_ROOT`에 그 절대 경로를 `C:/work/vision-risk-student-images`처럼 `/`로 적는다.
 
-### 단계 3. 사진 파일 확인 — Antigravity(터미널)
+### 단계 3. 사진 파일 확인 — AI 도구(터미널)
 
 ```powershell
 # Windows (PowerShell)
@@ -143,7 +144,7 @@ cd ../vision-risk-dashboard-student
 - 둘째 명령은 사진 수를 센다. `210`이어야 한다.
 - 탐색기에서 `vision-risk-student-images/assets/dataset/images`의 PNG 파일을 열어 그림이 보이면 된다.
 
-### 단계 4. 대시보드에서 확인 — Antigravity(터미널)
+### 단계 4. 대시보드에서 확인 — AI 도구(터미널)
 
 `npm.cmd start`로 서버를 띄운다. 서버 콘솔에 `[RepositoryImages`로 시작하는 경고가 없고, 홈과 사건 등록 화면에 저장소 사진이 보이면 된다.
 경고가 있으면 `불러오지 못했습니다:` 뒤의 원인을 본다.
@@ -151,7 +152,7 @@ cd ../vision-risk-dashboard-student
 | 원인 | 할 일 |
 | --- | --- |
 | 경로 없음 | 단계 2의 위치에 받았는지, `REPOSITORY_IMAGES_ROOT` 경로가 맞는지 본다 |
-| git 미설치 | 단계 1을 하고 Antigravity를 다시 연다 |
+| git 미설치 | 단계 1을 하고 서버를 끈 뒤 새 PowerShell 창에서 다시 켠다. AI 도구가 켤 때는 새 창 명령 앞에 경로 다시 읽기 줄을 넣는다(docs/guide/session-1.md "서버 켜기"의 새 창 명령과 같은 꼴) |
 | git 저장소가 아님 | ZIP으로 받은 폴더다. 지우고 단계 2로 다시 받는다 |
 | origin 원격 없음, origin이 … 아님 | 단계 2의 https 주소로 다시 받는다 |
 | origin/main 없음(git fetch 필요) | `vision-risk-student-images` 폴더에서 `git fetch origin`을 실행한다 |
