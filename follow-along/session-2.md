@@ -25,14 +25,14 @@
 준비물: AI 도구에서 연 프로젝트 폴더, 서버 창(AI가 열어 서버를 켠 PowerShell 창), ego (lite) 브라우저, 프로젝트 폴더 옆에 받은 사진 저장소(`C:\vision-ai\vision-risk-student-images`, 아래 2에서 받습니다).
 
 1. 서버 켜 보기: 서버 창(서버가 켜진 창)이 있으면 ego (lite) 브라우저에서 http://127.0.0.1:8765 를 엽니다. 서버 창이 없으면 아래 2-1을 먼저 보내고, 답이 오면 AI에게 "서버를 켜 주세요."라고 보낸 뒤 같은 주소를 엽니다. 이때는 아래 2~3을 마친 뒤 2-2부터 이어 갑니다. 1회차 홈과 "확인 기준 보기" 단추가 보이면 됩니다.
-2. 사진 저장소 받기: 사진 저장소는 강사가 공개한 연습용 현장 사진 모음입니다. 웹 서비스는 프로젝트 폴더 옆에 git으로 받은 `vision-risk-student-images` 폴더에서 사진을 읽으므로, ZIP으로 받거나 폴더 이름을 바꾸면 사진을 읽지 못합니다. `C:\vision-ai` 안에 이 폴더가 이미 있으면 건너뜁니다. 없으면 시작 메뉴에서 PowerShell 창을 새로 열고 아래 두 줄을 한 줄씩 칩니다.
+2. 사진 저장소 받기(AI에게 맡겨도 됩니다): 사진 저장소는 강사가 공개한 연습용 현장 사진 모음입니다. 웹 서비스는 프로젝트 폴더 옆에 git으로 받은 `vision-risk-student-images` 폴더에서 사진을 읽으므로, ZIP으로 받거나 폴더 이름을 바꾸면 사진을 읽지 못합니다. `C:\vision-ai` 안에 이 폴더가 이미 있으면 건너뜁니다. 없으면 시작 메뉴에서 PowerShell 창을 새로 열고 아래 두 줄을 한 줄씩 칩니다.
 
 ```powershell
 cd C:\vision-ai
 git clone https://github.com/startup-life/vision-risk-student-images.git
 ```
 
-3. 사진 수 확인: 시작 메뉴에서 연 PowerShell 창(2에서 연 창이 있으면 그 창)에서 아래 한 줄을 칩니다. `210`이 나와야 합니다.
+3. 사진 수 확인(AI에게 맡겨도 됩니다): 시작 메뉴에서 연 PowerShell 창(2에서 연 창이 있으면 그 창)에서 아래 한 줄을 칩니다. `210`이 나와야 합니다. 다른 숫자가 나오면 폴더를 지우고 다시 받은 뒤 셉니다. 그래도 다르면 AI에게 "C:\vision-ai\vision-risk-student-images\assets\dataset\images의 png 사진 수가 210이 아니에요. 원인을 찾고, 다시 받아야 하면 그 폴더를 지운 뒤 C:\vision-ai에서 git clone https://github.com/startup-life/vision-risk-student-images.git 으로 다시 받아 주세요."라고 보냅니다.
 
 ```powershell
 (Get-ChildItem C:\vision-ai\vision-risk-student-images\assets\dataset\images -Filter *.png).Count
