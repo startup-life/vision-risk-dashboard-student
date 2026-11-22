@@ -22,7 +22,7 @@
 
 서버는 프롬프트나 사용자가 켜 달라고 할 때 AI가 켭니다. 따로 부탁이 없으면 AI의 터미널이 아니라 새 PowerShell 창을 열어 그 창에서 켭니다. 이 새 창이 서버 창입니다. 사용자는 이 창에서 서버가 보여 주는 줄과 빨간 오류 줄을 봅니다. 사용자가 AI의 터미널에서 켜 달라고 하면, AI 도구에 따라 그 터미널은 30초가 지나면 서버를 끌 수 있다고 한 줄 알린 뒤 부탁대로 합니다. 2회차부터 회차를 시작할 때 사용자가 "서버를 켜 주세요."라고 보내면 같은 순서로 켭니다.
 
-서버는 node --watch로 켭니다("웹 서비스와 폴더"의 package.json). server 폴더의 파일이 바뀌면 서버가 같은 창에서 알아서 다시 켜지므로, 다시 켤 때는 따로 부탁이 없으면 서버를 끄거나 새 창을 열지 않고 서버 창은 하나만 둡니다.
+서버는 node --watch로 켭니다("웹 서비스와 폴더"의 package.json). server 폴더의 파일이 바뀌면 서버가 같은 창에서 알아서 다시 켜지므로, 다시 켤 때는 따로 부탁이 없으면 서버를 끄거나 새 창을 열지 않고 서버 창은 하나만 둡니다. 이 절의 명령은 프로젝트 폴더에서 실행합니다. AI가 명령을 실행하는 터미널의 현재 폴더가 프로젝트 폴더가 아니면 같은 명령 앞에 `cd '(프로젝트 폴더 전체 경로)';`를 둡니다.
 
 **켜기 전 확인.** 먼저 package.json의 start가 "웹 서비스와 폴더"의 값(`node --watch server/server.js`)인지 봅니다. 다르면 그 값으로 고치고 고쳤다고 한 줄로 알려 줍니다. 사용자가 바꾼 값을 쓰겠다고 하면 그 값으로 둡니다. 그다음 8765번 포트를 듣는 프로세스가 있는지 봅니다.
 
@@ -31,8 +31,8 @@ $p = Get-NetTCPConnection -LocalPort 8765 -State Listen -ErrorAction SilentlyCon
 ```
 
 - 프로세스 번호가 나오면 아래 명령으로 그 번호의 명령 줄을 봅니다. 명령 줄에 package.json의 start에 적힌 시작 파일(이 문서의 구조면 `server/server.js`)이 있으면 서버가 이미 켜져 있는 것입니다. 새로 켜지 않고 "이미 켜져 있습니다"라고 알립니다. 이때 "감시 확인"에 아무것도 나오지 않으면 `--watch` 없이 켠 예전 방식 서버이니 "다시 켤 때"의 마지막 항목대로 합니다.
-- 그 시작 파일이 없으면 다른 프로그램이 8765번 포트를 쓰고 있는 것입니다. 서버를 켜지 않고, 어떤 프로그램이 8765번 포트를 쓰고 있는지 사용자에게 알립니다. 사용자가 그 프로그램을 꺼 달라고 하면 끄고, 포트가 빈 것을 확인한 뒤 "새 창에서 켜기"로 켭니다.
-- "듣는 프로세스 없음"이 나오면 "감시 확인"을 합니다. 줄이 나오면 서버 창이 열려 있고, 서버가 오류로 멈춘 채 파일이 바뀌기를 기다리는 중입니다. 따로 부탁이 없으면 새 창을 열지 않고 이 창을 씁니다. 서버 코드와 설정 파일을 읽어 원인을 찾아 고친 뒤 "다시 켤 때"대로 같은 창에서 다시 켭니다. 고칠 곳을 찾지 못하면 "다시 켤 때"대로 한 번 다시 켜 보고, 그래도 포트가 비어 있으면 서버 창의 빨간 줄을 복사해 붙여 넣어 달라고 합니다. 감시 확인에도 아무것도 나오지 않으면 아래 "새 창에서 켜기"로 켭니다.
+- 그 시작 파일이 없으면 다른 프로그램이 8765번 포트를 쓰고 있는 것입니다. 서버를 켜지 않고, 어떤 프로그램이 8765번 포트를 쓰고 있는지 사용자에게 알리고 그 프로그램을 끌지 물어봅니다. 사용자가 끄라고 하면(그 프로그램을 끄라고 이미 말했으면 묻지 않고) 끄고, 포트가 빈 것을 확인한 뒤 "감시 확인"에 줄이 나오면 "다시 켤 때"대로 같은 창에서, 나오지 않으면 "새 창에서 켜기"로 켭니다.
+- "듣는 프로세스 없음"이 나오면 "감시 확인"을 합니다. 줄이 나오면 서버 창이 열려 있고, 서버가 오류로 멈춘 채 파일이 바뀌기를 기다리는 중입니다. 따로 부탁이 없으면 새 창을 열지 않고 이 창을 씁니다. 먼저 아래 "오류 보기"대로 AI가 오류를 찾고, 서버 코드와 설정 파일을 읽어 원인을 고친 뒤 "다시 켤 때"대로 같은 창에서 다시 켭니다. 오류 보기로도 원인이 보이지 않을 때만 서버 창의 빨간 줄을 복사해 붙여 넣어 달라고 합니다. 감시 확인에도 아무것도 나오지 않으면 아래 "새 창에서 켜기"로 켭니다.
 
 ```powershell
 Get-CimInstance Win32_Process -Filter "ProcessId=(프로세스 번호)" | Select-Object -ExpandProperty CommandLine
@@ -44,30 +44,40 @@ Get-CimInstance Win32_Process -Filter "ProcessId=(프로세스 번호)" | Select
 Get-CimInstance Win32_Process -Filter "Name='node.exe'" | Where-Object { $_.CommandLine -like '* --watch *server/server.js*' } | Select-Object ProcessId, CommandLine
 ```
 
-**새 창에서 켜기.** 아래 명령으로 새 PowerShell 창을 열고 그 창에서 서버를 켭니다. 프로젝트 폴더가 `C:\vision-ai\vision-risk-dashboard`가 아니면 아래 명령의 경로를 프로젝트 폴더 경로로 바꿉니다. 서버가 꺼진 예전 서버 창이 남아 있으면 사용자에게 알리고, 닫아 달라고 하면 AI가 닫습니다. 명령 앞부분은 PATH(프로그램 찾는 경로)를 다시 읽는 줄입니다. AI 도구를 켠 뒤에 설치한 프로그램(1회차의 Node.js, 4회차의 nlm(NotebookLM을 부르는 도구) 등)도 서버 창에서 찾게 합니다.
+**새 창에서 켜기.** 아래 명령으로 새 PowerShell 창을 열고 그 창에서 서버를 켭니다. 새 창은 이 명령을 실행한 폴더(프로젝트 폴더)에서 시작합니다. 새 창을 열기 전에 아래 "끄기"의 명령으로 서버가 꺼진 예전 서버 창이 남아 있는지 보고, 나온 번호마다 `taskkill /PID (번호) /T /F`로 닫은 뒤 새 창을 엽니다(사용자가 닫아도 됩니다). 아래 새 창 명령의 앞부분은 PATH(프로그램 찾는 경로)를 다시 읽는 줄입니다. AI 도구를 켠 뒤에 설치한 프로그램(1회차의 Node.js, 4회차의 nlm(NotebookLM을 부르는 도구) 등)도 서버 창에서 찾게 합니다.
 
 ```powershell
-Start-Process powershell -ArgumentList '-NoExit','-Command','$env:Path = [Environment]::GetEnvironmentVariable(''Path'',''Machine'') + '';'' + [Environment]::GetEnvironmentVariable(''Path'',''User''); cd C:\vision-ai\vision-risk-dashboard; npm.cmd start'
+Start-Process powershell -WorkingDirectory (Get-Location).Path -ArgumentList '-NoExit','-Command','$env:Path = [Environment]::GetEnvironmentVariable(''Path'',''Machine'') + '';'' + [Environment]::GetEnvironmentVariable(''Path'',''User''); npm.cmd start'
 ```
 
 - 몇 초 뒤 "켜기 전 확인"의 포트 명령으로 8765번 포트를 듣는 프로세스가 생겼는지 봅니다.
 - 생겼으면 새 PowerShell 창에서 서버를 켰다고 알리고 주소 http://127.0.0.1:8765 를 알려 줍니다. 사용자가 화면을 열어 달라고 하면 AI가 ego (lite) 브라우저로 엽니다.
-- 생기지 않았으면 "감시 확인"을 합니다. 줄이 나오면 새 창을 더 열지 않고 원인을 찾아 고친 뒤 "다시 켤 때"대로 같은 창에서 다시 켭니다. 줄이 나오지 않으면(경로가 틀려 서버 창에서 npm.cmd start가 시작되지 않은 경우 등) 원인을 고친 뒤 "새 창에서 켜기"로 다시 켭니다. 원인을 찾지 못하면 서버 창에 나온 빨간 줄을 복사해 붙여 넣어 달라고 합니다.
+- 생기지 않았으면 "감시 확인"을 합니다. 줄이 나오면 새 창을 더 열지 않고 아래 "오류 보기"대로 원인을 찾아 고친 뒤 "다시 켤 때"대로 같은 창에서 다시 켭니다. 줄이 나오지 않으면(서버 창에서 npm.cmd start가 시작되지 않은 경우 등) 원인을 고친 뒤 "새 창에서 켜기"로 다시 켭니다. 원인을 찾지 못하면 먼저 "오류 보기"를 하고, 거기서도 원인이 보이지 않을 때만 서버 창에 나온 빨간 줄을 복사해 붙여 넣어 달라고 합니다.
 
 **다시 켤 때.** 따로 부탁이 없으면 서버를 끄거나 새 창을 열지 않고 같은 창에서 다시 켭니다. 사용자가 끄고 새 창에서 켜 달라고 하면 "끄기"대로 끈 뒤 "새 창에서 켜기"로 켭니다.
 
 - server 폴더의 .js 파일을 고쳤으면 서버가 같은 창에서 알아서 다시 켜집니다. 서버 창에 `Restarting`으로 시작하는 줄과 시작 줄이 다시 나옵니다. 화면 파일(public 폴더)만 고쳤으면 서버는 그대로이고, 서버가 캐시를 끄므로 ego (lite) 브라우저에서 새로고침(F5)만 하면 바뀐 화면이 보입니다.
-- server 폴더 밖의 파일(package.json, .env, 설정 파일)을 고쳤거나 파일을 고치지 않고 다시 켜야 하면(사용자가 다시 켜 달라고 할 때 등) 시작 파일의 수정 시각만 바꿉니다. 서버가 파일이 바뀐 것으로 보고 같은 창에서 다시 켜집니다. 프로젝트 폴더가 다르면 경로를 바꿉니다.
+- server 폴더 밖의 파일(package.json, .env, 설정 파일)을 고쳤거나 파일을 고치지 않고 다시 켜야 하면(사용자가 다시 켜 달라고 할 때 등) 시작 파일의 수정 시각만 바꿉니다. 서버가 파일이 바뀐 것으로 보고 같은 창에서 다시 켜집니다.
 
 ```powershell
-(Get-Item -LiteralPath 'C:\vision-ai\vision-risk-dashboard\server\server.js').LastWriteTime = Get-Date
+(Get-Item -LiteralPath 'server\server.js').LastWriteTime = Get-Date
 ```
 
-- 다시 켜기 전에 8765번 포트를 듣는 프로세스 번호를 봐 둡니다. 다시 켠 뒤 몇 초 기다렸다가 그 번호가 바뀌었는지 봅니다. 바뀌었으면 다시 켜진 것입니다. 포트가 비어 있으면 원인을 찾아 고친 뒤 위 순서로 다시 켜고, 원인을 찾지 못하면 서버 창의 빨간 줄을 복사해 붙여 넣어 달라고 합니다.
+- 다시 켜기 전에 8765번 포트를 듣는 프로세스 번호를 봐 둡니다. 다시 켠 뒤 몇 초 기다렸다가 그 번호가 바뀌었는지 봅니다. 바뀌었으면 다시 켜진 것입니다. 포트가 비어 있으면 아래 "오류 보기"대로 원인을 찾아 고친 뒤 위 순서로 다시 켜고, 오류 보기로도 원인이 보이지 않을 때만 서버 창의 빨간 줄을 복사해 붙여 넣어 달라고 합니다.
 - 포트를 듣는 서버는 있는데 "감시 확인"에 아무것도 나오지 않으면 `--watch` 없이 켠 예전 방식 서버라 알아서 다시 켜지지 않습니다. 이때는 "켜기 전 확인"대로 package.json을 고치고, 8765번 포트를 듣는 프로세스를 끝낸 뒤 포트가 빈 것을 확인하고 "새 창에서 켜기"로 켭니다.
 - 프로그램을 새로 설치한 뒤(4회차의 nlm 등) 서버가 그 프로그램을 써야 하면, 같은 창에서 다시 켜는 서버는 설치 전의 PATH(경로)를 그대로 써서 그 프로그램을 찾지 못합니다. 이때는 "끄기"대로 끈 뒤 "새 창에서 켜기"로 켭니다. 새 창 명령이 경로를 다시 읽습니다.
 
-**끄기.** 서버 창을 닫거나 그 창에서 Ctrl+C를 누르면 꺼집니다. "일괄 작업을 끝내시겠습니까 (Y/N)?"가 나오면 `Y`를 칩니다. 사용자가 꺼 달라고 하면 AI가 "감시 확인"에 나온 --watch 프로세스와 8765번 포트를 듣는 프로세스를 끝냅니다.
+**오류 보기.** AI는 서버 창의 글을 직접 볼 수 없으므로, 서버가 켜지지 않아 8765번 포트가 비어 있을 때의 오류는 AI가 먼저 찾습니다. 8765번 포트를 듣는 서버가 있을 때는 이 명령을 쓰지 않습니다(새로 켠 서버가 포트를 얻지 못해 멈추므로 원인과 다른 오류가 나옵니다). AI가 명령을 실행하는 터미널에서 아래 명령으로 시작 파일을 직접 켜 봅니다. 시작 파일이 `server/server.js`가 아니면 package.json의 start에 적힌 시작 파일로 바꿉니다. 이 명령은 15초 뒤 저절로 끝납니다. 서버가 쓴 글은 임시 폴더의 두 파일에 받아 명령 결과 끝에 40줄씩 보여 주므로, 서버가 시작하다 오류로 멈추면 그 오류 글로 원인을 찾아 고칩니다. 15초 동안 멈추지 않았으면 명령이 그 서버를 끄고 끝나며, 시작 파일에는 켤 때의 오류가 없는 것입니다. 이때는 "감시 확인"에 줄이 나오면 "다시 켤 때"대로, 나오지 않으면 "새 창에서 켜기"로 다시 켭니다. 그래도 포트가 비어 있으면 서버 창의 빨간 줄을 복사해 붙여 넣어 달라고 합니다.
+
+```powershell
+$env:Path = [Environment]::GetEnvironmentVariable('Path','Machine') + ';' + [Environment]::GetEnvironmentVariable('Path','User'); $o = "$env:TEMP\ai-server-check.log"; $e = "$env:TEMP\ai-server-check-err.log"; $p = Start-Process node -WorkingDirectory (Get-Location).Path -ArgumentList 'server/server.js' -NoNewWindow -PassThru -RedirectStandardOutput $o -RedirectStandardError $e; Start-Sleep -Seconds 15; if ($p.HasExited) { '서버가 15초 안에 멈췄습니다' } else { taskkill /PID $p.Id /T /F | Out-Null; '서버가 15초 동안 켜져 있어 껐습니다' }; Get-Content -Encoding UTF8 -Tail 40 $o, $e
+```
+
+**끄기.** 서버 창을 닫거나 그 창에서 Ctrl+C를 누르면 꺼집니다. "일괄 작업을 끝내시겠습니까 (Y/N)?"가 나오면 `Y`를 칩니다. AI가 끌 때는(사용자가 꺼 달라고 할 때 등) 아래 명령으로 명령 줄에 `npm.cmd start`가 든 powershell.exe(서버 창)를 찾아, 나온 번호마다 `taskkill /PID (번호) /T /F`로 끕니다. 창과 그 안의 프로세스가 함께 꺼집니다. 그다음 "켜기 전 확인"의 포트 명령과 "감시 확인"이 모두 빈 것을 봅니다. 남은 것이 있으면 `Get-CimInstance Win32_Process -Filter "ProcessId=(번호)" | Select-Object -ExpandProperty CommandLine`으로 명령 줄을 보고, 이 웹 서비스의 서버(명령 줄에 server/server.js가 든 node)면 `Stop-Process -Id (번호)`로 끄고, 다른 프로그램이면 끄기 전에 사용자에게 묻습니다.
+
+```powershell
+$w = Get-CimInstance Win32_Process -Filter "Name='powershell.exe'" | Where-Object { $_.ProcessId -ne $PID -and $_.CommandLine -like '*npm.cmd start*' } | Select-Object ProcessId, CommandLine; if ($w) { $w } else { '서버 창 없음' }
+```
 
 ## 오래 걸리는 명령
 
