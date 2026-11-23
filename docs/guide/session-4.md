@@ -4,6 +4,12 @@
 
 이 문서는 회차 전체를 한꺼번에 설명합니다. 프롬프트가 요청한 부분을 만들고, 나머지는 그 프롬프트가 오거나 사용자가 부탁할 때 만듭니다. 프롬프트가 절 이름을 말하면 그 절을 만듭니다.
 
+## 따라하기 단계와 도구 전환
+
+단계 번호는 [4회차 따라하기 교재](https://github.com/startup-life/vision-risk-dashboard-student/blob/main/follow-along/session-4.md)를 기준으로 합니다. 4-1~4-22는 Cline Desktop에서 진행하고, 4-23~4-24는 Antigravity에서 NotebookLM 로그인과 기준 원문 준비를 하고, 4-25~4-28은 다시 Cline Desktop에서 같은 프로젝트 폴더를 사용합니다.
+
+4-23과 4-25의 프롬프트에서 `---` 아래 두 줄은 앞 도구에서 마친 일과 현재 교재 위치입니다. 해당 파일과 설정을 이어 쓰고 구분선 위의 요청을 진행합니다. 4-25에서는 설정 파일의 NOTEBOOKLM_MODE, NOTEBOOKLM_NOTEBOOK_ID, NOTEBOOKLM_SOURCE_IDS를 지금 값 그대로 씁니다.
+
 ## NotebookLM 설정 키와 스위치
 
 설정 파일에 키 네 개를 더합니다.
@@ -317,9 +323,26 @@ review_summary에는 evidence(가장 최근 결과의 standard_id, source_id, qu
 
 ## 실제 NotebookLM(live) 연결
 
-notebooklm-mcp-cli 0.15.6(NotebookLM 도구)을 씁니다. 준비는 uv(Python 도구 관리자) 설치, uv tool install notebooklm-mcp-cli==0.15.6, nlm login --storage protected(뜨는 Chrome 창에서 Google 계정으로 로그인), nlm notebook create "현장 리스크 기준" --json으로 노트북 만들기, nlm source add (노트북 ID) --file materials/factory-criteria-v1.txt --wait로 기준 원문 올리기 순서입니다. 나온 노트북 ID와 소스 ID는 설정 파일의 NOTEBOOKLM_NOTEBOOK_ID와 NOTEBOOKLM_SOURCE_IDS에 넣습니다. AI가 이 준비를 맡으면 uv 설치, uv tool install, nlm login, nlm source add … --wait는 session-1.md의 "오래 걸리는 명령"대로 새 창에서 하나씩 실행합니다. nlm login이 연 Chrome 창은 AI 도구로 누를 수 없으니, 새 창을 띄운 뒤 그 Chrome 창에서 할 일을 사용자에게 한 줄로 알립니다. nlm(NotebookLM을 부르는 도구)은 파이썬 프로그램이라 AI가 실행할 때는 같은 명령 맨 앞에(새 창이면 Start-Process 앞에) `$env:PYTHONUTF8='1';`을 둡니다(출력의 ✓와 한글 때문에 오류가 나거나 글이 깨지지 않게). AI의 터미널에서 nlm을 부르는 명령에는 경로 다시 읽기 줄을 붙이고, 그래도 찾지 못하면 `& "$env:USERPROFILE\.local\bin\nlm.exe"`처럼 전체 경로로 부릅니다.
+notebooklm-mcp-cli 0.15.6(NotebookLM 도구)을 씁니다. 준비는 아래 "nlm 설치와 로그인"과 "노트북 만들기" 두 절의 순서입니다. 나온 노트북 ID와 소스 ID는 설정 파일의 NOTEBOOKLM_NOTEBOOK_ID와 NOTEBOOKLM_SOURCE_IDS에 넣습니다.
 
 이 회차에 더하는 패키지는 @modelcontextprotocol/sdk입니다. 설치 명령은 npm.cmd install @modelcontextprotocol/sdk이고, session-1.md의 "오래 걸리는 명령"대로 새 창에서 실행합니다. 설치하면 package-lock.json이 새로 생기거나 바뀝니다.
+
+### nlm 설치와 로그인
+
+nlm(NotebookLM을 부르는 도구)은 파이썬 프로그램이라 AI가 실행할 때는 같은 명령 맨 앞에(새 창이면 Start-Process 앞에) `$env:PYTHONUTF8='1';`을 둡니다(출력의 ✓와 한글 때문에 오류가 나거나 글이 깨지지 않게). AI의 터미널에서 nlm을 부르는 명령에는 경로 다시 읽기 줄을 붙이고, 그래도 찾지 못하면 `uv tool update-shell`을 실행한 뒤 경로 다시 읽기 줄을 붙여 다시 부릅니다. 그래도 찾지 못하면 `& "$env:USERPROFILE\.local\bin\nlm.exe"`처럼 전체 경로로 부릅니다.
+
+AI가 이 준비를 맡으면 아래 순서로 합니다. uv(Python 도구 관리자) 설치, uv tool install, nlm login은 session-1.md의 "오래 걸리는 명령"대로 새 창에서 하나씩 실행합니다.
+
+1. 설치: uv --version으로 uv가 있는지 보고, 없으면 powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"로 설치합니다. 그다음 uv tool install notebooklm-mcp-cli==0.15.6으로 설치하고 nlm --version에 0.15.6이 든 줄이 나오는지 봅니다. 이 수업은 0.15.6으로 확인했으므로 `Update available`이나 `uv tool upgrade` 안내가 나와도 판을 올리지 않습니다. 판을 올리면 명령의 출력과 웹 서비스의 NotebookLM 연결이 이 문서와 다르게 동작할 수 있습니다.
+2. 로그인 창 띄우기와 알리기: 먼저 nlm login --check를 보고, ✓ Authentication valid!가 나오면 로그인 창을 띄우지 않고 4로 갑니다. 그렇지 않으면 nlm login --storage protected를 실행합니다. 이 명령은 nlm 전용 Chrome 창을 띄우므로 ego (lite) 브라우저가 아닌 Chrome이 필요하고, 로그인은 창이 뜬 뒤 5분 안에 끝내야 합니다. nlm login이 연 Chrome 창은 AI 도구로 누를 수 없으니, 새 창을 띄운 뒤 그 Chrome 창에서 Google 계정으로 로그인해 달라고 사용자에게 한 줄로 알립니다. 키 저장소 오류와 함께 --storage file을 쓰라는 안내가 나오면 nlm login --storage file로 다시 띄웁니다. 5분이 지나 로그인 명령이 끝났으면 다시 띄웁니다. 앞서 --storage file로 로그인해 두어 `--storage only applies to new profiles` 오류가 나오면 --storage 없이 nlm login으로 다시 띄웁니다.
+3. 로그인 확인: 사용자가 마쳤다고 하면 nlm login --check가 ✓ Authentication valid!를 보이는지 봅니다.
+4. 서버 다시 켜기: 설치와 로그인을 마치면 session-1.md "다시 켤 때"의 마지막 항목대로 서버를 끄고 새 창에서 켭니다. 새 창의 서버가 경로를 새로 읽어 방금 설치한 nlm을 찾게 하려는 것입니다.
+
+### 노트북 만들기
+
+nlm을 부르는 방법은 위 "nlm 설치와 로그인"과 같습니다. 프롬프트가 같은 이름 노트북이 이미 있으면 새로 만들지 말라고 하면, 먼저 nlm notebook list --json으로 "현장 리스크 기준" 노트북이 있는지 보고(이 목록에서는 노트북 ID 이름이 notebook_id가 아니라 id이고, source_count가 소스 수입니다) 있으면 만들지 않고 사용자에게 알립니다.
+
+nlm notebook create "현장 리스크 기준" --json으로 노트북을 만듭니다. 출력의 notebook_id가 노트북 ID입니다. 그다음 nlm source add (노트북 ID) --file materials/factory-criteria-v1.txt --wait로 기준 원문을 올립니다(session-1.md의 "오래 걸리는 명령"대로 새 창에서). 다 올라가면 `✓ Added source: factory-criteria-v1.txt (ready)`처럼 끝에 (ready)가 붙은 줄과 `Source ID:` 줄이 나옵니다. 소스 ID는 `Source ID:` 줄이나 nlm source list (노트북 ID)의 출력에서 봅니다. 노트북 ID와 소스 ID는 설정 파일의 NOTEBOOKLM_NOTEBOOK_ID와 NOTEBOOKLM_SOURCE_IDS에 넣고, 키가 없으면 줄을 더합니다. NOTEBOOKLM_MODE는 바꾸지 않습니다.
 
 ### 실행 파일과 연결
 
