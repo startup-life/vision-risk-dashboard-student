@@ -334,9 +334,18 @@ nlm(NotebookLM을 부르는 도구)은 파이썬 프로그램이라 AI가 실행
 AI가 이 준비를 맡으면 아래 순서로 합니다. uv(Python 도구 관리자) 설치, uv tool install, nlm login은 session-1.md의 "오래 걸리는 명령"대로 새 창에서 하나씩 실행합니다.
 
 1. 설치: uv --version으로 uv가 있는지 보고, 없으면 powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"로 설치합니다. 그다음 uv tool install notebooklm-mcp-cli==0.15.6으로 설치하고 nlm --version에 0.15.6이 든 줄이 나오는지 봅니다. 이 수업은 0.15.6으로 확인했으므로 `Update available`이나 `uv tool upgrade` 안내가 나와도 판을 올리지 않습니다. 판을 올리면 명령의 출력과 웹 서비스의 NotebookLM 연결이 이 문서와 다르게 동작할 수 있습니다.
-2. 로그인 창 띄우기와 알리기: 먼저 nlm login --check를 보고, ✓ Authentication valid!가 나오면 로그인 창을 띄우지 않고 4로 갑니다. 그렇지 않으면 nlm login --storage protected를 실행합니다. 이 명령은 nlm 전용 Chrome 창을 띄우므로 ego (lite) 브라우저가 아닌 Chrome이 필요하고, 로그인은 창이 뜬 뒤 5분 안에 끝내야 합니다. nlm login이 연 Chrome 창은 AI 도구로 누를 수 없으니, 새 창을 띄운 뒤 그 Chrome 창에서 Google 계정으로 로그인해 달라고 사용자에게 한 줄로 알립니다. 키 저장소 오류와 함께 --storage file을 쓰라는 안내가 나오면 nlm login --storage file로 다시 띄웁니다. 5분이 지나 로그인 명령이 끝났으면 다시 띄웁니다. 앞서 --storage file로 로그인해 두어 `--storage only applies to new profiles` 오류가 나오면 --storage 없이 nlm login으로 다시 띄웁니다.
+2. 로그인 창 띄우기와 알리기: 먼저 nlm login --check를 보고, ✓ Authentication valid!가 나오면 로그인 창을 띄우지 않고 4로 갑니다. 그렇지 않으면 nlm login --storage protected를 실행합니다. 이 명령은 nlm 전용 Chrome 창을 띄우므로 ego (lite) 브라우저가 아닌 Chrome이 필요하고, 로그인은 창이 뜬 뒤 5분 안에 끝내야 합니다. nlm login이 연 Chrome 창은 AI 도구로 누를 수 없으니, 새 창을 띄운 뒤 그 Chrome 창에서 Google 계정으로 로그인해 달라고 사용자에게 한 줄로 알립니다. 키 저장소 오류와 함께 --storage file을 쓰라는 안내가 나오면 nlm login --storage file로 다시 띄웁니다. 5분이 지나 로그인 명령이 끝났으면 다시 띄웁니다. 앞서 --storage file로 로그인해 두어 `--storage only applies to new profiles` 오류가 나오면 --storage 없이 nlm login으로 다시 띄웁니다. 사용자가 창이 보이지 않는다고 했으면 이 항목의 다시 띄우기는 모두 새 창 명령 대신 session-1.md "새 창이 보이지 않을 때"대로 `.bat` 파일로 합니다.
 3. 로그인 확인: 사용자가 마쳤다고 하면 nlm login --check가 ✓ Authentication valid!를 보이는지 봅니다.
 4. 서버 다시 켜기: 설치와 로그인을 마치면 session-1.md "다시 켤 때"의 마지막 항목대로 서버를 끄고 새 창에서 켭니다. 새 창의 서버가 경로를 새로 읽어 방금 설치한 nlm을 찾게 하려는 것입니다.
+
+2의 로그인 창을 `.bat`으로 열 때는 아래 네 줄을 넣습니다. 셋째 줄의 `login` 뒤는 그때 띄우려던 명령과 같게 씁니다. `pause`를 두면 오류가 나도 창이 바로 닫히지 않습니다. Chrome 창이 뜨지 않거나 3의 확인이 통과하지 않으면 `.bat`이 연 창에 나온 글을 알려 달라고 합니다.
+
+```bat
+@echo off
+set PYTHONUTF8=1
+"%USERPROFILE%\.local\bin\nlm.exe" login --storage protected
+pause
+```
 
 ### 노트북 만들기
 
