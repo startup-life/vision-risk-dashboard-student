@@ -5,6 +5,12 @@ Apps Script 코드(Google에서 돌아가는 코드)는 내 컴퓨터 저장소�
 
 이 문서는 3회차 문서(이력, 사건 상태)와 4회차 문서(연동 상태 줄, 작업 대기열, 요청 알림 패널, 관련 기준 확인)를 이어 받습니다. 이 기능을 건드릴 때는 session-3.md와 session-4.md도 읽습니다.
 
+## 따라하기 단계와 도구 전환
+
+단계 번호는 [5회차 따라하기 교재](https://github.com/startup-life/vision-risk-dashboard-student/blob/main/follow-along/session-5.md)를 기준으로 합니다. 5-1~5-21은 Cline Desktop에서 진행하고, 5-22는 OnePort 키를 준비하고 ego (lite) 브라우저에서 Apps Script API를 켭니다. 5-23~5-30과 따라하기 교재 「참고」의 "Apps Script 코드 다시 올리기"는 Antigravity에서 같은 프로젝트 폴더를 사용합니다.
+
+5-23의 프롬프트에서 `---` 아래 두 줄은 앞 도구에서 마친 일과 현재 교재 위치입니다. 해당 파일과 설정을 이어 쓰고 구분선 위의 요청을 진행합니다. 5-23에서는 5-21까지 만든 gas 폴더의 Apps Script 코드와 package.json의 Apps Script 명령(npm.cmd run gas:로 시작하는 명령)을 이어 씁니다.
+
 ## 설정 스위치
 
 ### 설정 파일의 새 키와 스위치
@@ -386,7 +392,7 @@ Windows에서는 `spawnSync('start "" "' + url + '"', { shell: true })`처럼 �
 
 ### AI가 명령을 실행할 때
 
-AI가 gas:create, gas:push, gas:deploy, gas:redeploy, gas:init을 실행하면 답에 각 명령의 결과 줄을 알려 줍니다. gas:로 시작하는 명령은 clasp를 처음 내려받거나 Google에 요청하느라 30초를 넘길 수 있으니 session-1.md의 "오래 걸리는 명령"대로 새 창에서 한 번에 하나씩 실행하고, 결과 줄은 그 절의 "끝났는지 보기"로 읽습니다. gas:login은 로그인을 기다리는 명령이라 새 창에서 띄우고, 출력에 나온 로그인 주소를 ego (lite) 브라우저에서 열어 계정 고르기와 권한 허용까지 AI가 합니다. 비밀번호나 본인 확인이 나오면 할 일을 한 줄로 알리고, 사용자가 마쳤다고 하면 `AI-CMD-END:0` 줄로 봅니다. 그 줄이 아직 없으면 `if (Test-Path $env:USERPROFILE\.clasprc.json) { '저장 시각: ' + (Get-Item $env:USERPROFILE\.clasprc.json).LastWriteTime; '지금: ' + (Get-Date) } else { '로그인 정보 없음' }`으로 로그인 정보가 방금 저장됐는지 봅니다. gas:create나 gas:deploy가 시간 초과로 끊겼거나 `AI-CMD-END` 줄 없이 창이 닫혔으면, 다시 실행하면 프로젝트나 배포 주소가 하나 더 생길 수 있으니 먼저 .clasp.json과 설정 파일의 GAS_WEBAPP_URL, `npx.cmd --yes @google/clasp@3.4.1 list-deployments`의 출력을 보고 사용자에게 알립니다. gas:deploy는 새 웹앱 주소를 만듭니다. 이미 주소가 있으면 gas:redeploy로 같은 주소를 갱신합니다.
+AI가 gas:create, gas:push, gas:deploy, gas:redeploy, gas:init을 실행하면 답에 각 명령의 결과 줄을 알려 줍니다. gas:로 시작하는 명령은 clasp를 처음 내려받거나 Google에 요청하느라 30초를 넘길 수 있으니 session-1.md의 "오래 걸리는 명령"대로 새 창에서 한 번에 하나씩 실행하고, 결과 줄은 그 절의 "끝났는지 보기"로 읽습니다. gas:editor(clasp open-script)는 새 창처럼 출력을 파일로 받으면 브라우저를 열지 않고 `Open (주소) in your browser to continue.`만 보여 주므로, 그 주소를 ego (lite) 브라우저에서 열고 탭은 닫지 않고 둡니다. gas:login은 로그인을 기다리는 명령이라 새 창에서 띄우고, 출력에 나온 로그인 주소를 ego (lite) 브라우저에서 열어 계정 고르기와 권한 허용까지 AI가 합니다. 비밀번호나 본인 확인이 나오면 할 일을 한 줄로 알리고, 사용자가 마쳤다고 하면 `AI-CMD-END:0` 줄로 봅니다. 그 줄이 아직 없으면 `if (Test-Path $env:USERPROFILE\.clasprc.json) { '저장 시각: ' + (Get-Item $env:USERPROFILE\.clasprc.json).LastWriteTime; '지금: ' + (Get-Date) } else { '로그인 정보 없음' }`으로 로그인 정보가 방금 저장됐는지 봅니다. gas:create나 gas:deploy가 시간 초과로 끊겼거나 `AI-CMD-END` 줄 없이 창이 닫혔으면, 다시 실행하면 프로젝트나 배포 주소가 하나 더 생길 수 있으니 먼저 .clasp.json과 설정 파일의 GAS_WEBAPP_URL, `npx.cmd --yes @google/clasp@3.4.1 list-deployments`의 출력을 보고 사용자에게 알립니다. gas:deploy는 새 웹앱 주소를 만듭니다. 이미 주소가 있으면 gas:redeploy로 같은 주소를 갱신합니다.
 
 ## 만들지 않는 것
 
