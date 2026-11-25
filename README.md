@@ -2,6 +2,8 @@
 
 ## 간소화한 따라하기
 
+[전체 회차 프롬프트 한 파일로 보기](follow-along/promp.md)
+
 새 교재는 빈 폴더에서 AI와 함께 직접 만듭니다. 1회차부터 같은 폴더에서 순서대로 진행합니다. 수업 자료인 `materials`를 사용하며 `docs/guide`나 완료 브랜치 코드는 필요하지 않습니다.
 
 [1회차](follow-along/session-1.md) · [2회차](follow-along/session-2.md) · [3회차](follow-along/session-3.md) · [4회차](follow-along/session-4.md) · [5회차](follow-along/session-5.md) · [6회차](follow-along/session-6.md)
