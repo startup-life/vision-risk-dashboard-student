@@ -1,5 +1,13 @@
 # 비전 리스크 대시보드
 
+## 간소화한 따라하기
+
+새 교재는 빈 폴더에서 AI와 함께 직접 만듭니다. 1회차부터 같은 폴더에서 순서대로 진행합니다. 수업 자료인 `materials`를 사용하며 `docs/guide`나 완료 브랜치 코드는 필요하지 않습니다.
+
+[1회차](follow-along/session-1.md) · [2회차](follow-along/session-2.md) · [3회차](follow-along/session-3.md) · [4회차](follow-along/session-4.md) · [5회차](follow-along/session-5.md) · [6회차](follow-along/session-6.md)
+
+아래 내용은 이 저장소에 들어 있는 기존 완성 예제의 설치와 실행 안내입니다. 새 교재를 따라 만들 때는 완성 예제를 설치할 필요가 없습니다.
+
 가상 물류창고의 택배 발송·산업안전 상황을 사진으로 확인하고, 판단과 조치를 기록하는 현장 대시보드다.
 사진과 검사 기준을 살펴본 뒤 사람이 최종 판단을 남긴다.
 
