@@ -16,13 +16,14 @@
 빈 작업 폴더를 만들고 AI 도구에서 엽니다. 다음 프롬프트를 보냅니다.
 
 ```text
+웹사이트는 내가 보내는 프롬프트에 따라 만들어줘. 다른 저장소의 제작 가이드나 완성 코드는 읽지 말아줘.
 이 폴더에서 웹 서비스를 만들 수 있게 Node.js와 Git이 설치되어 있는지 확인해줘. 없으면 설치 방법을 알려줘. 설치나 로그인 중 내가 직접 해야 하는 일이 있으면 멈추고 알려줘.
 ```
 
 ### 수업 자료 받기
 
 ```text
-https://github.com/startup-life/vision-risk-dashboard-student 저장소에서 materials 폴더만 이 프로젝트에 가져와줘. 확인 기준과 로고를 수업에서 사용할 거야. 자료를 받지 못하면 이유를 알려줘.
+https://github.com/startup-life/vision-risk-dashboard-student 저장소의 materials에서 standards.json, factory-criteria-v1.txt, gemini-prompt.txt, factory-logo.png만 같은 경로로 가져와줘. 수업용 기준과 사진 판독에 쓸 자료야. 가져오지 못하면 이유를 알려줘.
 ```
 
 ### 화면 만들기
