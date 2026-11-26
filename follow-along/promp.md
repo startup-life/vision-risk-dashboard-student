@@ -79,7 +79,7 @@ materials/standards.json의 확인 기준을 확인 기준 화면에 표로 보�
 ### 연습 사진 사용하기
 
 ```text
-수업용 사진 저장소 https://github.com/startup-life/vision-risk-student-images 를 프로젝트 옆에 내려받고, 등록 화면에서 사진을 보고 선택할 수 있게 해줘. 내 컴퓨터의 사진을 직접 올리는 방법도 유지해줘. 사진 저장소를 받지 못하면 이유를 알려주고 직접 올리기는 계속 사용할 수 있게 해줘.
+수업용 사진 저장소 https://github.com/startup-life/vision-risk-student-images 의 사진을 ZIP으로 받아 이 프로젝트의 assets/vision-photos 폴더에 풀어줘. 등록 화면에서 사진을 보고 선택할 수 있게 해줘. 내 컴퓨터의 사진을 직접 올리는 방법도 유지해줘. 사진 저장소를 받지 못하면 이유를 알려주고 직접 올리기는 계속 사용할 수 있게 해줘.
 ```
 
 ### 직접 확인
